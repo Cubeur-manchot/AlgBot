@@ -13,10 +13,17 @@ bot.on("ready", function() {
 });
 
 bot.on("message", function (message) {
+	if (message.author.username === "AlgBot" &&
+		(message.content.includes("Impossible de") || message.content.includes("Option(s) non reconnue(s)"))) {
+		deleteMessageAfterSomeSeconds(message);
+	}
 	if (message.content.includes("!changeBotAvatar")) {
 		bot.user.setAvatar(message.content.split(" ")[1])
 			.then(() => message.channel.send("Avatar modifié"))
-			.catch((reason) => message.channel.send(":construction: Impossible de modifier l'avatar :construction: \n" + reason.toString()));
+			.catch((reason) => {
+				message.channel.send(":construction: Impossible de modifier l'avatar :construction: \n" + reason.toString());
+				deleteMessageAfterSomeSeconds(message);
+			});
 	} else if (message.content === "ping") {
 		message.channel.send("pong");
 	} else if (message.content.startsWith("$alg") || message.content.startsWith("$do")) {
@@ -25,11 +32,16 @@ bot.on("message", function (message) {
 			message.channel.send(moveSequence.join(" "), {files: [{attachment: imageUrl, name: "cubeImage.png"}]});
 		} else {
 			message.channel.send(":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n"));
+			deleteMessageAfterSomeSeconds(message);
 		}
 	}
 });
 
-bot.login("NzA1MDQ5NzMzMTI2OTQ2ODM2.XqmFKw.cCbU_YtxB4bF6fJXfGsqTS1ZskQ");
+bot.login("NzA1MDQ5NzMzMTI2OTQ2ODM2.XqrfAA.QDRho-SdLkHy8lsjIRMJgszw5Uo");
+
+function deleteMessageAfterSomeSeconds(message) {
+	setTimeout(() => message.delete(), 10000);
+}
 
 function getInfoFromCommand(command) {
 	let messageArray = command.split(" "),
