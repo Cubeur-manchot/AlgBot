@@ -80,6 +80,11 @@ function getInfoFromCommand(command) {
 			} else {
 				unrecognizedOptions.push(word);
 			}
+		} else if (word.includes("_")) { // alg insert (like PLL_F)
+			for (let move of getMoveSequenceFromAlgName(word)) {
+				moveSequence.push(move);
+				moveSequenceForImageUrl.push(move.replace("'", "%27"));
+			}
 		} else { // normal move
 			moveSequence.push(word);
 			moveSequenceForImageUrl.push(word.replace("'", "%27"));
@@ -104,4 +109,33 @@ function getInfoFromCommand(command) {
 			+ "&sch=" + colorScheme + "&stage=" + stage + "&" + caseOrAlg + "=" + moveSequenceForImageUrl.join("");
 	}
 	return {imageUrl: imageUrl, moveSequence: moveSequence, unrecognizedOptions: unrecognizedOptions};
+}
+
+function getMoveSequenceFromAlgName(algName) { // library of predefined alg sequences
+	let moveSequence;
+	switch(algName) {
+		case "PLL_Aa": moveSequence = "l' U R' D2 R U' R' D2 R2 x'"; break;
+		case "PLL_Ab": moveSequence = "l' R' D2 R U R' D2 R U' R x'"; break;
+		case "PLL_E" : moveSequence = "x' R U' R' D R U R' D' R U R' D R U' R' D' x"; break;
+		case "PLL_F" : moveSequence = "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R"; break;
+		case "PLL_Ga" : moveSequence = "R2 u R' U R' U' R u' R2' F' U F"; break;
+		case "PLL_Gb" : moveSequence = "F' U' F R2 u R' U R U' R u' R2'"; break;
+		case "PLL_Gc" : moveSequence = "R2' u' R U' R U R' u R2 f R' f'"; break;
+		case "PLL_Gd" : moveSequence = "f R f' R2' u' R U' R' U R' u R2"; break;
+		case "PLL_H" : moveSequence = "M2' U M2' U2 M2' U M2'"; break;
+		case "PLL_Ja": moveSequence = "R' U L' U2 R U' R' U2 R L"; break;
+		case "PLL_J": case "PLL_Jb": moveSequence = "R U R' F' R U R' U' R' F R2 U' R'"; break;
+		case "PLL_Na": moveSequence = "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'"; break;
+		case "PLL_Nb": moveSequence = "R' U L' U2 R U' L R' U L' U2 R U' L"; break;
+		case "PLL_Ra": moveSequence = "R U R' F' R U2 R' U2' R' F R U R U2' R'"; break;
+		case "PLL_Rb": moveSequence = "R' U2 R U2 R' F R U R' U' R' F' R2"; break;
+		case "PLL_T": moveSequence = "R U R' U' R' F R2 U' R' U' R U R' F'"; break;
+		case "PLL_Ua": moveSequence = "R2 U' R' U' R U R U R U' R"; break;
+		case "PLL_Ub": moveSequence = "R' U R' U' R' U' R' U R U R2"; break;
+		case "PLL_V": moveSequence = "R' U R' d' R' F' R2 U' R' U R' F R F"; break;
+		case "PLL_Y": moveSequence = "F R U' R' U' R U R' F' R U R' U' R' F R F'"; break;
+		case "PLL_Z": moveSequence = "M2' U M2' U M' U2 M2' U2 M'"; break;
+		default: moveSequence = ""; break;
+	}
+	return moveSequence.split(" ");
 }
