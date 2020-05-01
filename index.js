@@ -45,7 +45,7 @@ function deleteMessageAfterSomeSeconds(message) {
 
 function getInfoFromCommand(command) {
 	let messageArray = command.split(" "),
-		moveSequence = [], moveSequenceForImageUrl = [], imageUrl, puzzle, stage, caseOrAlg, colorScheme, unrecognizedOptions = [];
+		moveSequence = [], moveSequenceForImageUrl = [], imageUrl, puzzle, stage, caseOrAlg, colorScheme, unrecognizedOptions = [], view;
 	if (messageArray[0] === "$do") {
 		caseOrAlg = "alg";
 	} else {
@@ -67,16 +67,39 @@ function getInfoFromCommand(command) {
 				|| reducedWord === "coll" || reducedWord === "coell" || reducedWord === "wv" || reducedWord === "vh"
 				|| reducedWord === "els" || reducedWord === "cls" || reducedWord === "cmll" || reducedWord === "cross"
 				|| reducedWord === "f2l_3" || reducedWord === "f2l_2" || reducedWord === "f2l_sm" || reducedWord === "f2l_1"
-				|| reducedWord === "f2b" || reducedWord === "line") {
+				|| reducedWord === "f2b" || reducedWord === "line" || reducedWord === "2x2x2" || reducedWord === "2x2x3") {
 				stage = reducedWord;
+				if (view === undefined) { // sets view only if it's not already defined
+					if (reducedWord === "ll" || reducedWord === "cll" || reducedWord === "ell" || reducedWord === "oll"
+						|| reducedWord === "ocll" || reducedWord === "oell" || reducedWord === "coll" || reducedWord === "coell"
+						|| reducedWord === "wv" || reducedWord === "cmll" || reducedWord === "f2b" || reducedWord === "line"
+						|| reducedWord === "2x2x2" || reducedWord === "2x2x3") {
+						view = "&view=plan";
+					} else {
+						view = "";
+					}
+				}
 			} else if (reducedWord === "ollcp") {
 				stage = "coll";
+				if (view === undefined) { // sets view only if it's not already defined
+					view = "&view=plan";
+				}
 			} else if (reducedWord === "zbll" || reducedWord === "1lll") {
 				stage = "pll";
+				if (view === undefined) { // sets view only if it's not already defined
+					view = "&view=plan";
+				}
 			} else if (reducedWord === "zbls") {
 				stage = "vh";
+				if (view === undefined) { // sets view only if it's not already defined
+					view = "";
+				}
 			} else if (reducedWord === "yellow") {
 				colorScheme = "yogwrb";
+			} else if (reducedWord === "plan") { // overwrite view
+				view = "&view=plan";
+			} else if (reducedWord === "normal") { // overwrite view
+				view = "";
 			} else {
 				unrecognizedOptions.push(word);
 			}
@@ -89,6 +112,9 @@ function getInfoFromCommand(command) {
 			moveSequence.push(word);
 			moveSequenceForImageUrl.push(word.replace("'", "%27"));
 		}
+	}
+	if (view === undefined) {
+		view = "&view=plan";
 	}
 	if (colorScheme === undefined) {
 		colorScheme = "wrgyob";
@@ -105,7 +131,7 @@ function getInfoFromCommand(command) {
 	} else if (puzzle === "kilo") {
 	} else if (puzzle === "sq1") {
 	} else { // cube
-		imageUrl = "http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150&view=plan&pzl=" + puzzle
+		imageUrl = "http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150" + view + "&pzl=" + puzzle
 			+ "&sch=" + colorScheme + "&stage=" + stage + "&" + caseOrAlg + "=" + moveSequenceForImageUrl.join("");
 	}
 	return {imageUrl: imageUrl, moveSequence: moveSequence, unrecognizedOptions: unrecognizedOptions};
