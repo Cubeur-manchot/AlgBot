@@ -1,7 +1,6 @@
 const R = require('ramda');
 const {
   algCommand,
-  caseCommand,
   pingCommand,
   changeBotAvatarCommand,
 } = require('../helpers/message-handler');
