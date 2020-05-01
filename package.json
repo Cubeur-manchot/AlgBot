@@ -1,0 +1,23 @@
+{
+  "name": "alg-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Cubeur-manchot/AlgBot/",
+  "author": "Cubeur-manchot",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "gulp",
+    "test": "prettier -c *.js **/*.js *.json"
+  },
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "ramda": "^0.27.0"
+  },
+  "devDependencies": {
+    "@types/node": "^13.13.4",
+    "gulp": "^4.0.2",
+    "prettier": "^2.0.5"
+  }
+}
