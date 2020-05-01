@@ -6,13 +6,13 @@ const parseOptions = (args) => [
 ];
 
 const getPuzzle = R.cond([
-  [R.isNil, R.always('333')],
+  [R.isNil, R.always('3')],
   [(x) => !isNaN(x), R.always],
   [R.includes('mega'), R.always('mega')],
   [R.includes('kilo'), R.always('kilo')],
   [R.equals('skweb'), R.always('skewb')],
   [R.includes(R.__, ['sq1', 'skewb']), R.always],
-  [R.T, R.always('333')],
+  [R.T, R.always('3')],
 ]);
 
 const getStageAndView = R.cond([
@@ -60,7 +60,7 @@ const getStageAndView = R.cond([
 
 const getUrl = R.cond([
   [
-    R.propEq('puzzle', '333'),
+    R.propEq('puzzle', '3'),
     ({ algOrCase, puzzle, stage, view, colorScheme, urlMoveSequence }) =>
       `http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150${view}&pzl=${puzzle}&sch=${colorScheme}&stage=${stage}&${algOrCase}=${urlMoveSequence}`,
   ],
