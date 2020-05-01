@@ -103,7 +103,7 @@ function getInfoFromCommand(command) {
 			} else {
 				unrecognizedOptions.push(word);
 			}
-		} else if (word.includes("_")) { // alg insert (like PLL_F)
+		} else if (word.includes("_") || word.includes("une")) { // alg insert (like PLL_F) or sune/antisune
 			for (let move of getMoveSequenceFromAlgName(word)) {
 				moveSequence.push(move);
 				moveSequenceForImageUrl.push(move.replace("'", "%27"));
@@ -161,6 +161,8 @@ function getMoveSequenceFromAlgName(algName) { // library of predefined alg sequ
 		case "PLL_V": moveSequence = "R' U R' d' R' F' R2 U' R' U R' F R F"; break;
 		case "PLL_Y": moveSequence = "F R U' R' U' R U R' F' R U R' U' R' F R F'"; break;
 		case "PLL_Z": moveSequence = "M2' U M2' U M' U2 M2' U2 M'"; break;
+		case "sune": case "Sune": moveSequence = "R U R' U R U2' R'"; break;
+		case "antisune": case "Antisune": moveSequence = "R U2 R' U' R U' R'"; break;
 		default: moveSequence = ""; break;
 	}
 	return moveSequence.split(" ");
