@@ -1,0 +1,23 @@
+{
+  "name": "discord",
+  "version": "12.2.0",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^12.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cubeur-manchot/AlgBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cubeur-manchot/AlgBot/issues"
+  },
+  "homepage": "https://github.com/Cubeur-manchot/AlgBot#readme",
+  "description": ""
+}
