@@ -42,7 +42,8 @@ bot.on("message", function (message) {
 bot.login("NzA1MDQ5NzMzMTI2OTQ2ODM2.XqrfAA.QDRho-SdLkHy8lsjIRMJgszw5Uo");
 
 function getHelpMessage() {
-	return "Je suis un :robot: pour afficher des images de :3x3solved:\n"
+	let emoji = bot.emojis.cache.find(emoji => emoji.name === "3x3solved");
+	return `Je suis un :robot: pour afficher des images de <:${emoji.name}:${emoji.id}>\n`
 		+ "\n`$alg` : affiche une image du cas que l'algo résout```apache\n$alg r U R' F' R U R' U' R' F R2 U' r'```"
 		+ "\n`$do` : applique l'algo sur un cube résolu et affiche le résultat```apache\n$do r U R' F' R U R' U' R' F R2 U' r'```"
 		+ "\n`$help` : affiche cette aide```apache\n$help```";
