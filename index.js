@@ -36,17 +36,40 @@ bot.on("message", function (message) {
 		}
 	} else if (message.content === "$help") {
 		message.channel.send(getHelpMessage());
+	} else if (message.content === "$options") {
+		message.channel.send(getOptionsHelpMessage());
 	}
 });
 
 bot.login("NzA1MDQ5NzMzMTI2OTQ2ODM2.XqrfAA.QDRho-SdLkHy8lsjIRMJgszw5Uo");
 
+function getOptionsHelpMessage() {
+	return "Voici les options que je prends en charge :\n"
+		+ "\n`-puzzle` permet d'afficher l'algo sur un puzzle autre que 3x3 :"
+		+ "```yaml\n$alg Lw' U2 Lw' U2 F2 Lw' F2 Rw U2 Rw' U2' Lw2' -5```"
+		+ "Puzzles valides : tous les cubes de 1 à 10.\n"
+		+ "\n`-stage` masque certains stickers du cube pour faire apparaître une étape précise :"
+		+ "```yaml\n$alg R' F R U R' U' F' U R -oll```"
+		+ "Stages valides :\n"
+		+ "`cll`, `cmll`, `coll`, `ell`, `ll`, `ocll`, `ocell`, `oell`, `oll`, `wv` (appliquent une vue \"plan\")\n"
+		+ "`cls`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `2x2x2`, `2x2x3` (appliquent une vue \"normal\")\n"
+		+ "\n`-view` permet de modifier la vue :"
+		+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
+		+ "Vues valides : plan, normal.\n"
+		+ "\n`-yellow` affiche le cube avec du jaune en haut à la place du blanc par défaut :"
+		+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```"
+		+ "\nLorsqu'une option n'est pas prise en charge, un message d'erreur est envoyé dans le chan,"
+		+ " et la commande est supprimée au bout de 10 secondes pour faire le ménage."
+}
+
 function getHelpMessage() {
-	let emoji = bot.emojis.cache.find(emoji => emoji.name === "3x3solved");
-	return `Je suis un :robot: pour afficher des images de <:${emoji.name}:${emoji.id}>\n`
-		+ "\n`$alg` : affiche une image du cas que l'algo résout```apache\n$alg r U R' F' R U R' U' R' F R2 U' r'```"
-		+ "\n`$do` : applique l'algo sur un cube résolu et affiche le résultat```apache\n$do r U R' F' R U R' U' R' F R2 U' r'```"
-		+ "\n`$help` : affiche cette aide```apache\n$help```";
+	let cubeEmoji = bot.emojis.cache.find(emoji => emoji.name === "3x3solved");
+	return `Je suis un :robot: pour afficher des images de <:${cubeEmoji.name}:${cubeEmoji.id}>\n`
+		+ "\n`$alg` : affiche le cas que l'algo résout```parser3\n$alg r U R' F' R U R' U' R' F R2 U' r'```"
+		+ "\n`$do` : applique l'algo sur un cube résolu et affiche le résultat```parser3\n$do r U R' F' R U R' U' R' F R2 U' r'```"
+		+ "\n`$help` : affiche cette aide```parser3\n$help```"
+		+ "\n`$options` : affiche les options disponibles```parser3\n$options```"
+		+ "\nPour rappel, les tests devront être faits dans #bots_poubelle pour ne pas polluer les autres chans.";
 }
 
 function deleteMessageAfterSomeSeconds(message) {
@@ -82,8 +105,7 @@ function getInfoFromCommand(command) {
 				if (view === undefined) { // sets view only if it's not already defined
 					if (reducedWord === "ll" || reducedWord === "cll" || reducedWord === "ell" || reducedWord === "oll"
 						|| reducedWord === "ocll" || reducedWord === "oell" || reducedWord === "coll" || reducedWord === "coell"
-						|| reducedWord === "wv" || reducedWord === "cmll" || reducedWord === "f2b" || reducedWord === "line"
-						|| reducedWord === "2x2x2" || reducedWord === "2x2x3") {
+						|| reducedWord === "wv" || reducedWord === "cmll") {
 						view = "&view=plan";
 					} else {
 						view = "";
