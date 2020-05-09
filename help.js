@@ -2,11 +2,11 @@
 
 const helpCommand = (message) => {
 	let cubeEmoji = message.guild.emojis.cache.find(emoji => emoji.name === "3x3solved");
-	message.channel.send(getHelpMessage(cubeEmoji))
-		.catch(() => console.log("Impossible d'envoyer la réponse de $help"));
+	message.channel.send(getGeneralHelpMessage(cubeEmoji))
+		.catch(error => console.log(error));
 };
 
-const getHelpMessage = (cubeEmoji) => {
+const getGeneralHelpMessage = (cubeEmoji) => {
 	return `Je suis un :robot: pour afficher des images de <:${cubeEmoji.name}:${cubeEmoji.id}>\n`
 		+ "\n`$alg` : affiche le cas que l'algo résout```parser3\n$alg r U R' F' R U R' U' R' F R2 U' r'```"
 		+ "\n`$do` : applique l'algo sur un cube résolu et affiche le résultat```parser3\n$do r U R' F' R U R' U' R' F R2 U' r'```"
