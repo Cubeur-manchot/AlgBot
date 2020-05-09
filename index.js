@@ -9,6 +9,7 @@
 const Discord = require("discord.js");
 
 const {getMoveSequenceFromAlgName} = require("./algs.js");
+const {deleteMessage, deleteMessageAfterSomeSeconds} = require("./messageHandler.js");
 
 const bot = new Discord.Client();
 
@@ -58,9 +59,9 @@ function deletePreviousMessage(message) {
 		return message.author.username === "AlgBot" && message.attachments.size !== 0; // message send by AlgBot and containing an image
 	});
 	if (messageToDelete !== undefined) {
-		messageToDelete.delete();
+		deleteMessage(messageToDelete);
 	}
-	message.delete();
+	deleteMessage(message);
 }
 
 function getOptionsHelpMessage() {
@@ -90,10 +91,6 @@ function getHelpMessage() {
 		+ "\n`$help` : affiche cette aide```parser3\n$help```"
 		+ "\n`$options` : affiche les options disponibles```parser3\n$options```"
 		+ "\nPour rappel, les tests devront être faits dans #bots_poubelle pour ne pas polluer les autres chans.";
-}
-
-function deleteMessageAfterSomeSeconds(message) {
-	setTimeout(() => message.delete(), 10000);
 }
 
 function getInfoFromCommand(command) {

@@ -1,3 +1,5 @@
+"use strict";
+
 const getMoveSequenceFromAlgName = algName => {
 	let moveSequence;
 	if (algName.includes("PLL_")) {
