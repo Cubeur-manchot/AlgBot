@@ -40,10 +40,25 @@ bot.on("message", function (message) {
 		message.channel.send(getHelpMessage());
 	} else if (message.content === "$options") {
 		message.channel.send(getOptionsHelpMessage());
+	} else if (message.content.startsWith("$delete")) {
+		deletePreviousMessage(message);
+		console.log("on va delete le précédent message");
 	}
 });
 
 bot.login("NzA1MDQ5NzMzMTI2OTQ2ODM2.XqrfAA.QDRho-SdLkHy8lsjIRMJgszw5Uo");
+
+function deletePreviousMessage(message) {
+	let currentChannel = message.channel;
+	let messages = currentChannel.messages.cache.array();
+	let messageToDelete = messages.reverse().find(message => {
+		return message.author.username === "AlgBot" && message.attachments.size !== 0; // message send by AlgBot and containing an image
+	});
+	if (messageToDelete !== undefined) {
+		messageToDelete.delete();
+	}
+	message.delete();
+}
 
 function getOptionsHelpMessage() {
 	return "Voici les options que je prends en charge :\n"
