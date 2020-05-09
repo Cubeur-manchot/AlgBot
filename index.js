@@ -11,27 +11,25 @@ const Discord = require("discord.js");
 const {getMoveSequenceFromAlgName} = require("./algs.js");
 const {deleteMessage, deleteMessageAfterSomeSeconds} = require("./messageHandler.js");
 
-const bot = new Discord.Client();
+const AlgBot = new Discord.Client();
 
-bot.on("ready", function() {
-	bot.user.setActivity("attendre d'afficher des algos")
+AlgBot.on("ready", function() {
+	AlgBot.user.setActivity("attendre d'afficher des algos")
 		.catch(console.error);
 });
 
-bot.on("message", function (message) {
+AlgBot.on("message", function (message) {
 	if (message.author.username === "AlgBot" &&
 		(message.content.includes("Impossible de") || message.content.includes("Option(s) non reconnue(s)"))) {
 		deleteMessageAfterSomeSeconds(message);
 	}
 	if (message.content.includes("!changeBotAvatar")) {
-		bot.user.setAvatar(message.content.split(" ")[1])
+		AlgBot.user.setAvatar(message.content.split(" ")[1])
 			.then(() => message.channel.send("Avatar modifié"))
 			.catch((reason) => {
 				message.channel.send(":construction: Impossible de modifier l'avatar :construction: \n" + reason.toString());
 				deleteMessageAfterSomeSeconds(message);
 			});
-	} else if (message.content === "ping") {
-		message.channel.send("pong");
 	} else if (message.content.startsWith("$alg") || message.content.startsWith("$do")) {
 		let {imageUrl, moveSequence, unrecognizedOptions} = getInfoFromCommand(message.content);
 		if (unrecognizedOptions.length === 0) {
@@ -81,16 +79,6 @@ function getOptionsHelpMessage() {
 		+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```"
 		+ "\nLorsqu'une option n'est pas prise en charge, un message d'erreur est envoyé dans le chan,"
 		+ " et la commande est supprimée au bout de 10 secondes pour faire le ménage."
-}
-
-function getHelpMessage() {
-	let cubeEmoji = bot.emojis.cache.find(emoji => emoji.name === "3x3solved");
-	return `Je suis un :robot: pour afficher des images de <:${cubeEmoji.name}:${cubeEmoji.id}>\n`
-		+ "\n`$alg` : affiche le cas que l'algo résout```parser3\n$alg r U R' F' R U R' U' R' F R2 U' r'```"
-		+ "\n`$do` : applique l'algo sur un cube résolu et affiche le résultat```parser3\n$do r U R' F' R U R' U' R' F R2 U' r'```"
-		+ "\n`$help` : affiche cette aide```parser3\n$help```"
-		+ "\n`$options` : affiche les options disponibles```parser3\n$options```"
-		+ "\nPour rappel, les tests devront être faits dans #bots_poubelle pour ne pas polluer les autres chans.";
 }
 
 function getInfoFromCommand(command) {
