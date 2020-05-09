@@ -15,10 +15,12 @@ const {optionsCommand} = require("./options.js");
 
 const AlgBot = new Discord.Client();
 
-AlgBot.on("ready", function() {
+const onBotReady = () => {
 	AlgBot.user.setActivity("attendre d'afficher des algos")
 		.catch(console.error);
-});
+};
+
+AlgBot.on("ready", onBotReady);
 
 AlgBot.on("messageDelete", (message) => onDeleteMessage(message));
 
