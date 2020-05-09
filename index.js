@@ -22,7 +22,7 @@ const onBotReady = () => {
 
 AlgBot.on("ready", onBotReady);
 
-AlgBot.on("messageDelete", (message) => onDeleteMessage(message));
+AlgBot.on("messageDelete", message => onDeleteMessage(message));
 
 AlgBot.on("message", function (message) {
 	if (message.author.username === "AlgBot" &&

@@ -1,8 +1,10 @@
 "use strict";
 
 const deleteMessage = message => {
-	message.delete()
-		.catch(error => console.log(error));
+	if (message) {
+		message.delete()
+			.catch(error => console.log(error));
+	}
 };
 
 const deleteMessageAfterSomeSeconds = message => {
