@@ -9,7 +9,7 @@
 const Discord = require("discord.js");
 
 const {getMoveSequenceFromAlgName} = require("./algs.js");
-const {deleteMessage, deleteMessageAfterSomeSeconds} = require("./messageHandler.js");
+const {deleteMessage, deleteMessageAfterSomeSeconds, onDeleteMessage} = require("./messageHandler.js");
 const {helpCommand} = require("./help.js");
 const {optionsCommand} = require("./options.js");
 
@@ -19,6 +19,8 @@ AlgBot.on("ready", function() {
 	AlgBot.user.setActivity("attendre d'afficher des algos")
 		.catch(console.error);
 });
+
+AlgBot.on("messageDelete", (message) => onDeleteMessage(message));
 
 AlgBot.on("message", function (message) {
 	if (message.author.username === "AlgBot" &&
@@ -44,25 +46,10 @@ AlgBot.on("message", function (message) {
 		helpCommand(message);
 	} else if (message.content === "$options") {
 		optionsCommand(message);
-	} else if (message.content.startsWith("$delete")) {
-		deletePreviousMessage(message);
-		console.log("on va delete le précédent message");
 	}
 });
 
 bot.login("NzA1MDQ5NzMzMTI2OTQ2ODM2.XqrfAA.QDRho-SdLkHy8lsjIRMJgszw5Uo");
-
-function deletePreviousMessage(message) {
-	let currentChannel = message.channel;
-	let messages = currentChannel.messages.cache.array();
-	let messageToDelete = messages.reverse().find(message => {
-		return message.author.username === "AlgBot" && message.attachments.size !== 0; // message send by AlgBot and containing an image
-	});
-	if (messageToDelete !== undefined) {
-		deleteMessage(messageToDelete);
-	}
-	deleteMessage(message);
-}
 
 function getInfoFromCommand(command) {
 	let messageArray = command.split(" "),
