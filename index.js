@@ -1,6 +1,8 @@
 /* console commands :
-- initializa npm : npm init
+- initialize npm : npm init
 - install discord.js : npm install --save discord.js
+- install pm2.js : npm install --save pm2
+- install pm2-windows-startup : npm install --save pm2-windows-startup
 - launch script : node index.js
 */
 
