@@ -10,6 +10,7 @@ const Discord = require("discord.js");
 
 const {getMoveSequenceFromAlgName} = require("./algs.js");
 const {deleteMessage, deleteMessageAfterSomeSeconds} = require("./messageHandler.js");
+const {helpCommand} = require("./help.js");
 
 const AlgBot = new Discord.Client();
 
@@ -39,7 +40,7 @@ AlgBot.on("message", function (message) {
 			deleteMessageAfterSomeSeconds(message);
 		}
 	} else if (message.content === "$help") {
-		message.channel.send(getHelpMessage());
+		helpCommand(message);
 	} else if (message.content === "$options") {
 		message.channel.send(getOptionsHelpMessage());
 	} else if (message.content.startsWith("$delete")) {
