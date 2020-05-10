@@ -12,10 +12,6 @@ const messageIsAlgBotMessage = message => {
 	return message.author.username === "AlgBot";
 };
 
-const messageIsErrorMessage = message => {
-	return message.content.includes("non reconnu");
-};
-
 const findNextAlgBotMessage = fromMessage => {
 	return fromMessage.channel.messages.cache.array().find(message => {
 		return messageIsAlgBotMessage(message) && message.createdTimestamp > fromMessage.createdTimestamp; // first AlgBot's message after message
