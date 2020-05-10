@@ -1,8 +1,33 @@
 "use strict";
 
 const {getMoveSequenceFromAlgName} = require("./algs.js");
-const {helpCommand} = require("./help.js");
-const {optionsCommand} = require("./options.js");
+
+// general information about message
+
+const messageIsAlgBotCommand = message => {
+	return message.content.startsWith("$");
+};
+
+const messageIsAlgBotMessage = message => {
+	return message.author.username === "AlgBot";
+};
+
+const messageIsErrorMessage = message => {
+	return message.content.includes("non reconnu");
+};
+
+const findNextAlgBotMessage = fromMessage => {
+	return fromMessage.channel.messages.cache.array().find(message => {
+		return messageIsAlgBotMessage(message) && message.createdTimestamp > fromMessage.createdTimestamp; // first AlgBot's message after message
+	});
+};
+
+// message handling (send/delete)
+
+const sendMessageToChannel = (channel, message, options) => {
+	channel.send(message, options)
+		.catch(console.error);
+};
 
 const deleteMessage = message => {
 	if (message) {
@@ -15,48 +40,11 @@ const deleteMessageAfterSomeSeconds = message => {
 	setTimeout(() => deleteMessage(message), 10000);
 };
 
-const findNextAlgBotMessage = fromMessage => {
-	return fromMessage.channel.messages.cache.array().find(message => {
-		return message.author.username === "AlgBot" && message.createdTimestamp > fromMessage.createdTimestamp; // first AlgBot's message after message
-	});
-};
-
 const deleteNextAlgBotMessage = message => {
 	deleteMessage(findNextAlgBotMessage(message));
 };
 
-const onDeleteMessage = message => {
-	if (message.content.startsWith("$")) { // if an alg command message is deleted
-		deleteNextAlgBotMessage(message);
-	}
-};
-
-function onMessage(message) {
-	if (message.author.username === "AlgBot" &&
-		(message.content.includes("Impossible de") || message.content.includes("Option(s) non reconnue(s)"))) {
-		deleteMessageAfterSomeSeconds(message);
-	}
-	if (message.content.includes("$changeBotAvatar")) {
-		AlgBot.user.setAvatar(message.content.split(" ")[1])
-			.then(() => message.channel.send("Avatar modifié"))
-			.catch((reason) => {
-				message.channel.send(":construction: Impossible de modifier l'avatar :construction: \n" + reason.toString());
-				deleteMessageAfterSomeSeconds(message);
-			});
-	} else if (message.content.startsWith("$alg") || message.content.startsWith("$do")) {
-		let {imageUrl, moveSequence, unrecognizedOptions} = getInfoFromCommand(message.content);
-		if (unrecognizedOptions.length === 0) {
-			message.channel.send(moveSequence.join(" "), {files: [{attachment: imageUrl, name: "cubeImage.png"}]});
-		} else {
-			message.channel.send(":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n"));
-			deleteMessageAfterSomeSeconds(message);
-		}
-	} else if (message.content === "$help") {
-		helpCommand(message);
-	} else if (message.content === "$options") {
-		optionsCommand(message);
-	}
-}
+// other
 
 function getInfoFromCommand(command) {
 	let messageArray = command.split(" "),
@@ -151,4 +139,4 @@ function getInfoFromCommand(command) {
 	return {imageUrl: imageUrl, moveSequence: moveSequence, unrecognizedOptions: unrecognizedOptions};
 }
 
-module.exports = {onDeleteMessage, onMessage};
+module.exports = {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotMessage, getInfoFromCommand};

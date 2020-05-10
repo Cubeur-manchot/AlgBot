@@ -8,17 +8,15 @@
 
 const Discord = require("discord.js");
 
-const {onDeleteMessage, onMessage} = require("./messageHandler.js");
-const {onReady} = require("./miscellaneous.js");
+const {onReady, onMessage, onMessageUpdate, onMessageDelete} = require("./eventHandler.js");
 
 const AlgBot = new Discord.Client();
 
 AlgBot.on("ready", () => onReady(AlgBot));
-
-AlgBot.on("messageDelete", onDeleteMessage);
-
+AlgBot.on("message", onMessage);
+AlgBot.on("messageUpdate", onMessageUpdate);
+AlgBot.on("messageDelete", onMessageDelete);
 
 AlgBot.login(/*            Insert token here between quotes             */)
-AlgBot.on("message", onMessage);
 	.then(() => console.log("AlgBot is logged in !"))
 	.catch(console.error);
