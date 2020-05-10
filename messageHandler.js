@@ -56,7 +56,7 @@ function getInfoFromCommand(command) {
 	}
 	for (let word of messageArray.slice(1)) {
 		if (word.startsWith("-")) { // option
-			let reducedWord = word.slice(1);
+			let reducedWord = word.slice(1).toLowerCase();
 			if (/^\d+$/.test(reducedWord)) { // word is -number
 				puzzle = reducedWord;
 			} else if (reducedWord === "megaminx" || reducedWord === "kilominx") {
