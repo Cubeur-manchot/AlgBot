@@ -3,7 +3,7 @@
 const helpCommand = (message) => {
 	let cubeEmoji = message.guild.emojis.cache.find(emoji => emoji.name === "3x3solved");
 	message.channel.send(getGeneralHelpMessage(cubeEmoji))
-		.catch(error => console.log(error));
+		.catch(console.error);
 };
 
 const getGeneralHelpMessage = (cubeEmoji) => {

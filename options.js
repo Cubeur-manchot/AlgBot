@@ -2,7 +2,7 @@
 
 const optionsCommand = (message) => {
 	message.channel.send(getOptionsHelpMessage())
-		.catch(error => console.log(error));
+		.catch(console.error);
 };
 
 const getOptionsHelpMessage = () => {
