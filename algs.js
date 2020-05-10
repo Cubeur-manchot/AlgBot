@@ -13,8 +13,8 @@ const getMoveSequenceFromAlgName = algName => {
 
 const algCollection = {
 	PLLCollection: {
-		pll_aa: "l' U R' D2 R U' R' D2 R2 x'",
-		pll_ab: "l' R' D2 R U R' D2 R U' R x'",
+		pll_aa: "x R' U R' D2 R U' R' D2 R2 x'",
+		pll_ab: "x R2' D2 R U R' D2 R U' R x'",
 		pll_e: "x' R U' R' D R U R' D' R U R' D R U' R' D' x",
 		pll_f: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R",
 		pll_ga: "R2 u R' U R' U' R u' R2' F' U F",
@@ -38,7 +38,18 @@ const algCollection = {
 	},
 	otherAlgCollection: {
 		sune: "R U R' U R U2' R'",
-		antisune: "R U2 R' U' R U' R'"
+		antisune: "R U2 R' U' R U' R'",
+		leftsune: "L' U' L U' L' U2 L",
+		leftantisune: "L' U2 L U L' U L",
+		backsune: "R' U' R U' R' U2 R",
+		backantisune: "R' U2 R U R' U R",
+		leftbacksune: "L U L' U L U2 L'",
+		leftbackantisune: "L U2 L' U' L U' L'",
+		doublesune: "R U R' U R U' R' U R U2 R'",
+		doubleantisune: "R U2 R' U' R U R' U' R U' R'",
+		sledge: "R' F R F'",
+		hedge: "F R' F' R",
+		sexy: "R U R' U'"
 	}
 };
 
