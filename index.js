@@ -12,15 +12,11 @@ const {getMoveSequenceFromAlgName} = require("./algs.js");
 const {deleteMessage, deleteMessageAfterSomeSeconds, onDeleteMessage} = require("./messageHandler.js");
 const {helpCommand} = require("./help.js");
 const {optionsCommand} = require("./options.js");
+const {onReady} = require("./miscellaneous.js");
 
 const AlgBot = new Discord.Client();
 
-const onBotReady = () => {
-	AlgBot.user.setActivity("attendre d'afficher des algos")
-		.catch(console.error);
-};
-
-AlgBot.on("ready", onBotReady);
+AlgBot.on("ready", () => onReady(AlgBot));
 
 AlgBot.on("messageDelete", message => onDeleteMessage(message));
 
