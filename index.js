@@ -15,10 +15,10 @@ const AlgBot = new Discord.Client();
 
 AlgBot.on("ready", () => onReady(AlgBot));
 
-AlgBot.on("messageDelete", message => onDeleteMessage(message));
+AlgBot.on("messageDelete", onDeleteMessage);
 
-AlgBot.on("message", message => onMessage(message));
 
 AlgBot.login(/*            Insert token here between quotes             */)
+AlgBot.on("message", onMessage);
 	.then(() => console.log("AlgBot is logged in !"))
 	.catch(console.error);
