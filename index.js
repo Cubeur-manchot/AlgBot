@@ -19,4 +19,6 @@ AlgBot.on("messageDelete", message => onDeleteMessage(message));
 
 AlgBot.on("message", message => onMessage(message));
 
-bot.login("NzA1MDQ5NzMzMTI2OTQ2ODM2.XqrfAA.QDRho-SdLkHy8lsjIRMJgszw5Uo");
+AlgBot.login(/*            Insert token here between quotes             */)
+	.then(() => console.log("AlgBot is logged in !"))
+	.catch(console.error);
