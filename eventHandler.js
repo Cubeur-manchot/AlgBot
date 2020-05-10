@@ -2,7 +2,7 @@
 
 const {helpCommand} = require("./help.js");
 const {optionsCommand} = require("./options.js");
-const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotMessage, getInfoFromCommand} = require("./messageHandler.js");
+const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotMessage, parseTheCommand} = require("./messageHandler.js");
 
 const onReady = (AlgBot) => {
 	AlgBot.user.setActivity("attendre d'afficher des algos")
@@ -18,19 +18,23 @@ const onMessage = message => {
 
 const handleCommand = message => {
 	if (message.content.startsWith("$alg") || message.content.startsWith("$do")) {
-		let {imageUrl, moveSequence, unrecognizedOptions} = getInfoFromCommand(message.content);
-		if (unrecognizedOptions.length === 0) {
-			sendMessageToChannel(message.channel, moveSequence.join(" "), {files: [{attachment: imageUrl, name: "cubeImage.png"}]});
-		} else {
-			sendMessageToChannel(message.channel, ":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n"));
-			deleteMessageAfterSomeSeconds(message);
-		}
-	} else if (message.startsWith("$help")) {
+		imageCommand(message);
+	} else if (message.content.startsWith("$help")) {
 		helpCommand(message);
-	} else if (message.startsWith("$options")) {
+	} else if (message.content.startsWith("$options")) {
 		optionsCommand(message);
 	} else {
 		unrecognizedCommand(message);
+	}
+};
+
+const imageCommand = message => {
+	let {messageContent, imageUrl, unrecognizedOptions} = parseTheCommand(message.content);
+	if (!unrecognizedOptions.length) {
+		sendMessageToChannel(message.channel, messageContent, {files: [{attachment: imageUrl, name: "cubeImage.png"}]});
+	} else {
+		sendMessageToChannel(message.channel, ":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n"));
+		deleteMessageAfterSomeSeconds(message);
 	}
 };
 

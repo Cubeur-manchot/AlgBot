@@ -1,6 +1,6 @@
 "use strict";
 
-const {getMoveSequenceFromAlgName} = require("./algs.js");
+const {getMoveSequenceFromAlgName, deployMove} = require("./algs.js");
 
 // general information about message
 
@@ -44,16 +44,28 @@ const deleteNextAlgBotMessage = message => {
 	deleteMessage(findNextAlgBotMessage(message));
 };
 
-// other
+// command parsing
 
-function getInfoFromCommand(command) {
-	let messageArray = command.split(" "),
-		moveSequence = [], moveSequenceForImageUrl = [], imageUrl, puzzle, stage, caseOrAlg, colorScheme, unrecognizedOptions = [], view;
-	if (messageArray[0] === "$do") {
-		caseOrAlg = "alg";
-	} else {
-		caseOrAlg = "case";
+const parseMoves = moves => {
+	let moveSequence = [];
+	for (let move of moves) {
+		moveSequence.push(deployMove(move));
 	}
+	return moveSequence.join(" ");
+};
+
+const parseTheCommand = command => {
+	let comments = command.split("//").slice(1).join("");
+	command = command.split("//")[0]; // removes comments
+	let messageWords = command.split(" ");
+	let caseOrAlg = messageWords[0] === "$alg" ? "case" : "do"; // $alg/$do command in AlgBot is respectively case/alg in VisualCube
+	messageWords = messageWords.slice(1); // remove first word
+	let options = messageWords.filter(word => word.startsWith("-"));
+	let moves = messageWords.filter(word => !word.startsWith("-"));
+	let moveSequence2 = parseMoves(moves);
+	let moveSequenceForImageUrl2 = moveSequence2.replace(/'/g, "%27");
+	let messageArray = command.split(" "),
+		imageUrl, puzzle, stage, colorScheme, unrecognizedOptions = [], view;
 	for (let word of messageArray.slice(1)) {
 		if (word.startsWith("-")) { // option
 			let reducedWord = word.slice(1).toLowerCase();
@@ -105,14 +117,6 @@ function getInfoFromCommand(command) {
 			} else {
 				unrecognizedOptions.push(word);
 			}
-		} else if (word.includes("_") || word.toLowerCase().includes("une")) { // alg insert (like PLL_F) or sune/antisune
-			for (let move of getMoveSequenceFromAlgName(word)) {
-				moveSequence.push(move);
-				moveSequenceForImageUrl.push(move.replace("'", "%27"));
-			}
-		} else { // normal move
-			moveSequence.push(word);
-			moveSequenceForImageUrl.push(word.replace("'", "%27"));
 		}
 	}
 	if (view === undefined) {
@@ -129,14 +133,13 @@ function getInfoFromCommand(command) {
 	}
 	if (puzzle === "skewb") {
 	} else if (puzzle === "mega") {
-		imageUrl = "http://cubiclealgdbimagegen.azurewebsites.net/generator?puzzle=mega&alg=" + moveSequenceForImageUrl.join("");
 	} else if (puzzle === "kilo") {
 	} else if (puzzle === "sq1") {
 	} else { // cube
 		imageUrl = "http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150" + view + "&pzl=" + puzzle
-			+ "&sch=" + colorScheme + "&stage=" + stage + "&" + caseOrAlg + "=" + moveSequenceForImageUrl.join("");
+			+ "&sch=" + colorScheme + "&stage=" + stage + "&" + caseOrAlg + "=" + moveSequenceForImageUrl2;
 	}
-	return {imageUrl: imageUrl, moveSequence: moveSequence, unrecognizedOptions: unrecognizedOptions};
-}
+	return {messageContent: moveSequence2 + (comments ? "//" + comments : ""), imageUrl: imageUrl, unrecognizedOptions: unrecognizedOptions};
+};
 
-module.exports = {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotMessage, getInfoFromCommand};
+module.exports = {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotMessage, parseTheCommand};
