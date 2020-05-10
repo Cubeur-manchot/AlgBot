@@ -6,7 +6,7 @@ const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSecon
 
 const onReady = (AlgBot) => {
 	AlgBot.user.setActivity("attendre d'afficher des algos")
-		.then(() => console.log("Algbot is ready !"))
+		.then(() => console.log("AlgBot is ready !"))
 		.catch(console.error);
 };
 

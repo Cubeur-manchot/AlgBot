@@ -11,17 +11,6 @@ const deployMove = move => {
 	}
 };
 
-const getMoveSequenceFromAlgName = algName => {
-	let moveSequence;
-	algName = algName.toLowerCase();
-	if (algName.includes("pll_")) {
-		moveSequence = algCollection.PLLCollection[algName];
-	} else {
-		moveSequence = algCollection.otherAlgCollection[algName];
-	}
-	return (moveSequence ? moveSequence.split(" ") : []);
-};
-
 const algCollection = {
 	PLLCollection: {
 		pll_aa: "x R' U R' D2 R U' R' D2 R2 x'",
@@ -64,4 +53,4 @@ const algCollection = {
 	}
 };
 
-module.exports = {getMoveSequenceFromAlgName, deployMove};
+module.exports = {deployMove};

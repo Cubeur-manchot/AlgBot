@@ -1,6 +1,6 @@
 "use strict";
 
-const {getMoveSequenceFromAlgName, deployMove} = require("./algs.js");
+const {deployMove} = require("./algs.js");
 
 // general information about message
 
