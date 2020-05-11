@@ -51,17 +51,26 @@ const parseMoves = moves => {
 };
 
 const parseOptions = options => {
-	let result = {puzzle: "3", stage: "pll", view: "plan", colorScheme: "wrgyob", unrecognizedOptions: []}; // default parameters
+	let result = {puzzle: "3", stage: "pll", view: undefined, colorScheme: "wrgyob", unrecognizedOptions: []}; // default parameters
 	for (let option of options) {
 		if (option === "-yellow") {
 			result.colorScheme = "yogwrb";
 		} else if (isPuzzleOption(option)) {
 			result.puzzle = getPuzzleFromOption(option);
+		} else if (isViewOption(option)) {
+			result.view = option.slice(1);
 		} else {
 			result.unrecognizedOptions.push(option);
 		}
 	}
+	if (result.view === undefined) {
+		result.view = "plan";
+	}
 	return result;
+};
+
+const isViewOption = option => {
+	return /^-(plan|normal|trans)$/i.test(option);
 };
 
 const isPuzzleOption = option => {
@@ -85,11 +94,11 @@ const parseTheCommand = command => {
 	let caseOrAlg = messageWords[0] === "$alg" ? "case" : "do"; // $alg/$do command in AlgBot is respectively case/alg in VisualCube
 	messageWords = messageWords.slice(1); // remove first word
 	let options = messageWords.filter(word => word.startsWith("-"));
-	let {colorScheme, puzzle} = parseOptions(options);
+	let {colorScheme, puzzle, view} = parseOptions(options);
 	let moves = messageWords.filter(word => !word.startsWith("-"));
 	let moveSequence = parseMoves(moves);
 	let messageArray = command.split(" "),
-		imageUrl, stage, unrecognizedOptions = [], view;
+		imageUrl, stage, unrecognizedOptions = [], oldView;
 	for (let word of messageArray.slice(1)) {
 		if (word.startsWith("-")) { // option
 			let reducedWord = word.slice(1).toLowerCase();
@@ -100,45 +109,38 @@ const parseTheCommand = command => {
 				|| reducedWord === "f2l_3" || reducedWord === "f2l_2" || reducedWord === "f2l_sm" || reducedWord === "f2l_1"
 				|| reducedWord === "f2b" || reducedWord === "line" || reducedWord === "2x2x2" || reducedWord === "2x2x3") {
 				stage = reducedWord;
-				if (view === undefined) { // sets view only if it's not already defined
+				if (oldView === undefined) { // sets view only if it's not already defined
 					if (reducedWord === "ll" || reducedWord === "cll" || reducedWord === "ell" || reducedWord === "oll"
 						|| reducedWord === "ocll" || reducedWord === "oell" || reducedWord === "coll" || reducedWord === "coell"
 						|| reducedWord === "wv" || reducedWord === "cmll") {
-						view = "&view=plan";
+						oldView = "&view=plan";
 					} else {
-						view = "";
+						oldView = "";
 					}
 				}
 			} else if (reducedWord === "ollcp") {
 				stage = "coll";
-				if (view === undefined) { // sets view only if it's not already defined
-					view = "&view=plan";
+				if (oldView === undefined) { // sets view only if it's not already defined
+					oldView = "&view=plan";
 				}
 			} else if (reducedWord === "zbll" || reducedWord === "1lll") {
 				stage = "pll";
-				if (view === undefined) { // sets view only if it's not already defined
-					view = "&view=plan";
+				if (oldView === undefined) { // sets view only if it's not already defined
+					oldView = "&view=plan";
 				}
 			} else if (reducedWord === "zbls") {
 				stage = "vh";
-				if (view === undefined) { // sets view only if it's not already defined
-					view = "";
+				if (oldView === undefined) { // sets view only if it's not already defined
+					oldView = "";
 				}
-			} else if (reducedWord === "plan") { // overwrite view
-				view = "&view=plan";
-			} else if (reducedWord === "normal") { // overwrite view
-				view = "";
 			}
 		}
-	}
-	if (view === undefined) {
-		view = "&view=plan";
 	}
 	if (stage === undefined) {
 		stage = "pll";
 	}
 	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
-		imageUrl = "http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150" + view + "&pzl=" + puzzle
+		imageUrl = "http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150" + (view === "normal" ? "" : "&view=" + view) + "&pzl=" + puzzle
 			+ "&sch=" + colorScheme + "&stage=" + stage + "&" + caseOrAlg + "=" + moveSequence.replace(/'/g, "%27");
 		return {messageContent: moveSequence + (comments ? "//" + comments : ""), imageUrl: imageUrl, unrecognizedOptions: unrecognizedOptions, puzzleIsRecognized: true};
 	} else { // puzzle not yet supported
