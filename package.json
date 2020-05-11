@@ -4,6 +4,7 @@
   "main": "index.js",
   "dependencies": {
     "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
     "pm2": "^4.4.0",
     "pm2-windows-startup": "^1.0.3"
   },
