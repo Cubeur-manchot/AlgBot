@@ -29,12 +29,16 @@ const handleCommand = message => {
 };
 
 const imageCommand = message => {
-	let {messageContent, imageUrl, unrecognizedOptions} = parseTheCommand(message.content);
-	if (!unrecognizedOptions.length) {
-		sendMessageToChannel(message.channel, messageContent, {files: [{attachment: imageUrl, name: "cubeImage.png"}]});
+	let {messageContent, imageUrl, unrecognizedOptions, puzzleIsRecognized, puzzle} = parseTheCommand(message.content);
+	if (puzzleIsRecognized) {
+		if (!unrecognizedOptions.length) {
+			sendMessageToChannel(message.channel, messageContent, {files: [{attachment: imageUrl, name: "cubeImage.png"}]});
+		} else {
+			sendMessageToChannel(message.channel, ":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n"));
+			deleteMessageAfterSomeSeconds(message);
+		}
 	} else {
-		sendMessageToChannel(message.channel, ":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n"));
-		deleteMessageAfterSomeSeconds(message);
+		unrecognizedPuzzle(message, puzzle);
 	}
 };
 
@@ -57,6 +61,11 @@ const onMessageDelete = message => {
 
 const unrecognizedCommand = message => {
 	sendMessageToChannel(message.channel, ":x: Commande non reconnue : " + message.content.split(" ")[0]);
+	deleteMessageAfterSomeSeconds(message);
+};
+
+const unrecognizedPuzzle = (message, puzzle) => {
+	sendMessageToChannel(message.channel, ":x: Puzzle non pris en charge : " + puzzle);
 	deleteMessageAfterSomeSeconds(message);
 };
 

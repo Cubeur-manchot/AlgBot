@@ -50,6 +50,34 @@ const parseMoves = moves => {
 	return moveSequence.join(" ");
 };
 
+const parseOptions = options => {
+	let result = {puzzle: "3", stage: "pll", view: "plan", colorScheme: "wrgyob", unrecognizedOptions: []}; // default parameters
+	for (let option of options) {
+		if (option === "-yellow") {
+			result.colorScheme = "yogwrb";
+		} else if (isPuzzleOption(option)) {
+			result.puzzle = getPuzzleFromOption(option);
+		} else {
+			result.unrecognizedOptions.push(option);
+		}
+	}
+	return result;
+};
+
+const isPuzzleOption = option => {
+	return /^-(\d+|(mega|kilo)(minx)?|sq1|sk(ew|we)b)$/i.test(option);
+};
+
+const getPuzzleFromOption = option => {
+	switch (true) {
+		case (/^-\d+$/.test(option)): return option.slice(1); // digit : just remove "-" character
+		case (/^-(mega|kilo|pyra)(minx)?$/i.test(option)): return option.substring(1, 5); // megaminx, kilominx, pyraminx : take first 4 letters
+		case (/^-sk(ew|we)b$/i.test(option)): return "skewb"; // skewb
+		case (/^-sq1$/i.test(option)): return "sq1"; // square one
+		default: return "3"; // default should not be reached, but 3x3 by default
+	}
+};
+
 const parseTheCommand = command => {
 	let comments = command.split("//").slice(1).join("");
 	command = command.split("//")[0]; // removes comments
@@ -57,23 +85,15 @@ const parseTheCommand = command => {
 	let caseOrAlg = messageWords[0] === "$alg" ? "case" : "do"; // $alg/$do command in AlgBot is respectively case/alg in VisualCube
 	messageWords = messageWords.slice(1); // remove first word
 	let options = messageWords.filter(word => word.startsWith("-"));
+	let {colorScheme, puzzle} = parseOptions(options);
 	let moves = messageWords.filter(word => !word.startsWith("-"));
-	let moveSequence2 = parseMoves(moves);
-	let moveSequenceForImageUrl2 = moveSequence2.replace(/'/g, "%27");
+	let moveSequence = parseMoves(moves);
 	let messageArray = command.split(" "),
-		imageUrl, puzzle, stage, colorScheme, unrecognizedOptions = [], view;
+		imageUrl, stage, unrecognizedOptions = [], view;
 	for (let word of messageArray.slice(1)) {
 		if (word.startsWith("-")) { // option
 			let reducedWord = word.slice(1).toLowerCase();
-			if (/^\d+$/.test(reducedWord)) { // word is -number
-				puzzle = reducedWord;
-			} else if (reducedWord === "megaminx" || reducedWord === "kilominx") {
-				puzzle = reducedWord.substring(0, 4);
-			} else if (reducedWord === "mega" || reducedWord === "sq1" || reducedWord === "skewb" || reducedWord === "kilo") {
-				puzzle = reducedWord;
-			} else if (reducedWord === "skweb") {
-				puzzle = "skewb";
-			} else if (reducedWord === "fl" || reducedWord === "f2l" || reducedWord === "ll" || reducedWord === "cll"
+			if (reducedWord === "fl" || reducedWord === "f2l" || reducedWord === "ll" || reducedWord === "cll"
 				|| reducedWord === "ell" || reducedWord === "oll" || reducedWord === "ocll" || reducedWord === "oell"
 				|| reducedWord === "coll" || reducedWord === "coell" || reducedWord === "wv" || reducedWord === "vh"
 				|| reducedWord === "els" || reducedWord === "cls" || reducedWord === "cmll" || reducedWord === "cross"
@@ -104,38 +124,26 @@ const parseTheCommand = command => {
 				if (view === undefined) { // sets view only if it's not already defined
 					view = "";
 				}
-			} else if (reducedWord === "yellow") {
-				colorScheme = "yogwrb";
 			} else if (reducedWord === "plan") { // overwrite view
 				view = "&view=plan";
 			} else if (reducedWord === "normal") { // overwrite view
 				view = "";
-			} else {
-				unrecognizedOptions.push(word);
 			}
 		}
 	}
 	if (view === undefined) {
 		view = "&view=plan";
 	}
-	if (colorScheme === undefined) {
-		colorScheme = "wrgyob";
-	}
-	if (puzzle === undefined) {
-		puzzle = "3";
-	}
 	if (stage === undefined) {
 		stage = "pll";
 	}
-	if (puzzle === "skewb") {
-	} else if (puzzle === "mega") {
-	} else if (puzzle === "kilo") {
-	} else if (puzzle === "sq1") {
-	} else { // cube
+	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
 		imageUrl = "http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150" + view + "&pzl=" + puzzle
-			+ "&sch=" + colorScheme + "&stage=" + stage + "&" + caseOrAlg + "=" + moveSequenceForImageUrl2;
+			+ "&sch=" + colorScheme + "&stage=" + stage + "&" + caseOrAlg + "=" + moveSequence.replace(/'/g, "%27");
+		return {messageContent: moveSequence + (comments ? "//" + comments : ""), imageUrl: imageUrl, unrecognizedOptions: unrecognizedOptions, puzzleIsRecognized: true};
+	} else { // puzzle not yet supported
+		return {puzzleIsRecognized: false, puzzle: puzzle};
 	}
-	return {messageContent: moveSequence2 + (comments ? "//" + comments : ""), imageUrl: imageUrl, unrecognizedOptions: unrecognizedOptions};
 };
 
 module.exports = {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotMessage, parseTheCommand};
