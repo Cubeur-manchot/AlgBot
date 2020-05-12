@@ -51,14 +51,20 @@ const parseMoves = moves => {
 };
 
 const parseOptions = options => {
-	let result = {puzzle: "3", stage: "pll", view: undefined, colorScheme: "wrgyob", unrecognizedOptions: []}; // default parameters
+	let result = {stage: "pll", view: undefined, puzzle: "3", colorScheme: "wrgyob", unrecognizedOptions: []}; // default parameters
 	for (let option of options) {
+		option = option.toLowerCase();
 		if (option === "-yellow") {
 			result.colorScheme = "yogwrb";
 		} else if (isPuzzleOption(option)) {
 			result.puzzle = getPuzzleFromOption(option);
 		} else if (isViewOption(option)) {
 			result.view = option.slice(1);
+		} else if (isStageOption(option)) {
+			result.stage = getStageFromOption(option);
+			if (result.view === undefined) {
+				result.view = getViewFromOption(option);
+			}
 		} else {
 			result.unrecognizedOptions.push(option);
 		}
@@ -69,12 +75,38 @@ const parseOptions = options => {
 	return result;
 };
 
+const getViewFromOption = option => {
+	if (isStageOptionWithPlanView(option)) {
+		return "plan";
+	} else {
+		return "normal";
+	}
+};
+
+const getStageFromOption = option => {
+	switch(option) {
+		case "-zbll": case "-1lll": return "pll";
+		case "-ollcp": return "coll";
+		case "-zbls": return "vh";
+		case "-vls": return "wv";
+		default: return option.slice(1); // just remove "-" at the beginning
+	}
+};
+
+const isStageOptionWithPlanView = option => {
+	return /^-(ollcp|(o|oc|oe|co|coe|cm|zb|1l)?ll|wv)$/i.test(option);
+};
+
+const isStageOption = option => {
+	return isStageOptionWithPlanView(option) || /^-(cross|fl|f2l(_1|_2|_3|_sm)?|(e|c|zb)ls|line|2x2x2|2x2x3|f2b|vh|vls)$/i.test(option);
+};
+
 const isViewOption = option => {
 	return /^-(plan|normal|trans)$/i.test(option);
 };
 
 const isPuzzleOption = option => {
-	return /^-(\d+|(mega|kilo)(minx)?|sq1|sk(ew|we)b)$/i.test(option);
+	return /^-(\d+|(mega|kilo|pyra)(minx)?|sq1|sk(ew|we)b)$/i.test(option);
 };
 
 const getPuzzleFromOption = option => {
@@ -93,56 +125,18 @@ const parseTheCommand = command => {
 	let messageWords = command.split(" ");
 	let caseOrAlg = messageWords[0] === "$alg" ? "case" : "do"; // $alg/$do command in AlgBot is respectively case/alg in VisualCube
 	messageWords = messageWords.slice(1); // remove first word
-	let options = messageWords.filter(word => word.startsWith("-"));
-	let {colorScheme, puzzle, view} = parseOptions(options);
-	let moves = messageWords.filter(word => !word.startsWith("-"));
-	let moveSequence = parseMoves(moves);
-	let messageArray = command.split(" "),
-		imageUrl, stage, unrecognizedOptions = [], oldView;
-	for (let word of messageArray.slice(1)) {
-		if (word.startsWith("-")) { // option
-			let reducedWord = word.slice(1).toLowerCase();
-			if (reducedWord === "fl" || reducedWord === "f2l" || reducedWord === "ll" || reducedWord === "cll"
-				|| reducedWord === "ell" || reducedWord === "oll" || reducedWord === "ocll" || reducedWord === "oell"
-				|| reducedWord === "coll" || reducedWord === "coell" || reducedWord === "wv" || reducedWord === "vh"
-				|| reducedWord === "els" || reducedWord === "cls" || reducedWord === "cmll" || reducedWord === "cross"
-				|| reducedWord === "f2l_3" || reducedWord === "f2l_2" || reducedWord === "f2l_sm" || reducedWord === "f2l_1"
-				|| reducedWord === "f2b" || reducedWord === "line" || reducedWord === "2x2x2" || reducedWord === "2x2x3") {
-				stage = reducedWord;
-				if (oldView === undefined) { // sets view only if it's not already defined
-					if (reducedWord === "ll" || reducedWord === "cll" || reducedWord === "ell" || reducedWord === "oll"
-						|| reducedWord === "ocll" || reducedWord === "oell" || reducedWord === "coll" || reducedWord === "coell"
-						|| reducedWord === "wv" || reducedWord === "cmll") {
-						oldView = "&view=plan";
-					} else {
-						oldView = "";
-					}
-				}
-			} else if (reducedWord === "ollcp") {
-				stage = "coll";
-				if (oldView === undefined) { // sets view only if it's not already defined
-					oldView = "&view=plan";
-				}
-			} else if (reducedWord === "zbll" || reducedWord === "1lll") {
-				stage = "pll";
-				if (oldView === undefined) { // sets view only if it's not already defined
-					oldView = "&view=plan";
-				}
-			} else if (reducedWord === "zbls") {
-				stage = "vh";
-				if (oldView === undefined) { // sets view only if it's not already defined
-					oldView = "";
-				}
-			}
-		}
-	}
-	if (stage === undefined) {
-		stage = "pll";
-	}
+	let moveSequence = parseMoves(messageWords.filter(word => !word.startsWith("-"))); // parse moves
+	let {stage, view, colorScheme, puzzle, unrecognizedOptions} = parseOptions(messageWords.filter(word => word.startsWith("-"))); // parse options
+	view = view === "normal" ? "" : `&view=${view}`; // adjust view for url
+	moveSequence = moveSequence.replace(/'/g, "%27"); // adjust moveSequence for url
 	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
-		imageUrl = "http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150" + (view === "normal" ? "" : "&view=" + view) + "&pzl=" + puzzle
-			+ "&sch=" + colorScheme + "&stage=" + stage + "&" + caseOrAlg + "=" + moveSequence.replace(/'/g, "%27");
-		return {messageContent: moveSequence + (comments ? "//" + comments : ""), imageUrl: imageUrl, unrecognizedOptions: unrecognizedOptions, puzzleIsRecognized: true};
+		return {
+			messageContent: moveSequence + (comments ? "//" + comments : ""),
+			imageUrl: `http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150${view}&pzl=${puzzle}` +
+				`&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequence}`,
+			unrecognizedOptions: unrecognizedOptions,
+			puzzleIsRecognized: true
+		};
 	} else { // puzzle not yet supported
 		return {puzzleIsRecognized: false, puzzle: puzzle};
 	}
