@@ -4,6 +4,8 @@ const {helpCommand} = require("./help.js");
 const {optionsCommand} = require("./options.js");
 const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotMessage, parseTheCommand} = require("./messageHandler.js");
 
+// event handling
+
 const onReady = (AlgBot) => {
 	AlgBot.user.setActivity("attendre d'afficher des algos")
 		.then(() => console.log("AlgBot is ready !"))
@@ -15,6 +17,26 @@ const onMessage = message => {
 		handleCommand(message);
 	} // else normal message, don't mind
 };
+
+const onMessageUpdate = (oldMessage, newMessage) => {
+	if (messageIsAlgBotCommand(oldMessage)) {
+		if (messageIsAlgBotCommand(newMessage)) { // command is edited
+			// TO DO
+		} else { // message is not a command any more, the answer should be deleted
+			deleteNextAlgBotMessage(newMessage);
+		}
+	} else if (messageIsAlgBotCommand(newMessage)) { // message was not a command, but now it is
+		onMessage(newMessage); // exact same behaviour as when a new command is posted
+	} // else classical message edit, don't mind
+};
+
+const onMessageDelete = message => {
+	if (messageIsAlgBotCommand(message)) {
+		deleteNextAlgBotMessage(message);
+	}
+};
+
+// command handling
 
 const handleCommand = message => {
 	if (message.content.startsWith("$alg") || message.content.startsWith("$do")) {
@@ -39,23 +61,6 @@ const imageCommand = message => {
 		}
 	} else {
 		unrecognizedPuzzle(message, puzzle);
-	}
-};
-
-const onMessageUpdate = (oldMessage, newMessage) => {
-	if (messageIsAlgBotCommand(oldMessage)) {
-		if (messageIsAlgBotCommand(newMessage)) { // command is edited
-		} else { // message is not a command any more, the answer should be deleted
-			deleteNextAlgBotMessage(newMessage);
-		}
-	} else if (messageIsAlgBotCommand(newMessage)) { // message was not a command, but now it is
-		onMessage(newMessage); // exact same behaviour as when a new command is posted
-	} // else classical message edit, don't mind
-};
-
-const onMessageDelete = message => {
-	if (messageIsAlgBotCommand(message)) {
-		deleteNextAlgBotMessage(message);
 	}
 };
 

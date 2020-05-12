@@ -1,6 +1,7 @@
 "use strict";
 
 const {parseMoves} = require("./algs.js");
+const {parseOptions} = require("./options.js");
 
 // general information about message
 
@@ -41,75 +42,6 @@ const deleteNextAlgBotMessage = message => {
 };
 
 // command parsing
-
-const parseOptions = options => {
-	let result = {stage: "pll", view: undefined, puzzle: "3", colorScheme: "wrgyob", unrecognizedOptions: []}; // default parameters
-	for (let option of options) {
-		option = option.toLowerCase();
-		if (option === "-yellow") {
-			result.colorScheme = "yogwrb";
-		} else if (isPuzzleOption(option)) {
-			result.puzzle = getPuzzleFromOption(option);
-		} else if (isViewOption(option)) {
-			result.view = option.slice(1);
-		} else if (isStageOption(option)) {
-			result.stage = getStageFromOption(option);
-			if (result.view === undefined) {
-				result.view = getViewFromOption(option);
-			}
-		} else {
-			result.unrecognizedOptions.push(option);
-		}
-	}
-	if (result.view === undefined) {
-		result.view = "plan";
-	}
-	return result;
-};
-
-const getViewFromOption = option => {
-	if (isStageOptionWithPlanView(option)) {
-		return "plan";
-	} else {
-		return "normal";
-	}
-};
-
-const getStageFromOption = option => {
-	switch(option) {
-		case "-zbll": case "-1lll": return "pll";
-		case "-ollcp": return "coll";
-		case "-zbls": return "vh";
-		case "-vls": return "wv";
-		default: return option.slice(1); // just remove "-" at the beginning
-	}
-};
-
-const isStageOptionWithPlanView = option => {
-	return /^-(ollcp|(o|oc|oe|co|coe|cm|zb|1l)?ll|wv)$/i.test(option);
-};
-
-const isStageOption = option => {
-	return isStageOptionWithPlanView(option) || /^-(cross|fl|f2l(_1|_2|_3|_sm)?|(e|c|zb)ls|line|2x2x2|2x2x3|f2b|vh|vls)$/i.test(option);
-};
-
-const isViewOption = option => {
-	return /^-(plan|normal|trans)$/i.test(option);
-};
-
-const isPuzzleOption = option => {
-	return /^-(\d+|(mega|kilo|pyra)(minx)?|sq1|sk(ew|we)b)$/i.test(option);
-};
-
-const getPuzzleFromOption = option => {
-	switch (true) {
-		case (/^-\d+$/.test(option)): return option.slice(1); // digit : just remove "-" character
-		case (/^-(mega|kilo|pyra)(minx)?$/i.test(option)): return option.substring(1, 5); // megaminx, kilominx, pyraminx : take first 4 letters
-		case (/^-sk(ew|we)b$/i.test(option)): return "skewb"; // skewb
-		case (/^-sq1$/i.test(option)): return "sq1"; // square one
-		default: return "3"; // default should not be reached, but 3x3 by default
-	}
-};
 
 const parseTheCommand = command => {
 	let comments = command.split("//").slice(1).join("");
