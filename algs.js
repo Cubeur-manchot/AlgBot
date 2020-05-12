@@ -1,11 +1,19 @@
 "use strict";
 
+const parseMoves = moves => {
+	let moveSequence = [];
+	for (let move of moves) {
+		moveSequence.push(deployMove(move));
+	}
+	return moveSequence.join(" ");
+};
+
 const deployMove = move => {
 	let moveLower = move.toLowerCase();
 	if (moveLower.includes("pll_")) { // move is actually a PLL
 		return algCollection.PLLCollection[moveLower];
 	} else if (moveLower.includes("sune") || moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a sune, a sledge/hedge, or sexy
-		return algCollection.otherAlgCollection[move];
+		return algCollection.otherAlgCollection[moveLower];
 	} else { // normal move
 		return move;
 	}
@@ -53,4 +61,4 @@ const algCollection = {
 	}
 };
 
-module.exports = {deployMove};
+module.exports = {parseMoves};

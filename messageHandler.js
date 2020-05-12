@@ -1,6 +1,6 @@
 "use strict";
 
-const {deployMove} = require("./algs.js");
+const {parseMoves} = require("./algs.js");
 
 // general information about message
 
@@ -41,14 +41,6 @@ const deleteNextAlgBotMessage = message => {
 };
 
 // command parsing
-
-const parseMoves = moves => {
-	let moveSequence = [];
-	for (let move of moves) {
-		moveSequence.push(deployMove(move));
-	}
-	return moveSequence.join(" ");
-};
 
 const parseOptions = options => {
 	let result = {stage: "pll", view: undefined, puzzle: "3", colorScheme: "wrgyob", unrecognizedOptions: []}; // default parameters
@@ -128,12 +120,11 @@ const parseTheCommand = command => {
 	let moveSequence = parseMoves(messageWords.filter(word => !word.startsWith("-"))); // parse moves
 	let {stage, view, colorScheme, puzzle, unrecognizedOptions} = parseOptions(messageWords.filter(word => word.startsWith("-"))); // parse options
 	view = view === "normal" ? "" : `&view=${view}`; // adjust view for url
-	moveSequence = moveSequence.replace(/'/g, "%27"); // adjust moveSequence for url
 	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
 		return {
 			messageContent: moveSequence + (comments ? "//" + comments : ""),
 			imageUrl: `http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150${view}&pzl=${puzzle}` +
-				`&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequence}`,
+				`&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequence.replace(/'/g, "%27")}`,
 			unrecognizedOptions: unrecognizedOptions,
 			puzzleIsRecognized: true
 		};
