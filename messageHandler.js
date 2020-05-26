@@ -40,18 +40,4 @@ const deleteNextAlgBotCorrespondingMessage = (message, messageInfo) => {
 	deleteMessage(findNextAlgBotCorrespondingMessage(message, messageInfo));
 };
 
-const editNextAlgBotCorrespondingMessage = (message, oldInfo, newInfo) => {
-	let algBotAnswer = findNextAlgBotCorrespondingMessage(message, oldInfo);
-	console.log("---------------\n\n");
-	console.log(algBotAnswer);
-	console.log(algBotAnswer.attachments);
-	console.log(algBotAnswer.attachments.array()[0]);
-	algBotAnswer.author = message.author;
-	console.log(algBotAnswer.author);
-	console.log(algBotAnswer.attachments);
-	algBotAnswer.edit(newInfo.answerContent, newInfo.answerOptions);
-	//algBotAnswer.content = newInfo.answerContent;
-	//algBotAnswer.options = newInfo.answerOptions;
-};
-
 module.exports = {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage};
