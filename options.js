@@ -89,11 +89,9 @@ const getOptionsHelpMessage = () => {
 		+ "`cls`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `zbls`, `2x2x2`, `2x2x3` (appliquent une vue \"normal\")\n"
 		+ "\n`-view` permet de modifier la vue :"
 		+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
-		+ "Vues valides : plan, normal.\n"
+		+ "Vues valides : plan, normal, trans.\n"
 		+ "\n`-yellow` affiche le cube avec du jaune en haut à la place du blanc par défaut :"
-		+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```"
-		+ "\nLorsqu'une option n'est pas prise en charge, un message d'erreur est envoyé dans le chan,"
-		+ " et la commande est supprimée au bout de 10 secondes pour faire le ménage."
+		+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```";
 };
 
 module.exports = {getOptionsHelpMessage, parseOptions};
