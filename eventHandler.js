@@ -1,7 +1,7 @@
 "use strict";
 
-const {helpCommand} = require("./help.js");
-const {optionsCommand} = require("./options.js");
+const {getGeneralHelpMessage} = require("./help.js");
+const {getOptionsHelpMessage} = require("./options.js");
 const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotMessage, parseTheCommand} = require("./messageHandler.js");
 
 // event handling
@@ -39,39 +39,31 @@ const onMessageDelete = message => {
 // command handling
 
 const handleCommand = message => {
+	let answer = {content: "", options: {}}, errorInCommand = false;
 	if (message.content.startsWith("$alg") || message.content.startsWith("$do")) {
-		imageCommand(message);
-	} else if (message.content.startsWith("$help")) {
-		helpCommand(message);
-	} else if (message.content.startsWith("$options")) {
-		optionsCommand(message);
-	} else {
-		unrecognizedCommand(message);
-	}
-};
-
-const imageCommand = message => {
-	let {messageContent, imageUrl, unrecognizedOptions, puzzleIsRecognized, puzzle} = parseTheCommand(message.content);
-	if (puzzleIsRecognized) {
-		if (!unrecognizedOptions.length) {
-			sendMessageToChannel(message.channel, messageContent, {files: [{attachment: imageUrl, name: "cubeImage.png"}]});
+		let {messageContent, imageUrl, unrecognizedOptions, puzzleIsRecognized, puzzle} = parseTheCommand(message.content);
+		if (!puzzleIsRecognized) {
+			answer.content = ":x: Puzzle non pris en charge : " + puzzle;
+			errorInCommand = true;
+		} else if (unrecognizedOptions.length) {
+			answer.content = ":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n");
+			errorInCommand = true;
 		} else {
-			sendMessageToChannel(message.channel, ":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n"));
-			deleteMessageAfterSomeSeconds(message);
+			answer.content = messageContent;
+			answer.options = {files: [{attachment: imageUrl, name: "cubeImage.png"}]};
 		}
+	} else if (message.content.startsWith("$help")) {
+		answer.content = getGeneralHelpMessage(message);
+	} else if (message.content.startsWith("$options")) {
+		answer.content = getOptionsHelpMessage();
 	} else {
-		unrecognizedPuzzle(message, puzzle);
+		answer.content = ":x: Commande non reconnue : " + message.content.split(" ")[0];
+		errorInCommand = true;
 	}
-};
-
-const unrecognizedCommand = message => {
-	sendMessageToChannel(message.channel, ":x: Commande non reconnue : " + message.content.split(" ")[0]);
-	deleteMessageAfterSomeSeconds(message);
-};
-
-const unrecognizedPuzzle = (message, puzzle) => {
-	sendMessageToChannel(message.channel, ":x: Puzzle non pris en charge : " + puzzle);
-	deleteMessageAfterSomeSeconds(message);
+	sendMessageToChannel(message.channel, answer.content, answer.options);
+	if (errorInCommand) {
+		deleteMessageAfterSomeSeconds(message);
+	}
 };
 
 module.exports = {onReady, onMessage, onMessageUpdate, onMessageDelete};

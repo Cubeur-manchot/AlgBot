@@ -77,11 +77,6 @@ const getPuzzleFromOption = option => {
 
 // option help message
 
-const optionsCommand = (message) => {
-	message.channel.send(getOptionsHelpMessage())
-		.catch(console.error);
-};
-
 const getOptionsHelpMessage = () => {
 	return "Voici les options que je prends en charge :\n"
 		+ "\n`-puzzle` permet d'afficher l'algo sur un puzzle autre que 3x3 :"
@@ -101,4 +96,4 @@ const getOptionsHelpMessage = () => {
 		+ " et la commande est supprimée au bout de 10 secondes pour faire le ménage."
 };
 
-module.exports = {optionsCommand, parseOptions};
+module.exports = {getOptionsHelpMessage, parseOptions};
