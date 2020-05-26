@@ -1,8 +1,5 @@
 "use strict";
 
-const {parseMoves} = require("./algs.js");
-const {parseOptions} = require("./options.js");
-
 // general information about message
 
 const messageIsAlgBotCommand = message => {
@@ -13,13 +10,15 @@ const messageIsAlgBotMessage = message => {
 	return message.author.username === "AlgBot";
 };
 
-const findNextAlgBotMessage = fromMessage => {
+const findNextAlgBotCorrespondingMessage = (fromMessage, messageInfo) => {
 	return fromMessage.channel.messages.cache.array().find(message => {
-		return messageIsAlgBotMessage(message) && message.createdTimestamp > fromMessage.createdTimestamp; // first AlgBot's message after message
+		return messageIsAlgBotMessage(message) // AlgBot's message
+			&& message.createdTimestamp > fromMessage.createdTimestamp // first corresponding after given message
+			&& message.content === messageInfo.answerContent; // message is exactly the answer of the given command
 	});
 };
 
-// message handling (send/delete)
+// message handling (send/delete/modify)
 
 const sendMessageToChannel = (channel, message, options) => {
 	channel.send(message, options)
@@ -37,32 +36,22 @@ const deleteMessageAfterSomeSeconds = message => {
 	setTimeout(() => deleteMessage(message), 10000);
 };
 
-const deleteNextAlgBotMessage = message => {
-	deleteMessage(findNextAlgBotMessage(message));
+const deleteNextAlgBotCorrespondingMessage = (message, messageInfo) => {
+	deleteMessage(findNextAlgBotCorrespondingMessage(message, messageInfo));
 };
 
-// command parsing
-
-const parseTheCommand = command => {
-	let comments = command.split("//").slice(1).join("");
-	command = command.split("//")[0]; // removes comments
-	let messageWords = command.split(" ");
-	let caseOrAlg = messageWords[0] === "$alg" ? "case" : "do"; // $alg/$do command in AlgBot is respectively case/alg in VisualCube
-	messageWords = messageWords.slice(1); // remove first word
-	let moveSequence = parseMoves(messageWords.filter(word => !word.startsWith("-"))); // parse moves
-	let {stage, view, colorScheme, puzzle, unrecognizedOptions} = parseOptions(messageWords.filter(word => word.startsWith("-"))); // parse options
-	view = view === "normal" ? "" : `&view=${view}`; // adjust view for url
-	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
-		return {
-			messageContent: moveSequence + (comments ? "//" + comments : ""),
-			imageUrl: `http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150${view}&pzl=${puzzle}` +
-				`&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequence.replace(/'/g, "%27")}`,
-			unrecognizedOptions: unrecognizedOptions,
-			puzzleIsRecognized: true
-		};
-	} else { // puzzle not yet supported
-		return {puzzleIsRecognized: false, puzzle: puzzle};
-	}
+const editNextAlgBotCorrespondingMessage = (message, oldInfo, newInfo) => {
+	let algBotAnswer = findNextAlgBotCorrespondingMessage(message, oldInfo);
+	console.log("---------------\n\n");
+	console.log(algBotAnswer);
+	console.log(algBotAnswer.attachments);
+	console.log(algBotAnswer.attachments.array()[0]);
+	algBotAnswer.author = message.author;
+	console.log(algBotAnswer.author);
+	console.log(algBotAnswer.attachments);
+	algBotAnswer.edit(newInfo.answerContent, newInfo.answerOptions);
+	//algBotAnswer.content = newInfo.answerContent;
+	//algBotAnswer.options = newInfo.answerOptions;
 };
 
-module.exports = {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotMessage, parseTheCommand};
+module.exports = {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage};
