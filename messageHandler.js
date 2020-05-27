@@ -20,9 +20,17 @@ const findNextAlgBotCorrespondingMessage = (fromMessage, messageInfo) => {
 
 // message handling (send/delete/modify)
 
-const sendMessageToChannel = (channel, message, options) => {
+const sendMessageToChannel = (channel, message, options, addReactions) => {
 	channel.send(message, options)
-		.catch(console.error);
+		.catch(console.error)
+		.then(message => {
+			if (addReactions) {
+				message.react("❤").catch(console.error);
+				message.react("💩").catch(console.error);
+				message.react("🥇").catch(console.error);
+				message.react("👽").catch(console.error);
+			}
+		});
 };
 
 const deleteMessage = message => {

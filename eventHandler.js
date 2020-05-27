@@ -12,7 +12,7 @@ const onReady = (AlgBot) => {
 const onMessage = message => {
 	if (messageIsAlgBotCommand(message)) {
 		let commandInfo = getInfoFromCommand(message);
-		sendMessageToChannel(message.channel, commandInfo.answerContent, commandInfo.answerOptions);
+		sendMessageToChannel(message.channel, commandInfo.answerContent, commandInfo.answerOptions, commandInfo.addReactions);
 		if (commandInfo.errorInCommand) {
 			deleteMessageAfterSomeSeconds(message);
 		}

@@ -5,8 +5,9 @@ const {getOptionsHelpMessage, parseOptions} = require("./options.js");
 const {parseMoves} = require("./algs.js");
 
 const getInfoFromCommand = message => {
-	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false};
+	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
 	if (message.content.startsWith("$alg") || message.content.startsWith("$do")) {
+		answer.addReactions = true;
 		let {messageContent, imageUrl, unrecognizedOptions, puzzleIsRecognized, puzzle} = parseTheCommand(message.content);
 		if (!puzzleIsRecognized) {
 			answer.answerContent = ":x: Puzzle non pris en charge : " + puzzle;
@@ -26,6 +27,7 @@ const getInfoFromCommand = message => {
 		answer.answerContent = ":x: Commande non reconnue : " + message.content.split(" ")[0];
 		answer.errorInCommand = true;
 	}
+	answer.addReactions &= !answer.errorInCommand; // don't react if there is an error in the command
 	return answer;
 };
 
