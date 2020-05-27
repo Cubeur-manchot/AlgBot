@@ -46,7 +46,7 @@ const isStageOption = option => {
 };
 
 const isStageOptionWithPlanView = option => {
-	return /^-(ollcp|(o|oc|oe|co|coe|cm|zb|1l)?ll|wv)$/i.test(option);
+	return /^-(ollcp|(o|oc|oe|co|coe|cm|p|zb|1l)?ll|wv)$/i.test(option);
 };
 
 const getStageFromOption = option => {
@@ -85,7 +85,7 @@ const getOptionsHelpMessage = () => {
 		+ "\n`-stage` masque certains stickers du cube pour faire apparaître une étape précise :"
 		+ "```yaml\n$alg R' F R U R' U' F' U R -oll```"
 		+ "Stages valides :\n"
-		+ "`cll`, `cmll`, `coll`, `ell`, `ll`, `ocll`, `ocell`, `oell`, `oll`, `ollcp`, `wv`, `zbll`, `1LLL` (appliquent une vue \"plan\")\n"
+		+ "`cll`, `cmll`, `coll`, `ell`, `ll`, `ocll`, `ocell`, `oell`, `oll`, `ollcp`, `pll`, `wv`, `zbll`, `1LLL` (appliquent une vue \"plan\")\n"
 		+ "`cls`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `zbls`, `2x2x2`, `2x2x3` (appliquent une vue \"normal\")\n"
 		+ "\n`-view` permet de modifier la vue :"
 		+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
