@@ -20,9 +20,12 @@ const deployMove = move => {
 	} else if (moveLower.includes("pll_")) { // move is actually a PLL
 		moveSequence.movesForAnswer = algCollection.PLLCollection[moveLower];
 		moveSequence.movesForVisualCube = algCollection.PLLCollection[moveLower];
-	} else if (moveLower.includes("sune") || moveLower.includes("niklas") || moveLower.includes("parity")) { // move is a basic alg
+	} else if (moveLower.includes("sune") || moveLower.includes("niklas")) { // move is a basic alg
 		moveSequence.movesForAnswer = algCollection.basicAlgsCollection[moveLower];
 		moveSequence.movesForVisualCube = algCollection.basicAlgsCollection[moveLower];
+	} else if (moveLower.includes("parity")) { // move is a 4x4 parity
+		moveSequence.movesForAnswer = algCollection.parity4x4x4Collection[moveLower];
+		moveSequence.movesForVisualCube = algCollection.parity4x4x4Collection[moveLower];
 	} else if (moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a trigger or composition
 		moveSequence.movesForAnswer = algCollection.triggerCollection[moveLower];
 		moveSequence.movesForVisualCube = algCollection.triggerCollection[moveLower];
@@ -107,9 +110,7 @@ const algCollection = {
 		triplesune: "R U R' U R U' R' U R U' R' U R U2' R'",
 		tripleantisune: "R U2 R' U' R U R' U' R U R' U' R U' R'",
 		niklasdroite: "R U' L' U R' U' L",
-		niklasgauche: "L' U R U' L U R'",
-		ollparity: "r U2 x r U2 r U2' r' U2 l U2 r' U2' r U2 r' U2' r'",
-		pllparity: "Rw2 R2 U2 Rw2 R2 Uw2 Rw2 R2 Uw2"
+		niklasgauche: "L' U R U' L U R'"
 	},
 	triggerCollection: {
 		sledge: "R' F R F'",
@@ -124,6 +125,11 @@ const algCollection = {
 		doubleantisexy: "U R U' R' U R U' R'",
 		triplesexy: "R U R' U' R U R' U' R U R' U'",
 		tripleantisexy: "U R U' R' U R U' R' U R U' R'"
+	},
+	parity4x4x4Collection: {
+		ollparity: "r U2 x r U2 r U2' r' U2 l U2 r' U2' r U2 r' U2' r'",
+		pllparity: "Rw2 R2 U2 Rw2 R2 Uw2 Rw2 R2 Uw2",
+		pllparitybigcubes: "Rw2' F2 U2 Rw2 R2' U2 F2 Rw2"
 	}
 };
 
