@@ -15,7 +15,7 @@ const parseMoves = moves => {
 const deployMove = move => {
 	let moveLower = move.toLowerCase();
 	let moveSequence = {movesForAnswer: "", movesForVisualCube: ""};
-	if (/^[\\$!.?]/.test(move)) { // bot commands
+	if (move.startsWith("$")) { // AlgBot commands
 		// don't insert the move
 	} else if (moveLower.includes("pll_")) { // move is actually a PLL
 		moveSequence.movesForAnswer = algCollection.PLLCollection[moveLower];
