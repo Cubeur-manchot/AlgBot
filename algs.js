@@ -42,13 +42,10 @@ const deployMove = move => {
 				} else {
 					moveSequence.movesForVisualCube += " " + (smallerSliceNumber - 1) + move.substring(3, move.length) + "'";
 				}
-				console.log(smallerSliceNumber)
 				if (smallerSliceNumber === 2) { // remove "w" for 1 slice moves (like 1Rw)
-					console.log("égalité")
 					moveSequence.movesForVisualCube = moveSequence.movesForVisualCube.replace(/w/g, "");
 				}
 			}
-			console.log(moveSequence)
 		} else {
 			if (move.includes("w")) { // basic outer block move
 				moveSequence.movesForVisualCube = move;
@@ -130,4 +127,18 @@ const algCollection = {
 	}
 };
 
-module.exports = {parseMoves};
+const getAlgListHelpMessage = (message) => {
+	let cube4x4x4Emoji = message.guild.emojis.cache.find(emoji => emoji.name === "4x4x4");
+	return "Je peux insérer directement des algos enregistrés.\nLes algos enregistrés sont les suivants :\n"
+		+ "\nToutes les PLL : `PLL_Aa`, `PLL_Ab`, `PLL_E`, `PLL_F`, `PLL_Ga`, `PLL_Gb`, `PLL_Gc`, `PLL_Gd`, `PLL_H`, `PLL_Ja`, `PLL_Jb`, "
+		+ "`PLL_Na`, `PLL_Nb`, `PLL_Ra`, `PLL_Rb`, `PLL_T`, `PLL_Ua`, `PLL_Ub`, `PLL_V`, `PLL_Y`, `PLL_Z` :"
+		+ "```parser3\n$alg R' PLL_Y R```"
+		+ "\nLes sunes, antisunes et composés, les niklas :"
+		+ "```parser3\n$alg tripleantisune niklasdroite```"
+		+ `\nLes parités du <:${cube4x4x4Emoji.name}:${cube4x4x4Emoji.id}> :`
+		+ "```parser3\n$alg ollparity pllparity pllparitybigcubes -4```"
+		+ `\nLes triggers usuels et composés :`
+		+ "```parser3\n$alg F triplesexy F' hedge antisexy sledge```";
+};
+
+module.exports = {parseMoves, getAlgListHelpMessage};

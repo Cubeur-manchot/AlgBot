@@ -23,6 +23,8 @@ const getInfoFromCommand = message => {
 		answer.answerContent = getGeneralHelpMessage(message);
 	} else if (message.content === "$options") {
 		answer.answerContent = getOptionsHelpMessage();
+	} else if (message.content === "$alglist") {
+		answer.answerContent = getAlgListHelpMessage(message);
 	} else {
 		answer.answerContent = ":x: Commande non reconnue : " + message.content.split(" ")[0];
 		answer.errorInCommand = true;
