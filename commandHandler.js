@@ -44,7 +44,7 @@ const parseTheCommand = command => {
 		return {
 			messageContent: moveSequence + (comments ? "//" + comments : ""),
 			imageUrl: `http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150${view}&pzl=${puzzle}` +
-				`&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequence.replace(/'/g, "%27")}`,
+				`&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube.replace(/'/g, "%27").replace(/&/g, "")}`,
 			unrecognizedOptions: unrecognizedOptions,
 			puzzleIsRecognized: true
 		};
