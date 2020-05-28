@@ -9,10 +9,15 @@ const parseMoves = moves => {
 };
 
 const deployMove = move => {
+	if (/^[\\$!.?]/.test(move)) { // don't insert commands for other bots
+		return "";
+	}
 	let moveLower = move.toLowerCase();
 	if (moveLower.includes("pll_")) { // move is actually a PLL
 		return algCollection.PLLCollection[moveLower];
-	} else if (moveLower.includes("sune") || moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a sune, a sledge/hedge, or sexy
+	} else if (moveLower.includes("sune") || moveLower.includes("niklas") || moveLower.includes("paritynode ")) { // move is a basic alg
+		return algCollection.basicAlgs[moveLower];
+	} else if (moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a trigger or composition
 		return algCollection.otherAlgCollection[moveLower];
 	} else { // normal move
 		return move;
@@ -44,7 +49,7 @@ const algCollection = {
 		pll_y: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
 		pll_z: "M2' U M2' U M' U2 M2' U2 M'"
 	},
-	otherAlgCollection: {
+	basicAlgs: {
 		sune: "R U R' U R U2' R'",
 		antisune: "R U2 R' U' R U' R'",
 		leftsune: "L' U' L U' L' U2 L",
@@ -53,11 +58,28 @@ const algCollection = {
 		backantisune: "R' U2 R U R' U R",
 		leftbacksune: "L U L' U L U2 L'",
 		leftbackantisune: "L U2 L' U' L U' L'",
-		doublesune: "R U R' U R U' R' U R U2 R'",
+		doublesune: "R U R' U R U' R' U R U2' R'",
 		doubleantisune: "R U2 R' U' R U R' U' R U' R'",
+		triplesune: "R U R' U R U' R' U R U' R' U R U2' R'",
+		tripleantisune: "R U2 R' U' R U R' U' R U R' U' R U' R'",
+		niklasdroite: "R U' L' U R' U' L",
+		niklasgauche: "L' U R U' L U R'",
+		ollparity: "r U2 x r U2 r U2' r' U2 l U2 r' U2' r U2 r' U2' r'",
+		pllparity: "Rw2 R2 U2 Rw2 R2 Uw2 Rw2 R2 Uw2"
+	},
+	otherAlgCollection: {
 		sledge: "R' F R F'",
 		hedge: "F R' F' R",
-		sexy: "R U R' U'"
+		doublesledge: "R' F R F' R' F R F'",
+		doublehedge: "F R' F' R F R' F' R",
+		triplesledge: "R' F R F' R' F R F' R' F R F'",
+		triplehedge: "F R' F' R F R' F' R F R' F' R",
+		sexy: "R U R' U'",
+		antisexy: "U R U' R'",
+		doublesexy: "R U R' U' R U R' U'",
+		doubleantisexy: "U R U' R' U R U' R'",
+		triplesexy: "R U R' U' R U R' U' R U R' U'",
+		tripleantisexy: "U R U' R' U R U' R' U R U' R'"
 	}
 };
 
