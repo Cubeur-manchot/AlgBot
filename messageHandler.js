@@ -3,7 +3,7 @@
 // general information about message
 
 const messageIsAlgBotCommand = message => {
-	return message.content.startsWith("$");
+	return message.content.match(/^\$[A-Za-z]/);
 };
 
 const messageIsAlgBotMessage = message => {

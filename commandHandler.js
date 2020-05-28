@@ -2,11 +2,11 @@
 
 const {getGeneralHelpMessage} = require("./help.js");
 const {getOptionsHelpMessage, parseOptions} = require("./options.js");
-const {parseMoves} = require("./algs.js");
+const {getAlgListHelpMessage, parseMoves} = require("./algs.js");
 
 const getInfoFromCommand = message => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
-	if (message.content.startsWith("$alg") || message.content.startsWith("$do")) {
+	if (message.content.startsWith("$alg ") || message.content.startsWith("$do ")) {
 		answer.addReactions = true;
 		let {messageContent, imageUrl, unrecognizedOptions, puzzleIsRecognized, puzzle} = parseTheCommand(message.content);
 		if (!puzzleIsRecognized) {
@@ -19,9 +19,9 @@ const getInfoFromCommand = message => {
 			answer.answerContent = messageContent;
 			answer.answerOptions = {files: [{attachment: imageUrl, name: "cubeImage.png"}]};
 		}
-	} else if (message.content.startsWith("$help")) {
+	} else if (message.content === "$help") {
 		answer.answerContent = getGeneralHelpMessage(message);
-	} else if (message.content.startsWith("$options")) {
+	} else if (message.content === "$options") {
 		answer.answerContent = getOptionsHelpMessage();
 	} else {
 		answer.answerContent = ":x: Commande non reconnue : " + message.content.split(" ")[0];
