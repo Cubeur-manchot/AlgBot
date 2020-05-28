@@ -37,12 +37,12 @@ const parseTheCommand = command => {
 	let messageWords = command.split(" ");
 	let caseOrAlg = messageWords[0] === "$alg" ? "case" : "alg"; // $alg/$do command in AlgBot is respectively case/alg in VisualCube
 	messageWords = messageWords.slice(1); // remove first word
-	let moveSequence = parseMoves(messageWords.filter(word => !word.startsWith("-"))); // parse moves
+	let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(messageWords.filter(word => !word.startsWith("-"))); // parse moves
 	let {stage, view, colorScheme, puzzle, unrecognizedOptions} = parseOptions(messageWords.filter(word => word.startsWith("-"))); // parse options
 	view = view === "normal" ? "" : `&view=${view}`; // adjust view for url
 	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
 		return {
-			messageContent: moveSequence + (comments ? "//" + comments : ""),
+			messageContent: moveSequenceForAnswer + (comments ? "//" + comments : ""),
 			imageUrl: `http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150${view}&pzl=${puzzle}` +
 				`&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube.replace(/'/g, "%27").replace(/&/g, "")}`,
 			unrecognizedOptions: unrecognizedOptions,

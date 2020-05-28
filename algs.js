@@ -1,27 +1,74 @@
 "use strict";
 
 const parseMoves = moves => {
-	let moveSequence = [];
+	let moveSequence = {moveSequenceForAnswer: [], moveSequenceForVisualCube: []};
 	for (let move of moves) {
-		moveSequence.push(deployMove(move));
+		let {movesForAnswer, movesForVisualCube} = deployMove(move);
+		moveSequence.moveSequenceForAnswer.push(movesForAnswer);
+		moveSequence.moveSequenceForVisualCube.push(movesForVisualCube);
 	}
-	return moveSequence.join(" ");
+	moveSequence.moveSequenceForAnswer = moveSequence.moveSequenceForAnswer.join(" ");
+	moveSequence.moveSequenceForVisualCube = moveSequence.moveSequenceForVisualCube.join(" ");
+	return moveSequence;
 };
 
 const deployMove = move => {
-	if (/^[\\$!.?]/.test(move)) { // don't insert commands for other bots
-		return "";
-	}
 	let moveLower = move.toLowerCase();
-	if (moveLower.includes("pll_")) { // move is actually a PLL
-		return algCollection.PLLCollection[moveLower];
-	} else if (moveLower.includes("sune") || moveLower.includes("niklas") || moveLower.includes("paritynode ")) { // move is a basic alg
-		return algCollection.basicAlgs[moveLower];
+	let moveSequence = {movesForAnswer: "", movesForVisualCube: ""};
+	if (/^[\\$!.?]/.test(move)) { // bot commands
+		// don't insert the move
+	} else if (moveLower.includes("pll_")) { // move is actually a PLL
+		moveSequence.movesForAnswer = algCollection.PLLCollection[moveLower];
+		moveSequence.movesForVisualCube = algCollection.PLLCollection[moveLower];
+	} else if (moveLower.includes("sune") || moveLower.includes("niklas") || moveLower.includes("parity")) { // move is a basic alg
+		moveSequence.movesForAnswer = algCollection.basicAlgsCollection[moveLower];
+		moveSequence.movesForVisualCube = algCollection.basicAlgsCollection[moveLower];
 	} else if (moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a trigger or composition
-		return algCollection.otherAlgCollection[moveLower];
+		moveSequence.movesForAnswer = algCollection.triggerCollection[moveLower];
+		moveSequence.movesForVisualCube = algCollection.triggerCollection[moveLower];
+	} else if (/^[0-9].*/.test(move)) { // slice moves start with a number
+		moveSequence.movesForAnswer = move;
+		if (move.includes("-")) {
+			let firstSliceNumber = move[0];
+			let secondSliceNumber = move[2];
+			let {biggerSliceNumber, smallerSliceNumber} = {
+				biggerSliceNumber: Math.max(firstSliceNumber, secondSliceNumber),
+				smallerSliceNumber: Math.min(firstSliceNumber, secondSliceNumber)
+			};
+			moveSequence.movesForVisualCube = biggerSliceNumber + move.substring(3);
+			if (smallerSliceNumber > 1 && move.length > 3) {
+				if (move.includes("'")) {
+					moveSequence.movesForVisualCube += " " + (smallerSliceNumber - 1) + move.substring(3, move.length - 1);
+				} else {
+					moveSequence.movesForVisualCube += " " + (smallerSliceNumber - 1) + move.substring(3, move.length) + "'";
+				}
+				console.log(smallerSliceNumber)
+				if (smallerSliceNumber === 2) { // remove "w" for 1 slice moves (like 1Rw)
+					console.log("égalité")
+					moveSequence.movesForVisualCube = moveSequence.movesForVisualCube.replace(/w/g, "");
+				}
+			}
+			console.log(moveSequence)
+		} else {
+			if (move.includes("w")) { // basic outer block move
+				moveSequence.movesForVisualCube = move;
+			} else { // slice move with only 1 slice
+				moveSequence.movesForVisualCube = move;
+				let sliceNumber = move[0];
+				if (sliceNumber > 1 && move.length > 1) {
+					if (move.includes("'")) {
+						moveSequence.movesForVisualCube += " " + (sliceNumber - 1) + move.substring(1, move.length - 1);
+					} else {
+						moveSequence.movesForVisualCube += " " + (sliceNumber - 1) + move.substring(1, move.length) + "'";
+					}
+				}
+			}
+		}
 	} else { // normal move
-		return move;
+		moveSequence.movesForAnswer = move;
+		moveSequence.movesForVisualCube = move;
 	}
+	return moveSequence;
 };
 
 const algCollection = {
@@ -49,7 +96,7 @@ const algCollection = {
 		pll_y: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
 		pll_z: "M2' U M2' U M' U2 M2' U2 M'"
 	},
-	basicAlgs: {
+	basicAlgsCollection: {
 		sune: "R U R' U R U2' R'",
 		antisune: "R U2 R' U' R U' R'",
 		leftsune: "L' U' L U' L' U2 L",
@@ -67,7 +114,7 @@ const algCollection = {
 		ollparity: "r U2 x r U2 r U2' r' U2 l U2 r' U2' r U2 r' U2' r'",
 		pllparity: "Rw2 R2 U2 Rw2 R2 Uw2 Rw2 R2 Uw2"
 	},
-	otherAlgCollection: {
+	triggerCollection: {
 		sledge: "R' F R F'",
 		hedge: "F R' F' R",
 		doublesledge: "R' F R F' R' F R F'",
