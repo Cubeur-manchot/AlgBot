@@ -23,9 +23,29 @@ const parseMoves = moves => {
 	let type = "simple"; // commutator, conjugate, multiple
 	let factor = "";
 	for (let i = 0; i < movesString.length; i++) { // look for ( or [
-		if (movesString[i] === "(") {
-			i = movesString.length;
-			// TODO
+		if (movesString[i] === "(") { // found (, now look for )
+			type = "multiple";
+			let depth = 1;
+			for (i++; i < movesString.length; i++) {
+				if (movesString[i] === ")" && depth === 1) { // found )
+					factor = movesString.substring(i + 1).match(/^\d*'?/);
+					if (factor === null) {
+						factor = "";
+						subSequenceAfter = movesString.substring(i + 1);
+					} else {
+						factor = factor[0];
+						subSequenceAfter = movesString.substring(i + factor.length + 1);
+					}
+					i = movesString.length;
+				} else {
+					if (movesString[i] === "(") {
+						depth++;
+					} else if (movesString[i] === ")") {
+						depth--;
+					}
+					subSequenceFirstInside += movesString[i];
+				}
+			}
 		} else if (movesString[i] === "[") { // found [, now look for , or :
 			let depth = 1;
 			for (i++; i < movesString.length; i++) {
@@ -69,7 +89,21 @@ const parseMoves = moves => {
 		let moveSequenceAfter = parseMoves(subSequenceAfter);
 		if (type === "multiple") {
 			let moveSequenceInside = parseMoves(subSequenceFirstInside);
-			// TODO
+			let factorIsInverse = factor.includes("'");
+			let factorNumber = factorIsInverse ? factor.substring(0, factor.length - 1) : factor;
+			if (factorNumber === "") {
+				factorNumber = 1;
+			}
+			if (factorIsInverse) {
+				moveSequenceInside.moveSequenceForAnswer = invertSequence(moveSequenceInside.moveSequenceForAnswer);
+				moveSequenceInside.moveSequenceForVisualCube = invertSequence(moveSequenceInside.moveSequenceForVisualCube);
+			}
+			moveSequenceForAnswer = moveSequenceBefore.moveSequenceForAnswer + " "
+				+ (moveSequenceInside.moveSequenceForAnswer + " ").repeat(factorNumber)
+				+ moveSequenceAfter.moveSequenceForAnswer;
+			moveSequenceForVisualCube = moveSequenceBefore.moveSequenceForVisualCube + " "
+				+ (moveSequenceInside.moveSequenceForVisualCube + " ").repeat(factorNumber)
+				+ moveSequenceAfter.moveSequenceForVisualCube;
 		} else if (type === "conjugate") {
 			let moveSequenceSetup = parseMoves(subSequenceFirstInside);
 			let moveSequenceSetuped = parseMoves(subSequenceSecondInside);
@@ -87,7 +121,7 @@ const parseMoves = moves => {
 					+ invertSequence(moveSequenceSecond.moveSequenceForAnswer) + " " + moveSequenceAfter.moveSequenceForAnswer;
 			moveSequenceForVisualCube = moveSequenceBefore.moveSequenceForAnswer + " " + moveSequenceFirst.moveSequenceForVisualCube + " "
 					+ moveSequenceSecond.moveSequenceForVisualCube + " " + invertSequence(moveSequenceFirst.moveSequenceForVisualCube) + " "
-					+ invertSequence(moveSequenceSecond.moveSequenceForVisualCube) + moveSequenceAfter.moveSequenceForVisualCube;
+					+ invertSequence(moveSequenceSecond.moveSequenceForVisualCube) + " " + moveSequenceAfter.moveSequenceForVisualCube;
 		}
 	}
 	moveSequenceForAnswer = moveSequenceForAnswer.trim();
