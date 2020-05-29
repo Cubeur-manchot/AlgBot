@@ -1,6 +1,101 @@
 "use strict";
 
+const invertSequence = moves => {
+	let invertedSequence = [];
+	if (moves === "") {
+		return "";
+	} else {
+		for (let move of moves.split(" ")) {
+			if (move.includes("'")) {
+				invertedSequence.unshift(move.substring(0, move.length - 1));
+			} else {
+				invertedSequence.unshift(move + "'");
+			}
+		}
+	}
+	return invertedSequence.join(" ");
+};
+
 const parseMoves = moves => {
+	let movesString = moves.join(" ");
+	let moveSequenceForAnswer = "", moveSequenceForVisualCube = "";
+	let subSequenceBefore = "", subSequenceAfter = "", subSequenceFirstInside = "", subSequenceSecondInside = "";
+	let type = "simple"; // commutator, conjugate, multiple
+	let factor = "";
+	for (let i = 0; i < movesString.length; i++) { // look for ( or [
+		if (movesString[i] === "(") {
+			i = movesString.length;
+			// TODO
+		} else if (movesString[i] === "[") { // found [, now look for , or :
+			let depth = 1;
+			for (i++; i < movesString.length; i++) {
+				if ((movesString[i] === "," || movesString[i] === ":") && depth === 1) { // found , or :, now look for ]
+					type = movesString[i] === "," ? "commutator" : "conjugate";
+					for (i++; i < movesString.length; i++) {
+						if (movesString[i] === "]" && depth === 1) { // found ]
+							subSequenceAfter = movesString.substring(i + 1);
+							i = movesString.length;
+						} else {
+							if (movesString[i] === "[") {
+								depth++;
+							} else if (movesString[i] === "]") {
+								depth--;
+							}
+							subSequenceSecondInside += movesString[i];
+						}
+					}
+				} else {
+					if (movesString[i] === "[") {
+						depth++;
+					} else if (movesString[i] === "]") {
+						depth--;
+					}
+					subSequenceFirstInside += movesString[i];
+				}
+			}
+			i = movesString.length;
+		} else {
+			subSequenceBefore += movesString[i];
+		}
+	}
+	subSequenceBefore = subSequenceBefore.split(" ").filter(x => {return x !== ""});
+	subSequenceAfter = subSequenceAfter.split(" ").filter(x => {return x !== ""});
+	subSequenceFirstInside = subSequenceFirstInside.split(" ").filter(x => {return x !== ""});
+	subSequenceSecondInside = subSequenceSecondInside.split(" ").filter(x => {return x !== ""});
+	if (type === "simple") {
+		return parseSimpleSequence(subSequenceBefore);
+	} else {
+		let moveSequenceBefore = parseSimpleSequence(subSequenceBefore);
+		let moveSequenceAfter = parseMoves(subSequenceAfter);
+		if (type === "multiple") {
+			let moveSequenceInside = parseMoves(subSequenceFirstInside);
+			// TODO
+		} else if (type === "conjugate") {
+			let moveSequenceSetup = parseMoves(subSequenceFirstInside);
+			let moveSequenceSetuped = parseMoves(subSequenceSecondInside);
+			moveSequenceForAnswer = moveSequenceBefore.moveSequenceForAnswer + " " + moveSequenceSetup.moveSequenceForAnswer + " "
+				+ moveSequenceSetuped.moveSequenceForAnswer + " " + invertSequence(moveSequenceSetup.moveSequenceForAnswer) + " "
+				+ moveSequenceAfter.moveSequenceForAnswer;
+			moveSequenceForVisualCube = moveSequenceBefore.moveSequenceForVisualCube + " " + moveSequenceSetup.moveSequenceForVisualCube + " "
+					+ moveSequenceSetuped.moveSequenceForVisualCube + " " + invertSequence(moveSequenceSetup.moveSequenceForVisualCube) + " "
+					+ moveSequenceAfter.moveSequenceForVisualCube;
+		} else { // commutator
+			let moveSequenceFirst = parseMoves(subSequenceFirstInside);
+			let moveSequenceSecond = parseMoves(subSequenceSecondInside);
+			moveSequenceForAnswer = moveSequenceBefore.moveSequenceForAnswer + " " + moveSequenceFirst.moveSequenceForAnswer + " "
+					+ moveSequenceSecond.moveSequenceForAnswer + " " + invertSequence(moveSequenceFirst.moveSequenceForAnswer) + " "
+					+ invertSequence(moveSequenceSecond.moveSequenceForAnswer) + " " + moveSequenceAfter.moveSequenceForAnswer;
+			moveSequenceForVisualCube = moveSequenceBefore.moveSequenceForAnswer + " " + moveSequenceFirst.moveSequenceForVisualCube + " "
+					+ moveSequenceSecond.moveSequenceForVisualCube + " " + invertSequence(moveSequenceFirst.moveSequenceForVisualCube) + " "
+					+ invertSequence(moveSequenceSecond.moveSequenceForVisualCube) + moveSequenceAfter.moveSequenceForVisualCube;
+		}
+	}
+	moveSequenceForAnswer = moveSequenceForAnswer.trim();
+	moveSequenceForVisualCube = moveSequenceForVisualCube.trim();
+	return {moveSequenceForAnswer: moveSequenceForAnswer, moveSequenceForVisualCube: moveSequenceForVisualCube};
+};
+
+const parseSimpleSequence = moves => {
 	let moveSequence = {moveSequenceForAnswer: [], moveSequenceForVisualCube: []};
 	for (let move of moves) {
 		let {movesForAnswer, movesForVisualCube} = deployMove(move);
