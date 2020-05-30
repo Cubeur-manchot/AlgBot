@@ -8,9 +8,9 @@ const getInfoFromCommand = message => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
 	if (message.content.startsWith("$alg ") || message.content.startsWith("$do ")) {
 		answer.addReactions = true;
-		let {messageContent, imageUrl, unrecognizedOptions, puzzleIsRecognized, puzzle} = parseTheCommand(message.content);
-		if (!puzzleIsRecognized) {
-			answer.answerContent = ":x: Puzzle non pris en charge : " + puzzle;
+		let {messageContent, imageUrl, unrecognizedOptions, unrecognizedPuzzle} = parseTheCommand(message.content);
+		if (unrecognizedPuzzle.length) {
+			answer.answerContent = ":x: Puzzle non pris en charge : " + unrecognizedPuzzle;
 			answer.errorInCommand = true;
 		} else if (unrecognizedOptions.length) {
 			answer.answerContent = ":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n");
@@ -44,14 +44,15 @@ const parseTheCommand = command => {
 	view = view === "normal" ? "" : `&view=${view}`; // adjust view for url
 	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
 		return {
-			messageContent: moveSequenceForAnswer + (comments ? "//" + comments : ""),
-			imageUrl: `http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150${view}&pzl=${puzzle}` +
-				`&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube.replace(/'/g, "%27").replace(/&/g, "")}`,
+			messageContent: moveSequenceForAnswer + (comments ? " //" + comments : ""),
+			imageUrl: "http://cube.crider.co.uk/visualcube.php?fmt=png&bg=t&size=150"
+				+ `${view}&pzl=${puzzle}&sch=${colorScheme}&stage=${stage}`
+				+ `&${caseOrAlg}=${moveSequenceForVisualCube.replace(/'/g, "%27").replace(/&/g, "")}`,
 			unrecognizedOptions: unrecognizedOptions,
-			puzzleIsRecognized: true
+			unrecognizedPuzzle: ""
 		};
 	} else { // puzzle not yet supported
-		return {puzzleIsRecognized: false, puzzle: puzzle};
+		return {unrecognizedPuzzle: puzzle};
 	}
 };
 
