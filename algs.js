@@ -226,7 +226,7 @@ const deployMove = move => {
 	let moveLower = move.toLowerCase();
 	let moveSequence = {movesForAnswer: "", movesForVisualCube: ""};
 	if (move.startsWith("$")) { // AlgBot commands
-		// don't insert the move, else AlgBot whould answer to itself
+		// don't insert the move, else AlgBot would answer to itself
 	} else if (moveLower.includes("pll_")) { // move is actually a PLL
 		moveSequence.movesForAnswer = algCollection.PLLCollection[moveLower];
 		moveSequence.movesForVisualCube = algCollection.PLLCollection[moveLower];
