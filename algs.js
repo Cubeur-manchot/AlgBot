@@ -86,7 +86,7 @@ const parseMoves = moves => {
 	subSequenceSecondInside = subSequenceSecondInside.split(" ").filter(x => {return x !== ""});
 	let {moveSequenceForAnswer, moveSequenceForVisualCube} =
 		getMoveSequenceFromStructure(type, factor, subSequenceBefore, subSequenceAfter, subSequenceFirstInside, subSequenceSecondInside);
-	return {moveSequenceForAnswer: moveSequenceForAnswer, moveSequenceForVisualCube: moveSequenceForVisualCube};
+	return {moveSequenceForAnswer, moveSequenceForVisualCube};
 };
 
 const parseSimpleSequence = moves => {
@@ -161,9 +161,7 @@ const parseSequenceStructure = movesString => {
 			subSequenceBefore += movesString[i];
 		}
 	}
-	return {subSequenceBefore: subSequenceBefore, subSequenceAfter: subSequenceAfter,
-		subSequenceFirstInside: subSequenceFirstInside, subSequenceSecondInside: subSequenceSecondInside,
-		type: type, factor: factor};
+	return {subSequenceBefore, subSequenceAfter, subSequenceFirstInside, subSequenceSecondInside, type, factor};
 };
 
 const getMoveSequenceFromStructure = (type, factor, subSequenceBefore, subSequenceAfter, subSequenceFirstInside, subSequenceSecondInside) => {
@@ -219,7 +217,7 @@ const getMoveSequenceFromStructure = (type, factor, subSequenceBefore, subSequen
 	}
 	moveSequenceForAnswer = moveSequenceForAnswer.trim();
 	moveSequenceForVisualCube = moveSequenceForVisualCube.trim();
-	return {moveSequenceForAnswer: moveSequenceForAnswer, moveSequenceForVisualCube: moveSequenceForVisualCube};
+	return {moveSequenceForAnswer, moveSequenceForVisualCube};
 };
 
 const deployMove = move => {
