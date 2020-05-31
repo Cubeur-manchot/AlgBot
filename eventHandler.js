@@ -3,15 +3,16 @@
 const {getInfoFromCommand} = require("./commandHandler.js");
 const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage} = require("./messageHandler.js");
 
-const onReady = (AlgBot) => {
-	AlgBot.user.setActivity("attendre d'afficher des algos")
-		.then(() => console.log("AlgBot is ready !"))
+const onReady = (AlgBot, language) => {
+	let activity = language === "french" ? "attendre d'afficher des algos" : "waiting for displaying algs";
+	AlgBot.user.setActivity(activity)
+		.then(() => console.log("AlgBot (" + language + ") is ready !"))
 		.catch(console.error);
 };
 
-const onMessage = message => {
+const onMessage = (message, language) => {
 	if (messageIsAlgBotCommand(message)) {
-		let commandInfo = getInfoFromCommand(message);
+		let commandInfo = getInfoFromCommand(message, language);
 		sendMessageToChannel(message.channel, commandInfo.answerContent, commandInfo.answerOptions, commandInfo.addReactions);
 		if (commandInfo.errorInCommand) {
 			deleteMessageAfterSomeSeconds(message);
@@ -19,16 +20,16 @@ const onMessage = message => {
 	} // else normal message, don't mind
 };
 
-const onMessageUpdate = (oldMessage, newMessage) => {
+const onMessageUpdate = (oldMessage, newMessage, language) => {
 	if (messageIsAlgBotCommand(oldMessage)) { // if previous message was already a command, delete the previous answer
-		deleteNextAlgBotCorrespondingMessage(newMessage, getInfoFromCommand(oldMessage));
+		deleteNextAlgBotCorrespondingMessage(newMessage, getInfoFromCommand(oldMessage, language));
 	}
-	onMessage(newMessage); // treat the message as if it was send
+	onMessage(newMessage, language); // treat the message as if it was send
 };
 
-const onMessageDelete = message => {
+const onMessageDelete = (message, language) => {
 	if (messageIsAlgBotCommand(message)) {
-		deleteNextAlgBotCorrespondingMessage(message, getInfoFromCommand(message));
+		deleteNextAlgBotCorrespondingMessage(message, getInfoFromCommand(message, language));
 	}
 };
 

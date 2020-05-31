@@ -25,6 +25,14 @@ const parseOptions = options => {
 	return result;
 };
 
+const getUnrecognizedOptionsErrorMessage = (unrecognizedOptions, language) => {
+	if (language === "french") {
+		return ":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions;
+	} else { // english
+		return ":x: Unrecognized option(s) :\n" + unrecognizedOptions;
+	}
+};
+
 // view options
 
 const isViewOption = option => {
@@ -75,23 +83,48 @@ const getPuzzleFromOption = option => {
 	}
 };
 
-// option help message
-
-const getOptionsHelpMessage = () => {
-	return "Voici les options que je prends en charge :\n"
-		+ "\n`-puzzle` permet d'afficher l'algo sur un puzzle autre que 3x3 :"
-		+ "```yaml\n$alg Lw' U2 Lw' U2 F2 Lw' F2 Rw U2 Rw' U2' Lw2' -5```"
-		+ "Puzzles valides : tous les cubes de 1 à 10.\n"
-		+ "\n`-stage` masque certains stickers du cube pour faire apparaître une étape précise :"
-		+ "```yaml\n$alg R' F R U R' U' F' U R -oll```"
-		+ "Stages valides :\n"
-		+ "`cll`, `cmll`, `coll`, `ell`, `ll`, `ocll`, `ocell`, `oell`, `oll`, `ollcp`, `pll`, `wv`, `zbll`, `1LLL` (appliquent une vue \"plan\")\n"
-		+ "`cls`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `zbls`, `2x2x2`, `2x2x3` (appliquent une vue \"normal\")\n"
-		+ "\n`-view` permet de modifier la vue :"
-		+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
-		+ "Vues valides : plan, normal, trans.\n"
-		+ "\n`-yellow` affiche le cube avec du jaune en haut à la place du blanc par défaut :"
-		+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```";
+const getUnsupportedPuzzleErrorMessage = (puzzle, language) => {
+	if (language === "french") {
+		return ":x: Puzzle non pris en charge : " + puzzle;
+	} else { // english
+		return ":x: Unsupported puzzle : " + puzzle;
+	}
 };
 
-module.exports = {getOptionsHelpMessage, parseOptions};
+// option help message
+
+const getOptionsHelpMessage = language => {
+	if (language === "french") {
+		return "Voici les options que je prends en charge :\n"
+			+ "\n`-puzzle` : permet d'afficher l'algo sur un puzzle autre que 3x3 :"
+			+ "```yaml\n$alg Lw' U2 Lw' U2 F2 Lw' F2 Rw U2 Rw' U2' Lw2' -5```"
+			+ "Puzzles valides : tous les cubes de 1 à 10.\n"
+			+ "\n`-stage` : masque certains stickers du cube pour faire apparaître une étape précise :"
+			+ "```yaml\n$alg R' F R U R' U' F' U R -oll```"
+			+ "Stages valides :\n"
+			+ "`cll`, `cmll`, `coll`, `ell`, `ll`, `ocll`, `ocell`, `oell`, `oll`, `ollcp`, `pll`, `wv`, `zbll`, `1LLL` (appliquent une vue \"plan\")\n"
+			+ "`cls`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `zbls`, `2x2x2`, `2x2x3` (appliquent une vue \"normal\")\n"
+			+ "\n`-view` : permet de modifier la vue :"
+			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
+			+ "Vues valides : plan, normal, trans.\n"
+			+ "\n`-yellow` : affiche le cube avec du jaune en haut à la place du blanc par défaut :"
+			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```";
+	} else { // english
+		return "Here are the options I support :\n"
+			+ "\n`-puzzle` : allows to display the alg on a puzzle other than 3x3 :"
+			+ "```yaml\n$alg Lw' U2 Lw' U2 F2 Lw' F2 Rw U2 Rw' U2' Lw2' -5```"
+			+ "Valid puzzles : all cubes from 1 to 10.\n"
+			+ "\n`-stage` : hides some stickers of the cube to show a precise step :"
+			+ "```yaml\n$alg R' F R U R' U' F' U R -oll```"
+			+ "Valid stages :\n"
+			+ "`cll`, `cmll`, `coll`, `ell`, `ll`, `ocll`, `ocell`, `oell`, `oll`, `ollcp`, `pll`, `wv`, `zbll`, `1LLL` (apply a \"plan\" view)\n"
+			+ "`cls`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `zbls`, `2x2x2`, `2x2x3` (apply a \"normal\" view)\n"
+			+ "\n`-view` : allows to change the view :"
+			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
+			+ "Valid views : plan, normal, trans.\n"
+			+ "\n`-yellow` : displays the cube with yellow on top instead of white by default :"
+			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```";
+	}
+};
+
+module.exports = {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions};

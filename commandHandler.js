@@ -1,32 +1,32 @@
 "use strict";
 
 const {getGeneralHelpMessage} = require("./help.js");
-const {getOptionsHelpMessage, parseOptions} = require("./options.js");
+const {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions} = require("./options.js");
 const {getAlgListHelpMessage, parseMoves} = require("./algs.js");
 
-const getInfoFromCommand = message => {
+const getInfoFromCommand = (message, language) => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
 	if (message.content.startsWith("$alg ") || message.content.startsWith("$do ")) {
 		answer.addReactions = true;
 		let {messageContent, imageUrl, unrecognizedOptions, unrecognizedPuzzle} = parseTheCommand(message.content);
 		if (unrecognizedPuzzle.length) {
-			answer.answerContent = ":x: Puzzle non pris en charge : " + unrecognizedPuzzle;
+			answer.answerContent = getUnsupportedPuzzleErrorMessage(unrecognizedPuzzle, language);
 			answer.errorInCommand = true;
 		} else if (unrecognizedOptions.length) {
-			answer.answerContent = ":x: Option(s) non reconnue(s) :\n" + unrecognizedOptions.join("\n");
+			answer.answerContent = getUnrecognizedOptionsErrorMessage(unrecognizedOptions.join("\n"), language);
 			answer.errorInCommand = true;
 		} else {
 			answer.answerContent = messageContent;
 			answer.answerOptions = {files: [{attachment: imageUrl, name: "cubeImage.png"}]};
 		}
 	} else if (message.content === "$help") {
-		answer.answerContent = getGeneralHelpMessage(message);
+		answer.answerContent = getGeneralHelpMessage(language);
 	} else if (message.content === "$options") {
-		answer.answerContent = getOptionsHelpMessage();
+		answer.answerContent = getOptionsHelpMessage(language);
 	} else if (message.content === "$alglist") {
-		answer.answerContent = getAlgListHelpMessage(message);
+		answer.answerContent = getAlgListHelpMessage(language);
 	} else {
-		answer.answerContent = ":x: Commande non reconnue : " + message.content.split(" ")[0];
+		answer.answerContent = getUnrecognizedCommandErrorMessage(message.content.split(" ")[0], language);
 		answer.errorInCommand = true;
 	}
 	answer.addReactions &= !answer.errorInCommand; // don't react if there is an error in the command
@@ -53,6 +53,14 @@ const parseTheCommand = command => {
 		};
 	} else { // puzzle not yet supported
 		return {unrecognizedPuzzle: puzzle};
+	}
+};
+
+const getUnrecognizedCommandErrorMessage = (command, language) => {
+	if (language === "french") {
+		return ":x: Commande non reconnue : " + command;
+	} else {
+		return ":x: Unrecognized command : " + command;
 	}
 };
 

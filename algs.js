@@ -277,17 +277,34 @@ const deployMove = move => {
 	return moveSequence;
 };
 
-const getAlgListHelpMessage = (message) => {
-	return "Je peux insérer directement des algos enregistrés.\nLes algos enregistrés sont les suivants :\n"
-		+ "\nToutes les PLL : `PLL_Aa`, `PLL_Ab`, `PLL_E`, `PLL_F`, `PLL_Ga`, `PLL_Gb`, `PLL_Gc`, `PLL_Gd`, `PLL_H`, `PLL_Ja`, `PLL_Jb`, "
-		+ "`PLL_Na`, `PLL_Nb`, `PLL_Ra`, `PLL_Rb`, `PLL_T`, `PLL_Ua`, `PLL_Ub`, `PLL_V`, `PLL_Y`, `PLL_Z` :"
-		+ "```parser3\n$alg R' PLL_Y R```"
-		+ "\nLes sunes, antisunes et composés, les niklas :"
-		+ "```parser3\n$alg tripleantisune niklasdroite```"
-		+ `\nLes parités du <:4x4x4:693863938915565599> :`
-		+ "```parser3\n$alg ollparity pllparity pllparitybigcubes -4```"
-		+ `\nLes triggers usuels et composés :`
-		+ "```parser3\n$alg F triplesexy F' hedge antisexy sledge```";
+const getAlgListHelpMessage = language => {
+	if (language === "french") {
+		return "Je peux insérer directement des algos enregistrés.\nLes algos enregistrés sont les suivants :\n"
+			+ "\nToutes les PLL : `PLL_Aa`, `PLL_Ab`, `PLL_E`, `PLL_F`, `PLL_Ga`, `PLL_Gb`, `PLL_Gc`, `PLL_Gd`, `PLL_H`, `PLL_Ja`, `PLL_Jb`, "
+			+ "`PLL_Na`, `PLL_Nb`, `PLL_Ra`, `PLL_Rb`, `PLL_T`, `PLL_Ua`, `PLL_Ub`, `PLL_V`, `PLL_Y`, `PLL_Z` :"
+			+ "```parser3\n$alg R' PLL_Y R```"
+			+ "\nLes sunes, antisunes et composés, les niklas :"
+			+ "```parser3\n$alg tripleantisune niklasright```"
+			+ "\nLes parités du <:4x4x4:693863938915565599> :"
+			+ "```parser3\n$alg ollparity pllparity pllparitybigcubes -4```"
+			+ "\nLes triggers usuels et composés :"
+			+ "```parser3\n$alg F triplesexy F' hedge antisexy sledge```"
+			+ "\nLes commutateurs, conjugués et multiples sont également supportés :"
+			+ "```parser\n$alg F (sexy)3' F' [R' U' : [R', F]]```";
+	} else { // english
+		return "I can directly insert registered algs.\nRegistered algs are the followings :\n"
+			+ "\nAll the PLL : `PLL_Aa`, `PLL_Ab`, `PLL_E`, `PLL_F`, `PLL_Ga`, `PLL_Gb`, `PLL_Gc`, `PLL_Gd`, `PLL_H`, `PLL_Ja`, `PLL_Jb`, "
+			+ "`PLL_Na`, `PLL_Nb`, `PLL_Ra`, `PLL_Rb`, `PLL_T`, `PLL_Ua`, `PLL_Ub`, `PLL_V`, `PLL_Y`, `PLL_Z` :"
+			+ "```parser3\n$alg R' PLL_Y R```"
+			+ "\nSunes, antisunes and compositions of them, niklas :"
+			+ "```parser3\n$alg tripleantisune niklasright```"
+			+ "\n<:4x4x4:693863938915565599> parities :"
+			+ "```parser3\n$alg ollparity pllparity pllparitybigcubes -4```"
+			+ "\nUsual triggers and compositions of them :"
+			+ "```parser3\n$alg F triplesexy F' hedge antisexy sledge```"
+			+ "\nCommutators, conjugates and multiples are also supported :"
+			+ "```parser\n$alg F (sexy)3' F' [R' U' : [R', F]]```";
+	}
 };
 
 module.exports = {parseMoves, getAlgListHelpMessage};
