@@ -1,8 +1,7 @@
 "use strict";
 
 const getGeneralHelpMessage = message => {
-	let cubeEmoji = message.guild.emojis.cache.find(emoji => emoji.name === "3x3solved");
-	return `Je suis un :robot: pour afficher des images de <:${cubeEmoji.name}:${cubeEmoji.id}>\n`
+	return `Je suis un :robot: pour afficher des images de <:3x3solved:693841238461382739>\n`
 		+ "\n`$alg` : affiche le cas que l'algo résout```parser3\n$alg r U R' F' R U R' U' R' F R2 U' r'```"
 		+ "\n`$do` : applique l'algo sur un cube résolu et affiche le résultat```parser3\n$do r U R' F' R U R' U' R' F R2 U' r'```"
 		+ "\n`$help` : affiche cette aide```parser3\n$help```"
