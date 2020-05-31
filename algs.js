@@ -38,8 +38,8 @@ const algCollection = {
 		doubleantisune: "R U2 R' U' R U R' U' R U' R'",
 		triplesune: "R U R' U R U' R' U R U' R' U R U2' R'",
 		tripleantisune: "R U2 R' U' R U R' U' R U R' U' R U' R'",
-		niklasdroite: "R U' L' U R' U' L",
-		niklasgauche: "L' U R U' L U R'"
+		niklasright: "R U' L' U R' U' L",
+		niklasleft: "L' U R U' L U R'"
 	},
 	triggerCollection: {
 		sledge: "R' F R F'",
