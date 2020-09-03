@@ -1,6 +1,6 @@
 "use strict";
 
-const getGeneralHelpMessage = (language) => {
+const getGeneralHelpMessage = language => {
 	if (language === "french") {
 		return "Je suis un :robot: qui affiche des images de <:3x3solved:708049634349547531>\n"
 			+ "\n`$alg` : affiche le cas que l'algo résout```parser3\n$alg r U R' F' R U R' U' R' F R2 U' r'```"
