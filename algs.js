@@ -84,6 +84,8 @@ const algCollection = {
 		oll_56: "r U r' U R U' R' U R U' R' r U' r'",
 		oll_57: "R U R' U' M' U R U' r'"
 	},
+	CMLLCollection: {
+	},
 	basicAlgsCollection: {
 		sune: "R U R' U R U2' R'",
 		antisune: "R U2 R' U' R U' R'",
@@ -290,6 +292,9 @@ const deployMove = move => {
 	} else if (moveLower.includes("oll_")) { // move is actually an OLL
 		moveSequence.movesForAnswer = algCollection.OLLCollection[moveLower];
 		moveSequence.movesForVisualCube = algCollection.OLLCollection[moveLower];
+	} else if (moveLower.includes("cmll_")) { // move is actually a CMLL
+		moveSequence.movesForAnswer = algCollection.CMLLCollection[moveLower];
+		moveSequence.movesForVisualCube = algCollection.CMLLCollection[moveLower];
 	} else if (moveLower.includes("sune") || moveLower.includes("niklas")) { // move is a basic alg
 		moveSequence.movesForAnswer = algCollection.basicAlgsCollection[moveLower];
 		moveSequence.movesForVisualCube = algCollection.basicAlgsCollection[moveLower];
