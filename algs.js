@@ -109,6 +109,12 @@ const algCollection = {
 		cmll_hdiag: "F R U R' U' R U R' U' R U R' U' F'",
 		cmll_hright: "R U2' R2' F R F' U2' R' F R F'",
 		cmll_hfront: "r U' r2' D' r U' r' D r2 U r'",
+		cmll_pinoswap: "R' U' R' F R F' R U' R' U2 R",
+		cmll_pidiag: "F R' F' R U2 R U' R' U R U2' R'",
+		cmll_piback: "F R' F' R U2 R U' R' U R U2' R'",
+		cmll_piright: "R' F R U F U' R U R' U' F'",
+		cmll_pifront: "R U2 R' U' R U R' U2' R' F R F'",
+		cmll_pileft: "r U' r2' D' r U r' D r2 U r'",
 	},
 	basicAlgsCollection: {
 		sune: "R U R' U R U2' R'",
