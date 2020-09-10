@@ -105,6 +105,10 @@ const algCollection = {
 		cmll_lright: "F R' F' R U R U' R'",
 		cmll_lfront: "F R U' R' U' R U R' F'",
 		cmll_lleft: "R' U2 R' D' R U2 R' D R2",
+		cmll_hnoswap: "R U R' U R U' R' U R U2' R'",
+		cmll_hdiag: "F R U R' U' R U R' U' R U R' U' F'",
+		cmll_hright: "R U2' R2' F R F' U2' R' F R F'",
+		cmll_hfront: "r U' r2' D' r U' r' D r2 U r'",
 	},
 	basicAlgsCollection: {
 		sune: "R U R' U R U2' R'",
