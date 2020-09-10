@@ -115,6 +115,18 @@ const algCollection = {
 		cmll_piright: "R' F R U F U' R U R' U' F'",
 		cmll_pifront: "R U2 R' U' R U R' U2' R' F R F'",
 		cmll_pileft: "r U' r2' D' r U r' D r2 U r'",
+		cmll_snoswap: "R U R' U R U2' R'",
+		cmll_sdiag: "R U R' U R' F R F' R U2' R'",
+		cmll_sback: "F R' F' R U2 R U2' R'",
+		cmll_sright: "R' F2 R2 U2' R' F R U2' R2' F2 R",
+		cmll_sfront: "r U' r' F R' F' R",
+		cmll_sleft: "L' U2 L U2 r U' r' F",
+		cmll_asnoswap: "R U2' R' U' R U' R'",
+		cmll_asdiag: "R U2' R' U' R U R2' F R F' R U2' R'",
+		cmll_asback: "F' r U r' U2' L' U2 L",
+		cmll_asright: "R U2' R' U2 R' F R F'",
+		cmll_asfront: "R' F R F' r U r'",
+		cmll_asleft: "R' F2 R2 U2' R' F' R U2' R2' F2 R"
 	},
 	basicAlgsCollection: {
 		sune: "R U R' U R U2' R'",
