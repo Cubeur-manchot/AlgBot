@@ -34,6 +34,7 @@ const getInfoFromCommand = (message, language) => {
 };
 
 const parseTheCommand = command => {
+	command = command.replace(/’/g, "'"); // replace wrong apostrophe typography
 	let comments = command.split("//").slice(1).join("");
 	command = command.split("//")[0]; // removes comments
 	let messageWords = command.split(" ");
