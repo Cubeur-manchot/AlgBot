@@ -386,6 +386,14 @@ const deployMove = move => {
 	return moveSequence;
 };
 
+const countMoves = moveSequence => {
+	if (moveSequence === "") {
+		return 0;
+	} else {
+		return moveSequence.split(" ").length;
+	}
+};
+
 const getAlgListHelpMessage = language => {
 	if (language === "french") {
 		return "Je peux insérer directement des algos enregistrés.\nLes algos enregistrés sont les suivants :\n"
@@ -424,4 +432,4 @@ const getAlgListHelpMessage = language => {
 	}
 };
 
-module.exports = {parseMoves, getAlgListHelpMessage};
+module.exports = {parseMoves, countMoves, getAlgListHelpMessage};

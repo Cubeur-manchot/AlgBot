@@ -15,6 +15,8 @@ const parseOptions = options => {
 			if (result.view === undefined) {
 				result.view = getViewFromStageOption(option);
 			}
+		} else if (isCountOption(option)) {
+			result.shouldCountMoves = true;
 		} else {
 			result.unrecognizedOptions.push(option);
 		}
@@ -89,6 +91,12 @@ const getUnsupportedPuzzleErrorMessage = (puzzle, language) => {
 	} else { // english
 		return ":x: Unsupported puzzle : " + puzzle;
 	}
+};
+
+// count option
+
+const isCountOption = option => {
+	return option === "-count";
 };
 
 // option help message
