@@ -6,7 +6,7 @@ const {getAlgListHelpMessage, parseMoves} = require("./algs.js");
 
 const getInfoFromCommand = (message, language) => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
-	if (message.content.startsWith("$alg ") || message.content.startsWith("$do ")) {
+	if (/^\$(alg|do)(	| |$)/.test(message.content)) {
 		answer.addReactions = true;
 		let {messageContent, imageUrl, unrecognizedOptions, unrecognizedPuzzle} = parseTheCommand(message.content);
 		if (unrecognizedPuzzle.length) {
