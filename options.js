@@ -116,7 +116,9 @@ const getOptionsHelpMessage = language => {
 			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
 			+ "Vues valides : plan, normal, trans.\n"
 			+ "\n`-yellow` : affiche le cube avec du jaune en haut à la place du blanc par défaut :"
-			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```";
+			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```"
+			+ "\n`-count` : permet de compter les mouvements :"
+			+ "```yaml\n$alg PLL_Y -count```\n";
 	} else { // english
 		return "Here are the options I support :\n"
 			+ "\n`-puzzle` : allows to display the alg on a puzzle other than 3x3 :"
@@ -131,7 +133,9 @@ const getOptionsHelpMessage = language => {
 			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
 			+ "Valid views : plan, normal, trans.\n"
 			+ "\n`-yellow` : displays the cube with yellow on top instead of white by default :"
-			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```";
+			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```"
+			+ "\n`-count` : also count the moves :"
+			+ "```yaml\n$alg PLL_Y -count```\n";
 	}
 };
 
