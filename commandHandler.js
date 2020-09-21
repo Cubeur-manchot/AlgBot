@@ -2,7 +2,7 @@
 
 const {getGeneralHelpMessage} = require("./help.js");
 const {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions} = require("./options.js");
-const {getAlgListHelpMessage, parseMoves} = require("./algs.js");
+const {getAlgListHelpMessage, parseMoves, countMoves} = require("./algs.js");
 
 const getInfoFromCommand = (message, language) => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
@@ -41,7 +41,10 @@ const parseTheCommand = command => {
 	let caseOrAlg = messageWords[0] === "$alg" ? "case" : "alg"; // $alg/$do command in AlgBot is respectively case/alg in VisualCube
 	messageWords = messageWords.slice(1); // remove first word
 	let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(messageWords.filter(word => !word.startsWith("-"))); // parse moves
-	let {stage, view, colorScheme, puzzle, unrecognizedOptions} = parseOptions(messageWords.filter(word => word.startsWith("-"))); // parse options
+	let {stage, view, colorScheme, puzzle, shouldCountMoves, unrecognizedOptions} = parseOptions(messageWords.filter(word => word.startsWith("-"))); // parse options
+	if (shouldCountMoves) {
+		moveSequenceForAnswer += " (" + countMoves(moveSequenceForAnswer) + ")"; // add move count if necessary
+	}
 	view = view === "normal" ? "" : `&view=${view}`; // adjust view for url
 	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
 		return {
