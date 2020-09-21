@@ -43,7 +43,8 @@ const parseTheCommand = command => {
 	let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(messageWords.filter(word => !word.startsWith("-"))); // parse moves
 	let {stage, view, colorScheme, puzzle, shouldCountMoves, unrecognizedOptions} = parseOptions(messageWords.filter(word => word.startsWith("-"))); // parse options
 	if (shouldCountMoves) {
-		moveSequenceForAnswer += " (" + countMoves(moveSequenceForAnswer) + ")"; // add move count if necessary
+		let {htmCount, stmCount, etmCount} = countMoves(moveSequenceForAnswer);
+		moveSequenceForAnswer += ` (${htmCount} HTM, ${stmCount} STM, ${etmCount} ETM)`; // add move count if necessary
 	}
 	view = view === "normal" ? "" : `&view=${view}`; // adjust view for url
 	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
