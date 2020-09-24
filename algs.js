@@ -386,25 +386,35 @@ const deployMove = move => {
 	return moveSequence;
 };
 
-const countMoves = moveSequence => {
+const countMoves = (moveSequence, shouldCountMoves) => {
+	let moveCount = [];
+	let result = [];
 	if (moveSequence === "") {
-		return {htmCount: 0, stmCount: 0, etmCount: 0};
+		moveCount["htm"] = 0;
+		moveCount["stm"] = 0;
+		moveCount["etm"] = 0;
 	} else {
-		let simpleMovesCount = countRegexInString(/(?<![0-9])[RUFLDBrufldb]/g, moveSequence); // moves of the form R, without a number before
-		simpleMovesCount += countRegexInString(/(?<!-)[2-9][RUFLDB]w/g, moveSequence); // moves of the form 3Rw, without a - before
-		simpleMovesCount += countRegexInString(/(?<!-)1[RUFLDB]/g, moveSequence); // moves of the form 1R, without a - before
-		simpleMovesCount += countRegexInString(/[0-9]-[01][RUFLDB]/g, moveSequence); // moves of the form 3-1R
-		simpleMovesCount += countRegexInString(/[01]-[0-9][RUFLDB]/g, moveSequence); // moves of the form 1-3R
-		let sliceMovesCount = countRegexInString(/[MES]/g, moveSequence); // moves of the form M
-		sliceMovesCount += countRegexInString(/(?<!-)[2-9][RUFLDB](?!w)/g, moveSequence); // moves of the form 3R, without a w after and without a - before
-		sliceMovesCount += countRegexInString(/[2-9]-[2-9][RUFLDB]/g, moveSequence); // moves of the form 2-3R
+		let simpleMovesCount =
+			countRegexInString(/(?<![0-9])[RUFLDBrufldb]/g, moveSequence) // moves of the form R, without a number before
+			+ countRegexInString(/(?<!-)[2-9][RUFLDB]w/g, moveSequence) // moves of the form 3Rw, without a - before
+			+ countRegexInString(/(?<!-)1[RUFLDB]/g, moveSequence) // moves of the form 1R, without a - before
+			+ countRegexInString(/[0-9]-[01][RUFLDB]/g, moveSequence) // moves of the form 3-1R
+			+ countRegexInString(/[01]-[0-9][RUFLDB]/g, moveSequence); // moves of the form 1-3R
+		let sliceMovesCount =
+			countRegexInString(/[MES]/g, moveSequence) // moves of the form M
+			+ countRegexInString(/(?<!-)[2-9][RUFLDB](?!w)/g, moveSequence) // moves of the form 3R, without a w after and without a - before
+			+ countRegexInString(/[2-9]-[2-9][RUFLDB]/g, moveSequence); // moves of the form 2-3R
 		let rotationMovesCount = countRegexInString(/[xyz]/g, moveSequence); // moves of the form x
-		return {
-			htmCount: simpleMovesCount + 2*sliceMovesCount,
-			stmCount: simpleMovesCount + sliceMovesCount,
-			etmCount: simpleMovesCount + sliceMovesCount + rotationMovesCount
-		};
+		moveCount["htm"] = simpleMovesCount + 2*sliceMovesCount;
+		moveCount["stm"] = simpleMovesCount + sliceMovesCount;
+		moveCount["etm"] = simpleMovesCount + sliceMovesCount + rotationMovesCount;
 	}
+	for (let metric of ["htm", "stm", "etm"]) {
+		if (shouldCountMoves[metric]) {
+			result.push(`${moveCount[metric]} ${metric.toUpperCase()}`);
+		}
+	}
+	return result;
 };
 
 const countRegexInString = (regex, string) => {

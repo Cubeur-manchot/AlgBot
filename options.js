@@ -1,7 +1,16 @@
 "use strict";
 
 const parseOptions = options => {
-	let result = {stage: "pll", view: undefined, puzzle: "3", colorScheme: "wrgyob", unrecognizedOptions: []}; // default parameters
+	let result = {
+		stage: "pll",
+		view: undefined,
+		puzzle: "3",
+		colorScheme: "wrgyob",
+		shouldCountMoves: [],
+		unrecognizedOptions: []}; // default parameters
+	result.shouldCountMoves["htm"] = false;
+	result.shouldCountMoves["stm"] = false;
+	result.shouldCountMoves["etm"] = false;
 	for (let option of options) {
 		option = option.toLowerCase();
 		if (option === "-yellow") {
@@ -16,7 +25,13 @@ const parseOptions = options => {
 				result.view = getViewFromStageOption(option);
 			}
 		} else if (isCountOption(option)) {
-			result.shouldCountMoves = true;
+			if (option === "-count") {
+				result.shouldCountMoves["htm"] = true;
+				result.shouldCountMoves["stm"] = true;
+				result.shouldCountMoves["etm"] = true;
+			} else {
+				result.shouldCountMoves[option.substring(1)] = true;
+			}
 		} else {
 			result.unrecognizedOptions.push(option);
 		}
@@ -93,10 +108,10 @@ const getUnsupportedPuzzleErrorMessage = (puzzle, language) => {
 	}
 };
 
-// count option
+// move count option
 
 const isCountOption = option => {
-	return option === "-count";
+	return /-(count|[hse]tm)/.test(option);
 };
 
 // option help message
@@ -117,7 +132,7 @@ const getOptionsHelpMessage = language => {
 			+ "Vues valides : plan, normal, trans.\n"
 			+ "\n`-yellow` : affiche le cube avec du jaune en haut à la place du blanc par défaut :"
 			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```"
-			+ "\n`-count` : permet de compter les mouvements :"
+			+ "\n`-htm`, `-stm`, `-etm` : compte les mouvements avec la métrique demandée (`-count` : compte avec toutes les métriques) :"
 			+ "```yaml\n$alg PLL_Y -count```\n";
 	} else { // english
 		return "Here are the options I support :\n"
@@ -134,7 +149,7 @@ const getOptionsHelpMessage = language => {
 			+ "Valid views : plan, normal, trans.\n"
 			+ "\n`-yellow` : displays the cube with yellow on top instead of white by default :"
 			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```"
-			+ "\n`-count` : also count the moves :"
+			+ "\n`-htm`, `-stm`, `-etm` : count moves with specified metrics (`-count` : count with all metrics) :"
 			+ "```yaml\n$alg PLL_Y -count```\n";
 	}
 };
