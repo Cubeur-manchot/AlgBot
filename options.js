@@ -7,7 +7,9 @@ const parseOptions = options => {
 		puzzle: "3",
 		colorScheme: "wrgyob",
 		shouldCountMoves: [],
-		unrecognizedOptions: []}; // default parameters
+		shouldMergeMoves: false,
+		unrecognizedOptions: []
+	}; // default parameters
 	result.shouldCountMoves["htm"] = false;
 	result.shouldCountMoves["stm"] = false;
 	result.shouldCountMoves["etm"] = false;
@@ -32,6 +34,8 @@ const parseOptions = options => {
 			} else {
 				result.shouldCountMoves[option.substring(1)] = true;
 			}
+		} else if (option === "-merge") {
+			result.shouldMergeMoves = true;
 		} else {
 			result.unrecognizedOptions.push(option);
 		}

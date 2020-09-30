@@ -426,6 +426,10 @@ const countRegexInString = (regex, string) => {
 	}
 };
 
+const mergeMoves = moveSequence => {
+	return moveSequence;
+};
+
 const cleanSequence = moveSequence => {
 	let moveSequenceWork = moveSequence.
 		replace(/'/g, "' "). // split by apostrophe
@@ -506,4 +510,4 @@ const getAlgListHelpMessage = language => {
 	}
 };
 
-module.exports = {cleanSequence, parseMoves, countMoves, getAlgListHelpMessage};
+module.exports = {cleanSequence, parseMoves, countMoves, mergeMoves, getAlgListHelpMessage};

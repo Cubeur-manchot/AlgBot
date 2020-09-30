@@ -2,7 +2,7 @@
 
 const {getGeneralHelpMessage} = require("./help.js");
 const {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions} = require("./options.js");
-const {getAlgListHelpMessage, cleanSequence, parseMoves, countMoves} = require("./algs.js");
+const {getAlgListHelpMessage, cleanSequence, parseMoves, countMoves, mergeMoves} = require("./algs.js");
 
 const getInfoFromCommand = (message, language) => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
@@ -43,7 +43,10 @@ const parseTheCommand = command => {
 	let movesToParse = messageWords.filter(word => !word.startsWith("-"));
 	let optionsToParse = messageWords.filter(word => word.startsWith("-"));
 	let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(cleanSequence(movesToParse.join(" "))); // parse moves
-	let {stage, view, colorScheme, puzzle, shouldCountMoves, unrecognizedOptions} = parseOptions(optionsToParse); // parse options
+	let {stage, view, colorScheme, puzzle, shouldCountMoves, shouldMergeMoves, unrecognizedOptions} = parseOptions(optionsToParse); // parse options
+	if (shouldMergeMoves) {
+		moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer);
+	}
 	if (shouldCountMoves["htm"] || shouldCountMoves["stm"] || shouldCountMoves["etm"]) {
 		moveSequenceForAnswer += " (" + countMoves(moveSequenceForAnswer, shouldCountMoves).join(", ") + ")"; // add move count if necessary
 	}
