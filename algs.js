@@ -426,6 +426,48 @@ const countRegexInString = (regex, string) => {
 	}
 };
 
+const cleanSequence = moveSequence => {
+	let moveSequenceWork = moveSequence.
+		replace(/'/g, "' "). // split by apostrophe
+		split(" "). // split by space
+		filter(string => { return string !== ""; }); // remove empty moves
+	let moveSequenceOutput = [];
+	for (let subsequence of moveSequenceWork) {
+		if (subsequence.match(/(p|o|cm)ll_|sune|parity|niklas|sexy|edge/gi)) {
+			moveSequenceOutput.push(subsequence); // consider the whole word as a single move (will be fully parsed later)
+		} else {
+			moveSequenceOutput.push(...splitSequence(subsequence, [
+				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
+				/[0-9]-[0-9][RUFLDB]w?[0-9]'?(?!-)/g, // moves of the form 2-3Rw2, not followed by a -
+				/[0-9]-[0-9][RUFLDB]w?'?/g, // moves of the form 2-3Rw. Note : if a number follows this sequence, it will be treated with the rest of the sequence
+				/[0-9]?(?:[RUFLDB]w?|[rufldb])[0-9]?'?/g, // moves of the form 2Rw2, 2Rw, Rw2, Rw, 2R2, 2R, R2, R, 2r2, 2r, r2, r. Note : the matching is greedy from left
+			], 0));
+		}
+	}
+	return moveSequenceOutput.filter(string => { return string !== ""; }); // remove empty moves
+};
+
+const splitSequence = (moveSequenceString, patternList, priority) => {
+	if (moveSequenceString === "") {
+		return [];
+	} else if (priority === patternList.length) {
+		return [moveSequenceString];
+	} else {
+		let moveSequenceArray = [];
+		let matches = moveSequenceString.match(patternList[priority]); // all matching subsequences
+		let antiMatches = moveSequenceString.split(patternList[priority]); // all non-matching subsequences
+		let nbMatches = matches === null ? 0 : matches.length;
+		if (nbMatches !== 0) {
+			for (let i = 0; i < nbMatches; i++) {
+				moveSequenceArray.push(...splitSequence(antiMatches[i], patternList, priority + 1));
+				moveSequenceArray.push(matches[i]);
+			}
+		}
+		moveSequenceArray.push(...splitSequence(antiMatches[nbMatches], patternList, priority + 1)); // antiMatches has always 1 more element than matches
+		return moveSequenceArray;
+	}
+};
+
 const getAlgListHelpMessage = language => {
 	if (language === "french") {
 		return "Je peux insérer directement des algos enregistrés.\nLes algos enregistrés sont les suivants :\n"
@@ -464,4 +506,4 @@ const getAlgListHelpMessage = language => {
 	}
 };
 
-module.exports = {parseMoves, countMoves, getAlgListHelpMessage};
+module.exports = {cleanSequence, parseMoves, countMoves, getAlgListHelpMessage};
