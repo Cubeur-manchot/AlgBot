@@ -7,7 +7,9 @@ const parseOptions = options => {
 		puzzle: "3",
 		colorScheme: "wrgyob",
 		shouldCountMoves: [],
-		unrecognizedOptions: []}; // default parameters
+		shouldMergeMoves: false,
+		unrecognizedOptions: []
+	}; // default parameters
 	result.shouldCountMoves["htm"] = false;
 	result.shouldCountMoves["stm"] = false;
 	result.shouldCountMoves["etm"] = false;
@@ -32,6 +34,8 @@ const parseOptions = options => {
 			} else {
 				result.shouldCountMoves[option.substring(1)] = true;
 			}
+		} else if (option === "-merge") {
+			result.shouldMergeMoves = true;
 		} else {
 			result.unrecognizedOptions.push(option);
 		}
@@ -133,7 +137,9 @@ const getOptionsHelpMessage = language => {
 			+ "\n`-yellow` : affiche le cube avec du jaune en haut à la place du blanc par défaut :"
 			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```"
 			+ "\n`-htm`, `-stm`, `-etm` : compte les mouvements avec la métrique demandée (`-count` : compte avec toutes les métriques) :"
-			+ "```yaml\n$alg PLL_Y -count```\n";
+			+ "```yaml\n$alg PLL_Y -count```"
+			+ "\n`-merge : fusionne et annule les mouvements si possible"
+			+ "```yaml\n$alg OLL_33 OLL_37 -merge```\n";
 	} else { // english
 		return "Here are the options I support :\n"
 			+ "\n`-puzzle` : allows to display the alg on a puzzle other than 3x3 :"
@@ -150,7 +156,9 @@ const getOptionsHelpMessage = language => {
 			+ "\n`-yellow` : displays the cube with yellow on top instead of white by default :"
 			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -yellow```"
 			+ "\n`-htm`, `-stm`, `-etm` : count moves with specified metrics (`-count` : count with all metrics) :"
-			+ "```yaml\n$alg PLL_Y -count```\n";
+			+ "```yaml\n$alg PLL_Y -count```"
+			+ "\n`-merge : merge and cancel moves if possible"
+			+ "```yaml\n$alg OLL_33 OLL_37 -merge```\n";
 	}
 };
 
