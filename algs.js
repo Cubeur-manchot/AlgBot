@@ -524,9 +524,9 @@ const splitSequence = (moveSequenceString, patternList, priority) => {
 		let antiMatches = moveSequenceString.split(patternList[priority]); // all non-matching subsequences
 		let nbMatches = matches === null ? 0 : matches.length;
 		if (nbMatches !== 0) {
-			for (let i = 0; i < nbMatches; i++) {
-				moveSequenceArray.push(...splitSequence(antiMatches[i], patternList, priority + 1));
-				moveSequenceArray.push(matches[i]);
+			for (let matchIndex = 0; matchIndex < nbMatches; matchIndex++) {
+				moveSequenceArray.push(...splitSequence(antiMatches[matchIndex], patternList, priority + 1));
+				moveSequenceArray.push(matches[matchIndex]);
 			}
 		}
 		moveSequenceArray.push(...splitSequence(antiMatches[nbMatches], patternList, priority + 1)); // antiMatches has always 1 more element than matches
