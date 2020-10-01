@@ -421,15 +421,6 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 	return result;
 };
 
-const countRegexInString = (regex, string) => {
-	let matches = string.match(regex);
-	if (matches === null) {
-		return 0;
-	} else {
-		return matches.length;
-	}
-};
-
 const mergeMoves = moveSequence => {
 	return moveSequence;
 };
