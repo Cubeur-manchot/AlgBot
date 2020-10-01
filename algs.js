@@ -147,16 +147,40 @@ const algCollection = {
 	triggerCollection: {
 		sledge: "R' F R F'",
 		hedge: "F R' F' R",
+		backsledge: "R B' R' B",
+		backhedge: "B' R B R'",
+		leftsledge: "L F' L' F",
+		lefthedge: "F' L F L'",
 		doublesledge: "R' F R F' R' F R F'",
 		doublehedge: "F R' F' R F R' F' R",
+		doublebacksledge: "R B' R' B R B' R' B",
+		doublebackhedge: "B' R B R' B' R B R'",
+		leftdoublesledge: "L F' L' F L F' L' F",
+		leftdoublehedge: "F' L F L' F' L F L'",
 		triplesledge: "R' F R F' R' F R F' R' F R F'",
 		triplehedge: "F R' F' R F R' F' R F R' F' R",
+		backtriplesledge: "R B' R' B R B' R' B R B' R' B",
+		backtriplehedge: "B' R B R' B' R B R' B' R B R'",
+		lefttriplesledge: "L F' L' F L F' L' F L F' L' F",
+		lefttriplehedge: "F' L F L' F' L F L' F' L F L'",
 		sexy: "R U R' U'",
 		antisexy: "U R U' R'",
+		backsexy: "R' U' R U",
+		backantisexy: "U' R' U R",
+		leftsexy: "L' U' L U",
+		leftantisexy: "U' L' U L",
 		doublesexy: "R U R' U' R U R' U'",
 		doubleantisexy: "U R U' R' U R U' R'",
+		backdoublesexy: "R' U' R U R' U' R U",
+		backdoubleantisexy: "U' R' U R U' R' U R",
+		leftdoublesexy: "L' U' L U L' U' L U",
+		leftdoubleantisexy: "U' L' U L U' L' U L",
 		triplesexy: "R U R' U' R U R' U' R U R' U'",
-		tripleantisexy: "U R U' R' U R U' R' U R U' R'"
+		tripleantisexy: "U R U' R' U R U' R' U R U' R'",
+		backtriplesexy: "R' U' R U R' U' R U R' U' R U",
+		backtripleantisexy: "U' R' U R U' R' U R U' R' U R",
+		lefttriplesexy: "L' U' L U L' U' L U L' U' L U",
+		lefttripleantisexy: "U' L' U L U' L' U L U' L' U L"
 	},
 	parity4x4x4Collection: {
 		ollparity: "r U2 x r U2 r U2' r' U2 l U2 r' U2' r U2 r' U2' r'",
@@ -421,17 +445,75 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 	return result;
 };
 
-const countRegexInString = (regex, string) => {
-	let matches = string.match(regex);
-	if (matches === null) {
-		return 0;
+const mergeMoves = moveSequence => {
+	if (moveSequence === "") {
+		return moveSequence;
 	} else {
-		return matches.length;
+		let moveSequenceArray = moveSequence.split(" ");
+		let moveSequenceOutput = [];
+		let movePattern = /[RUFLDBrufldbMESxyz]/g;
+		let lastMove = {
+			prefix: moveSequenceArray[0].split(movePattern)[0],
+			family: moveSequenceArray[0].match(movePattern)[0],
+			suffix: moveSequenceArray[0].split(movePattern)[1]
+		};
+		for (let moveIndex = 1; moveIndex < moveSequenceArray.length; moveIndex++) {
+			let currentMove = {
+				prefix: moveSequenceArray[moveIndex].split(movePattern)[0],
+				family: moveSequenceArray[moveIndex].match(movePattern)[0],
+				suffix: moveSequenceArray[moveIndex].split(movePattern)[1]
+			};
+			if (currentMove.family === lastMove.family && currentMove.prefix === lastMove.prefix) { // R* R* (simple cancellation)
+				let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
+				let currentTurnAngle = getTurnAngleFromSuffix(currentMove.suffix);
+				let combinedTurnAngle = ((lastTurnAngle + currentTurnAngle) % 4 + 4) % 4;
+				switch (combinedTurnAngle) {
+					case 0: // perfect cancellation
+						moveIndex++;
+						if (moveIndex < moveSequenceArray.length) { // continue to try to merge moves
+							lastMove = {
+								prefix: moveSequenceArray[moveIndex].split(movePattern)[0],
+								family: moveSequenceArray[moveIndex].match(movePattern),
+								suffix: moveSequenceArray[moveIndex].split(movePattern)[1]
+							};
+						} else { // reach the end of the string
+							return moveSequenceOutput.join(" ");
+						}
+						break;
+					case 1: lastMove.suffix = ""; break; // classic fusion
+					case 2: // classic fusion
+						if (currentMove.suffix.includes("'") && lastMove.suffix.includes("'")) {
+							lastMove.suffix = "2'";
+						} else {
+							lastMove.suffix = "2";
+						}
+						break;
+					case 3: lastMove.suffix = "'"; break; // classic fusion
+				}
+			} else { // moves can't be merged
+				moveSequenceOutput.push(lastMove.prefix + lastMove.family + lastMove.suffix);
+				lastMove = currentMove;
+			}
+		}
+		moveSequenceOutput.push(lastMove.prefix + lastMove.family + lastMove.suffix);
+		return moveSequenceOutput.join(" ");
 	}
 };
 
-const mergeMoves = moveSequence => {
-	return moveSequence;
+const getTurnAngleFromSuffix = suffix => {
+	if (suffix.includes("'")) {
+		if (suffix.slice(0, -1) === "") {
+			return -1;
+		} else {
+			return - suffix.slice(0, -1);
+		}
+	} else {
+		if (suffix === "") {
+			return 1;
+		} else {
+			return suffix.slice(0, -1);
+		}
+	}
 };
 
 const cleanSequence = moveSequence => {
@@ -466,9 +548,9 @@ const splitSequence = (moveSequenceString, patternList, priority) => {
 		let antiMatches = moveSequenceString.split(patternList[priority]); // all non-matching subsequences
 		let nbMatches = matches === null ? 0 : matches.length;
 		if (nbMatches !== 0) {
-			for (let i = 0; i < nbMatches; i++) {
-				moveSequenceArray.push(...splitSequence(antiMatches[i], patternList, priority + 1));
-				moveSequenceArray.push(matches[i]);
+			for (let matchIndex = 0; matchIndex < nbMatches; matchIndex++) {
+				moveSequenceArray.push(...splitSequence(antiMatches[matchIndex], patternList, priority + 1));
+				moveSequenceArray.push(matches[matchIndex]);
 			}
 		}
 		moveSequenceArray.push(...splitSequence(antiMatches[nbMatches], patternList, priority + 1)); // antiMatches has always 1 more element than matches
