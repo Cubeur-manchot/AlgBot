@@ -394,17 +394,21 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 		moveCount["stm"] = 0;
 		moveCount["etm"] = 0;
 	} else {
-		let simpleMovesCount =
-			countRegexInString(/(?<![0-9])[RUFLDBrufldb]/g, moveSequence) // moves of the form R, without a number before
-			+ countRegexInString(/(?<!-)[2-9][RUFLDB]w/g, moveSequence) // moves of the form 3Rw, without a - before
-			+ countRegexInString(/(?<!-)1[RUFLDB]/g, moveSequence) // moves of the form 1R, without a - before
-			+ countRegexInString(/[0-9]-[01][RUFLDB]/g, moveSequence) // moves of the form 3-1R
-			+ countRegexInString(/[01]-[0-9][RUFLDB]/g, moveSequence); // moves of the form 1-3R
-		let sliceMovesCount =
-			countRegexInString(/[MES]/g, moveSequence) // moves of the form M
-			+ countRegexInString(/(?<!-)[2-9][RUFLDB](?!w)/g, moveSequence) // moves of the form 3R, without a w after and without a - before
-			+ countRegexInString(/[2-9]-[2-9][RUFLDB]/g, moveSequence); // moves of the form 2-3R
-		let rotationMovesCount = countRegexInString(/[xyz]/g, moveSequence); // moves of the form x
+		let simpleMovesCount = 0, sliceMovesCount = 0, rotationMovesCount = 0;
+		for (let move of moveSequence.split(" ")) {
+			if (/[xyz][0-9]?'?/g.test(move)) { // moves of the form x
+				rotationMovesCount++;
+			} else if (/[MES][0-9]?'?/g.test(move) // moves of the form M
+				|| /[2-9]-[2-9][RUFLDB]w?[0-9]?'?/g.test(move) // moves of the form 2-3Rw
+				|| /(?<!-)[2-9][RUFLDB](?!w)[0-9]?'?/g.test(move)) { // moves of the form 2R, without a "-" before, not followed by a "w"
+				sliceMovesCount++;
+			} else if (/([01]-[0-9]|[0-9]-[01])[RUFLDB]w?[0-9]?'?/g.test(move) // moves of the form 1-3Rw2' or 3-1Rw2'
+				|| /(?<!-)[01][RUFLDB]w?[0-9]?'?/g.test(move) // moves of the form 1R, without a "-" before
+				|| /(?<!-)[2-9]?([RUFLDB]w|[rufldb])[0-9]?'?/g.test(move) // moves of the form 3Rw or 3r, without a "-" before
+				|| /(?<![0-9])[RUFDLB](?!w)[0-9]?'?/g.test(move)) { // moves of the form R, without a digit before, not followed by a "w"
+				simpleMovesCount++;
+			} // other moves are ignored
+		}
 		moveCount["htm"] = simpleMovesCount + 2*sliceMovesCount;
 		moveCount["stm"] = simpleMovesCount + sliceMovesCount;
 		moveCount["etm"] = simpleMovesCount + sliceMovesCount + rotationMovesCount;
