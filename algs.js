@@ -457,7 +457,7 @@ const mergeMoves = moveSequence => {
 			if (currentMove.family === lastMove.family && currentMove.prefix === lastMove.prefix) { // R* R* (simple cancellation)
 				let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
 				let currentTurnAngle = getTurnAngleFromSuffix(currentMove.suffix);
-				let combinedTurnAngle = ((lastTurnAngle + currentTurnAngle) % 4 + 4) % 4;
+				let combinedTurnAngle = ((+lastTurnAngle + +currentTurnAngle) % 4 + 4) % 4;
 				switch (combinedTurnAngle) {
 					case 0: // perfect cancellation
 						moveIndex++;
