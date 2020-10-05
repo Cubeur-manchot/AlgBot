@@ -449,10 +449,10 @@ const mergeMoves = moveSequence => {
 	if (moveSequence === "") {
 		return moveSequence;
 	} else {
-		let moveSequenceArray = moveSequence.split(" ");
-		let moveSequenceOutput = [];
-		for (let moveIndex = 1; moveIndex < moveSequenceArray.length; moveIndex++) {
+		let moveSequenceArrayInput = moveSequence.split(" ");
+		let moveSequenceArrayOutput = [];
 		let lastMove = parseOneMove(moveSequenceArrayInput[0]);
+		for (let moveIndex = 1; moveIndex < moveSequenceArrayInput.length; moveIndex++) {
 			let currentMove = parseOneMove(moveSequenceArrayInput[moveIndex]);
 			if (currentMove.family === lastMove.family && currentMove.prefix === lastMove.prefix) { // R* R* (simple cancellation)
 				let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
