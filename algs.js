@@ -460,9 +460,14 @@ const mergeMoves = moveSequence => {
 				let combinedTurnAngle = ((+lastTurnAngle + +currentTurnAngle) % 4 + 4) % 4;
 				switch (combinedTurnAngle) {
 					case 0: // perfect cancellation
-						moveIndex++;
-						if (moveIndex < moveSequenceArray.length) { // continue to try to merge moves
-						} else { // reach the end of the string
+						if (moveIndex < moveSequenceArrayInput.length - 1) { // continue to try to merge next moves with the last one
+							if (moveSequenceArrayOutput.length === 0) {
+								moveIndex++;
+								lastMove = parseOneMove(moveSequenceArrayInput[moveIndex]);
+							} else {
+								lastMove = moveSequenceArrayOutput.pop();
+							}
+						} else { // reached the end of the string
 							return getOutputSequenceStringFromArray(moveSequenceArrayOutput);
 						}
 						break;
