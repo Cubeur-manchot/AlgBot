@@ -303,7 +303,11 @@ const mergeMoves = moveSequence => {
 				lastMove = currentMove;
 			}
 		}
-		moveSequenceArrayOutput.push(lastMove);
+		moveSequenceArrayOutput.push({
+			prefix: lastMove.prefix,
+			family: lastMove.family,
+			suffix: lastMove.suffix === "1" ? "" : lastMove.suffix
+		});
 		return getOutputSequenceStringFromArray(moveSequenceArrayOutput);
 	}
 };
