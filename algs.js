@@ -463,7 +463,7 @@ const mergeMoves = moveSequence => {
 						moveIndex++;
 						if (moveIndex < moveSequenceArray.length) { // continue to try to merge moves
 						} else { // reach the end of the string
-							return moveSequenceOutput.join(" ");
+							return getOutputSequenceStringFromArray(moveSequenceArrayOutput);
 						}
 						break;
 					case 1: lastMove.suffix = ""; break; // classic fusion
@@ -477,12 +477,19 @@ const mergeMoves = moveSequence => {
 					case 3: lastMove.suffix = "'"; break; // classic fusion
 				}
 			} else { // moves can't be merged
-				moveSequenceOutput.push(lastMove.prefix + lastMove.family + lastMove.suffix);
+				moveSequenceArrayOutput.push({
+					prefix: lastMove.prefix,
+					family: lastMove.family,
+					suffix: lastMove.suffix === "1" ? "" : lastMove.suffix
+				});
 				lastMove = currentMove;
 			}
 		}
-		moveSequenceOutput.push(lastMove.prefix + lastMove.family + lastMove.suffix);
-		return moveSequenceOutput.join(" ");
+		moveSequenceArrayOutput.push(lastMove);
+		return getOutputSequenceStringFromArray(moveSequenceArrayOutput);
+	}
+};
+
 const parseOneMove = move => {
 	let movePattern = /[RUFLDBrufldbMESxyz]/g;
 	let moveInfo = {
@@ -496,7 +503,12 @@ const parseOneMove = move => {
 	return moveInfo;
 };
 
+const getOutputSequenceStringFromArray = moveSequenceArray => {
+	let moveSequenceString = "";
+	for (let moveObject of moveSequenceArray) {
+		moveSequenceString += moveObject.prefix + moveObject.family + moveObject.suffix + " ";
 	}
+	return moveSequenceString.slice(0, -1); // remove last space
 };
 
 const getTurnAngleFromSuffix = suffix => {
