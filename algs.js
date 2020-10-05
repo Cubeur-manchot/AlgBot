@@ -451,18 +451,9 @@ const mergeMoves = moveSequence => {
 	} else {
 		let moveSequenceArray = moveSequence.split(" ");
 		let moveSequenceOutput = [];
-		let movePattern = /[RUFLDBrufldbMESxyz]/g;
-		let lastMove = {
-			prefix: moveSequenceArray[0].split(movePattern)[0],
-			family: moveSequenceArray[0].match(movePattern)[0],
-			suffix: moveSequenceArray[0].split(movePattern)[1]
-		};
 		for (let moveIndex = 1; moveIndex < moveSequenceArray.length; moveIndex++) {
-			let currentMove = {
-				prefix: moveSequenceArray[moveIndex].split(movePattern)[0],
-				family: moveSequenceArray[moveIndex].match(movePattern)[0],
-				suffix: moveSequenceArray[moveIndex].split(movePattern)[1]
-			};
+		let lastMove = parseOneMove(moveSequenceArrayInput[0]);
+			let currentMove = parseOneMove(moveSequenceArrayInput[moveIndex]);
 			if (currentMove.family === lastMove.family && currentMove.prefix === lastMove.prefix) { // R* R* (simple cancellation)
 				let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
 				let currentTurnAngle = getTurnAngleFromSuffix(currentMove.suffix);
@@ -471,11 +462,6 @@ const mergeMoves = moveSequence => {
 					case 0: // perfect cancellation
 						moveIndex++;
 						if (moveIndex < moveSequenceArray.length) { // continue to try to merge moves
-							lastMove = {
-								prefix: moveSequenceArray[moveIndex].split(movePattern)[0],
-								family: moveSequenceArray[moveIndex].match(movePattern),
-								suffix: moveSequenceArray[moveIndex].split(movePattern)[1]
-							};
 						} else { // reach the end of the string
 							return moveSequenceOutput.join(" ");
 						}
@@ -497,6 +483,19 @@ const mergeMoves = moveSequence => {
 		}
 		moveSequenceOutput.push(lastMove.prefix + lastMove.family + lastMove.suffix);
 		return moveSequenceOutput.join(" ");
+const parseOneMove = move => {
+	let movePattern = /[RUFLDBrufldbMESxyz]/g;
+	let moveInfo = {
+		prefix: move.split(movePattern)[0],
+		family:	move.match(movePattern)[0],
+		suffix:	move.split(movePattern)[1]
+	};
+	if (moveInfo.suffix === "") {
+		moveInfo.suffix = "1";
+	}
+	return moveInfo;
+};
+
 	}
 };
 
@@ -511,7 +510,7 @@ const getTurnAngleFromSuffix = suffix => {
 		if (suffix === "") {
 			return 1;
 		} else {
-			return suffix.slice(0, -1);
+			return suffix;
 		}
 	}
 };
