@@ -225,7 +225,7 @@ const deployMove = move => {
 	return moveSequence;
 };
 
-// move countiong
+// move counting
 
 const countMoves = (moveSequence, shouldCountMoves) => {
 	let moveCount = [];
