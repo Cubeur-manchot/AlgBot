@@ -2,6 +2,8 @@
 
 const {algCollection} = require("./algCollection.js");
 
+// sequence parsing
+
 const invertSequence = moves => {
 	let invertedSequence = [];
 	if (moves === "") {
@@ -223,6 +225,8 @@ const deployMove = move => {
 	return moveSequence;
 };
 
+// move countiong
+
 const countMoves = (moveSequence, shouldCountMoves) => {
 	let moveCount = [];
 	let result = [];
@@ -257,6 +261,8 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 	}
 	return result;
 };
+
+// move merging
 
 const mergeMoves = moveSequence => {
 	if (moveSequence === "") {
@@ -349,6 +355,8 @@ const getTurnAngleFromSuffix = suffix => {
 	}
 };
 
+// sequence cleaning
+
 const cleanSequence = moveSequence => {
 	let moveSequenceWork = moveSequence.
 		replace(/'/g, "' "). // split by apostrophe
@@ -390,6 +398,8 @@ const splitSequence = (moveSequenceString, patternList, priority) => {
 		return moveSequenceArray;
 	}
 };
+
+// help messages
 
 const getAlgListHelpMessage = language => {
 	if (language === "french") {
