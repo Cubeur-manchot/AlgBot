@@ -374,7 +374,7 @@ const splitSequence = (moveSequenceString, patternList, priority) => {
 	if (moveSequenceString === "") {
 		return [];
 	} else if (priority === patternList.length) {
-		return [moveSequenceString];
+		return [];
 	} else {
 		let moveSequenceArray = [];
 		let matches = moveSequenceString.match(patternList[priority]); // all matching subsequences
