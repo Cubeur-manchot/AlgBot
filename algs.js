@@ -382,7 +382,7 @@ const splitSequence = (moveSequenceString, patternList, priority) => {
 	if (moveSequenceString === "") {
 		return [];
 	} else if (priority === patternList.length) {
-		moveSequenceString = moveSequenceString.replace(/[^,:\[\]()]/g, ""); // keep only characters [],: which are necessary for structure parsing
+		moveSequenceString = moveSequenceString.replace(/(?![,:\[\](]|\)[0-9]*)/g, ""); // keep only characters [ ] , : ( and )\d* which are necessary for structure parsing
 		if (moveSequenceString === "") {
 			return [];
 		} else {
