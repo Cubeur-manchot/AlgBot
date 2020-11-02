@@ -265,56 +265,79 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 // move merging
 
 const mergeMoves = moveSequence => {
-	if (moveSequence === "") {
+	if (moveSequence.length <= 1) { // sequence is too small, moves can't be merged
 		return moveSequence;
 	} else {
-		let moveSequenceArrayInput = moveSequence.split(" ");
-		let moveSequenceArrayOutput = [];
-		let lastMove = parseOneMove(moveSequenceArrayInput[0]);
-		for (let moveIndex = 1; moveIndex < moveSequenceArrayInput.length; moveIndex++) {
-			let currentMove = parseOneMove(moveSequenceArrayInput[moveIndex]);
-			if (currentMove.family === lastMove.family && currentMove.prefix === lastMove.prefix) { // R* R* (simple cancellation)
-				let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
-				let currentTurnAngle = getTurnAngleFromSuffix(currentMove.suffix);
-				let combinedTurnAngle = ((+lastTurnAngle + +currentTurnAngle) % 4 + 4) % 4;
-				switch (combinedTurnAngle) {
-					case 0: // perfect cancellation
-						if (moveIndex < moveSequenceArrayInput.length - 1) { // continue to try to merge next moves with the last one
-							if (moveSequenceArrayOutput.length === 0) {
-								moveIndex++;
-								lastMove = parseOneMove(moveSequenceArrayInput[moveIndex]);
-							} else {
-								lastMove = moveSequenceArrayOutput.pop();
+		let movesToMergeSplitByCommutingGroup = [], moveSequenceArrayOutput = [], nonMergingMoves = [];
+		moveSequence.split(" ").forEach(moveString => { // parse prefix, family and suffix on each move, and join them by commuting groups
+			let moveObject = parseOneMove(moveString);
+			if (movesToMergeSplitByCommutingGroup.length === 0
+			|| moveObject.familyGroup !== getLastElementOfArray(getLastElementOfArray(movesToMergeSplitByCommutingGroup)).familyGroup) {
+				movesToMergeSplitByCommutingGroup.push([moveObject]);
+			} else {
+				getLastElementOfArray(movesToMergeSplitByCommutingGroup).push(moveObject);
+			}
+		});
+		let lastMove, nextMove, fusion = [];
+		for (let moveCommutingSubsequence of movesToMergeSplitByCommutingGroup) {
+			while (moveCommutingSubsequence.length !== 0) {
+				[lastMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
+				if (moveCommutingSubsequence.length !== 0) { // move is not alone in commuting group, try to merge moves
+					tryToMergeMoves:
+					{
+						while (moveCommutingSubsequence.length !== 0) {
+							[nextMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
+							fusion = tryToMergeTwoMoves(lastMove, nextMove);
+							if (fusion.length === 0) { // perfect cancellation, just reinitialize arrays and break the loop
+								moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
+								nonMergingMoves = [];
+								break tryToMergeMoves;
+							} else if (fusion.length === 1) { // normal fusion, reinitialize arrays and keep trying to merge
+								lastMove = fusion[0];
+								moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
+								nonMergingMoves = [];
+							} else if (fusion.length === 2) { // no merge, keep trying to merge
+								nonMergingMoves.push(nextMove);
 							}
-						} else { // reached the end of the string
-							return getOutputSequenceStringFromArray(moveSequenceArrayOutput);
 						}
-						break;
-					case 1: lastMove.suffix = ""; break; // classic fusion
-					case 2: // classic fusion
-						if (currentMove.suffix.includes("'") && lastMove.suffix.includes("'")) {
-							lastMove.suffix = "2'";
-						} else {
-							lastMove.suffix = "2";
-						}
-						break;
-					case 3: lastMove.suffix = "'"; break; // classic fusion
+						moveSequenceArrayOutput.push(...fusion);
+					}
+				} else { // move is alone in commuting group, it should simply be added
+					moveSequenceArrayOutput.push(lastMove);
 				}
-			} else { // moves can't be merged
-				moveSequenceArrayOutput.push({
-					prefix: lastMove.prefix,
-					family: lastMove.family,
-					suffix: lastMove.suffix === "1" ? "" : lastMove.suffix
-				});
-				lastMove = currentMove;
 			}
 		}
-		moveSequenceArrayOutput.push({
-			prefix: lastMove.prefix,
-			family: lastMove.family,
-			suffix: lastMove.suffix === "1" ? "" : lastMove.suffix
-		});
 		return getOutputSequenceStringFromArray(moveSequenceArrayOutput);
+	}
+};
+
+const tryToMergeTwoMoves = (lastMove, nextMove) => {
+	if (lastMove.family === nextMove.family && lastMove.prefix === nextMove.prefix) { // 2R* 2R* (simple pattern)
+		let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
+		let nextTurnAngle = getTurnAngleFromSuffix(nextMove.suffix);
+		let combinedTurnAngle = ((+lastTurnAngle + +nextTurnAngle) % 4 + 4) % 4;
+		if (combinedTurnAngle === 0) {
+			return [];
+		} else {
+			let suffixString = "";
+			if (combinedTurnAngle === 3) {
+				suffixString = "'";
+			} else if (combinedTurnAngle === 2) {
+				if (lastMove.suffix.includes("'") && nextMove.suffix.includes("'")) {
+					suffixString = "2'";
+				} else {
+					suffixString = "2";
+				}
+			} // else combinedTurnAngle === 1 and suffixString = ""
+			return [{
+				prefix: lastMove.prefix,
+				family: lastMove.family,
+				suffix: suffixString,
+				familyGroup: lastMove.familyGroup
+			}];
+		}
+	} else { // nothing to merge
+		return [lastMove, nextMove];
 	}
 };
 
@@ -325,6 +348,11 @@ const parseOneMove = move => {
 		family:	move.match(movePattern)[0],
 		suffix:	move.split(movePattern)[1]
 	};
+	for (let familyGroup of [/[RLrlM]/g, /[UDudE]/g, /[FBfbS]/g]) {
+		if (familyGroup.test(move)) {
+			moveInfo.familyGroup = familyGroup + "";
+		}
+	}
 	if (moveInfo.suffix === "") {
 		moveInfo.suffix = "1";
 	}
@@ -334,7 +362,7 @@ const parseOneMove = move => {
 const getOutputSequenceStringFromArray = moveSequenceArray => {
 	let moveSequenceString = "";
 	for (let moveObject of moveSequenceArray) {
-		moveSequenceString += moveObject.prefix + moveObject.family + moveObject.suffix + " ";
+		moveSequenceString += moveObject.prefix + moveObject.family + (moveObject.suffix === "1" ? "" : moveObject.suffix) + " ";
 	}
 	return moveSequenceString.slice(0, -1); // remove last space
 };
@@ -344,15 +372,19 @@ const getTurnAngleFromSuffix = suffix => {
 		if (suffix.slice(0, -1) === "") {
 			return -1;
 		} else {
-			return - suffix.slice(0, -1);
+			return - parseInt(suffix.slice(0, -1));
 		}
 	} else {
 		if (suffix === "") {
 			return 1;
 		} else {
-			return suffix;
+			return parseInt(suffix);
 		}
 	}
+};
+
+const getLastElementOfArray = array => {
+	return array.slice(-1)[0];
 };
 
 // sequence cleaning
