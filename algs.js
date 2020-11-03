@@ -350,7 +350,7 @@ const parseOneMove = move => {
 		family:	move.match(movePattern)[0],
 		suffix:	move.split(movePattern)[1]
 	};
-	for (let familyGroup of [/[RLrlM]/g, /[UDudE]/g, /[FBfbS]/g]) {
+	for (let familyGroup of [/[RLrlMx]/g, /[UDudEy]/g, /[FBfbSz]/g]) {
 		if (familyGroup.test(move)) {
 			moveInfo.familyGroup = familyGroup + "";
 		}
