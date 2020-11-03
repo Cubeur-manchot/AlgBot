@@ -300,7 +300,9 @@ const mergeMoves = moveSequence => {
 								nonMergingMoves.push(nextMove);
 							}
 						}
-						moveSequenceArrayOutput.push(...fusion);
+						moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
+						nonMergingMoves = [];
+						moveSequenceArrayOutput.push(lastMove);
 					}
 				} else { // move is alone in commuting group, it should simply be added
 					moveSequenceArrayOutput.push(lastMove);
