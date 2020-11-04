@@ -264,51 +264,60 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 
 // move merging
 
-const mergeMoves = moveSequence => {
-	if (moveSequence.length <= 1) { // sequence is too small, moves can't be merged
-		return moveSequence;
+const mergeMoves = moveSequenceString => {
+	if (moveSequenceString.length <= 1) { // sequence is too small, moves can't be merged
+		return moveSequenceString;
 	} else {
-		let movesToMergeSplitByCommutingGroup = [], moveSequenceArrayOutput = [], nonMergingMoves = [];
-		moveSequence.split(" ").forEach(moveString => { // parse prefix, family and suffix on each move, and join them by commuting groups
-			let moveObject = parseOneMove(moveString);
-			if (movesToMergeSplitByCommutingGroup.length === 0
-			|| moveObject.familyGroup !== getLastElementOfArray(getLastElementOfArray(movesToMergeSplitByCommutingGroup)).familyGroup) {
-				movesToMergeSplitByCommutingGroup.push([moveObject]);
-			} else {
-				getLastElementOfArray(movesToMergeSplitByCommutingGroup).push(moveObject);
-			}
-		});
-		let lastMove, nextMove, fusion = [];
-		for (let moveCommutingSubsequence of movesToMergeSplitByCommutingGroup) {
-			while (moveCommutingSubsequence.length !== 0) {
-				[lastMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
-				if (moveCommutingSubsequence.length !== 0) { // move is not alone in commuting group, try to merge moves
-					tryToMergeMoves:
-					{
-						while (moveCommutingSubsequence.length !== 0) {
-							[nextMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
-							fusion = tryToMergeTwoMoves(lastMove, nextMove);
-							if (fusion.length === 0) { // perfect cancellation, just reinitialize arrays and break the loop
-								moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
-								nonMergingMoves = [];
-								break tryToMergeMoves;
-							} else if (fusion.length === 1) { // normal fusion, reinitialize arrays and keep trying to merge
-								lastMove = fusion[0];
-								moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
-								nonMergingMoves = [];
-							} else if (fusion.length === 2) { // no merge, keep trying to merge
-								nonMergingMoves.push(nextMove);
+		let shouldRecomputeAfter;
+		let movesToMergeSplitByCommutingGroup, moveSequenceArrayOutput, parsedMoveSequence = [];
+		moveSequenceString.split(" ").forEach(moveString => parsedMoveSequence.push(parseOneMove(moveString))); // parse prefix, family and suffix on each move
+		do {
+			shouldRecomputeAfter = false;
+			movesToMergeSplitByCommutingGroup = [];
+			parsedMoveSequence.forEach(moveObject => { // join moves by commuting groups
+				if (movesToMergeSplitByCommutingGroup.length === 0
+					|| moveObject.familyGroup !== getLastElementOfArray(getLastElementOfArray(movesToMergeSplitByCommutingGroup)).familyGroup) {
+					movesToMergeSplitByCommutingGroup.push([moveObject]);
+				} else {
+					getLastElementOfArray(movesToMergeSplitByCommutingGroup).push(moveObject);
+				}
+			});
+			moveSequenceArrayOutput = [];
+			let lastMove, nextMove, fusion = [];
+			for (let moveCommutingSubsequence of movesToMergeSplitByCommutingGroup) {
+				while (moveCommutingSubsequence.length !== 0) {
+					[lastMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
+					if (moveCommutingSubsequence.length !== 0) { // move is not alone in commuting group, try to merge moves
+						tryToMergeMoves:
+						{
+							let nonMergingMoves = [];
+							while (moveCommutingSubsequence.length !== 0) {
+								[nextMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
+								fusion = tryToMergeTwoMoves(lastMove, nextMove);
+								if (fusion.length === 0) { // perfect cancellation, just reinitialize arrays and break the loop
+									moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
+									nonMergingMoves = [];
+									shouldRecomputeAfter = true;
+									break tryToMergeMoves;
+								} else if (fusion.length === 1) { // normal fusion, reinitialize arrays and keep trying to merge
+									lastMove = fusion[0];
+									moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
+									nonMergingMoves = [];
+								} else if (fusion.length === 2) { // no merge, keep trying to merge
+									nonMergingMoves.push(nextMove);
+								}
 							}
+							moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
+							nonMergingMoves = [];
+							moveSequenceArrayOutput.push(lastMove);
 						}
-						moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
-						nonMergingMoves = [];
+					} else { // move is alone in commuting group, it should simply be added
 						moveSequenceArrayOutput.push(lastMove);
 					}
-				} else { // move is alone in commuting group, it should simply be added
-					moveSequenceArrayOutput.push(lastMove);
 				}
 			}
-		}
+			parsedMoveSequence = moveSequenceArrayOutput.slice(0); // copy moveSequenceArrayOutput into parsedMoveSequence
+		} while (shouldRecomputeAfter);
 		return getOutputSequenceStringFromArray(moveSequenceArrayOutput);
 	}
 };
