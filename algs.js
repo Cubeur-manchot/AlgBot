@@ -323,7 +323,7 @@ const mergeMoves = moveSequenceString => {
 };
 
 const tryToMergeTwoMoves = (lastMove, nextMove) => {
-	if (lastMove.family === nextMove.family && lastMove.prefix === nextMove.prefix) { // 2R* 2R* (simple pattern)
+	if (lastMove.family === nextMove.family && lastMove.prefix === nextMove.prefix && !lastMove.suffix.includes("w") && !nextMove.suffix.includes("w")) { // 2R* 2R* (simple pattern)
 		let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
 		let nextTurnAngle = getTurnAngleFromSuffix(nextMove.suffix);
 		let combinedTurnAngle = ((+lastTurnAngle + +nextTurnAngle) % 4 + 4) % 4;
