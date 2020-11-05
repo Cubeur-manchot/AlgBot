@@ -330,16 +330,10 @@ const tryToMergeTwoMoves = (lastMove, nextMove) => {
 		if (combinedTurnAngle === 0) {
 			return [];
 		} else {
-			let suffixString = "";
-			if (combinedTurnAngle === 3) {
-				suffixString = "'";
-			} else if (combinedTurnAngle === 2) {
-				if (lastMove.suffix.includes("'") && nextMove.suffix.includes("'")) {
-					suffixString = "2'";
-				} else {
-					suffixString = "2";
-				}
-			} // else combinedTurnAngle === 1 and suffixString = ""
+			let suffixString =
+				combinedTurnAngle === 3 ? "'" :
+				combinedTurnAngle === 1 ? "" :
+				((lastMove.suffix.includes("'") && nextMove.suffix.includes("'"))) ? "2'" : "2";
 			return [{
 				prefix: lastMove.prefix,
 				family: lastMove.family,
