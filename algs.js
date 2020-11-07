@@ -322,10 +322,10 @@ const mergeMoves = (moveSequenceString, puzzle) => {
 	}
 };
 
-	if (lastMove.family === nextMove.family && lastMove.prefix === nextMove.prefix && !lastMove.suffix.includes("w") && !nextMove.suffix.includes("w")) { // 2R* 2R* (simple pattern)
-		let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
-		let nextTurnAngle = getTurnAngleFromSuffix(nextMove.suffix);
 const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
+	let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
+	let nextTurnAngle = getTurnAngleFromSuffix(nextMove.suffix);
+	if (lastMove.family === nextMove.family && lastMove.prefix === nextMove.prefix && !lastMove.suffix.includes("w") && !nextMove.suffix.includes("w")) { // 2R* 2R* : combine turn angle
 		let combinedTurnAngle = ((+lastTurnAngle + +nextTurnAngle) % 4 + 4) % 4;
 		if (combinedTurnAngle === 0) {
 			return [];
@@ -341,9 +341,42 @@ const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
 				familyGroup: lastMove.familyGroup
 			}];
 		}
-	} else { // nothing to merge
+	} else {
 		return [lastMove, nextMove];
+		let lastMoveSliceNumbers = getTurnSliceNumbers(lastMove, puzzle);
+		let nextMoveSliceNumbers = getTurnSliceNumbers(nextMove, puzzle);
 	}
+};
+
+const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
+	let orientationSense = /[RrUuFfS]/g.test(moveObject.family);
+	let isMiddleMove = /[MES]/.test(moveObject.family);
+	let hasW = moveObject.family.includes("w");
+	let minSliceNumber, maxSliceNumber, turnAngle = getTurnAngleFromSuffix(moveObject.suffix);
+	if (isMiddleMove) { // move of the form M2
+		let middleSliceNumber = (puzzle + 1)/2;
+		minSliceNumber = middleSliceNumber;
+		maxSliceNumber = middleSliceNumber;
+	} else if (moveObject.prefix.length === 0) { // move of the form R2, Rw2 or r2
+		let isSmallLetter = /[rufldb]/.test(moveObject.family);
+		minSliceNumber = 1 + (isSmallLetter && puzzle !== 3); // = 2 for r2 on 4x4+, = 1 for r2 on 3x3, R2 and Rw2
+		maxSliceNumber = 1 + (isSmallLetter || hasW); // = 1 for R2, 2 for Rw2 and r2
+	} else if (moveObject.prefix.length === 1) { // move of the form 2R2, 2Rw2 or 2r2
+		let digit = moveObject.prefix;
+		minSliceNumber = hasW ? 1 : +digit; // = 1 for 2Rw2, = digit for 2R2 and 2r2
+		maxSliceNumber = +digit; // = digit for 2Rw2, 2R2 and 2r2
+	} else { // move of the form 2-3Rw2 or 2-3R2
+		let firstDigit = +moveObject.prefix[0];
+		let secondDigit = +moveObject.prefix[2];
+		minSliceNumber = Math.min(firstDigit, secondDigit);
+		maxSliceNumber = Math.max(firstDigit, secondDigit);
+	}
+	if (!orientationSense) {
+		turnAngle = -turnAngle;
+		minSliceNumber = puzzle + 1 - minSliceNumber; // complement
+		maxSliceNumber = puzzle + 1 - maxSliceNumber; // complement
+	}
+	return {minSliceNumber, maxSliceNumber, turnAngle};
 };
 
 const parseOneMove = move => {
@@ -406,7 +439,7 @@ const cleanSequence = moveSequence => {
 		} else {
 			moveSequenceOutput.push(...splitSequence(subsequence, [
 				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
-				/[0-9]-[0-9][RUFLDB]w?[0-9]'?(?!-)/g, // moves of the form 2-3Rw2, not followed by a -
+				/[0-9]-[0-9][RUFLDB]w?[0-9]'?(?!-)/g, // moves of the form 2-3Rw2, 2-3R2, not followed by a -
 				/[0-9]-[0-9][RUFLDB]w?'?/g, // moves of the form 2-3Rw. Note : if a number follows this sequence, it will be treated with the rest of the sequence
 				/[0-9]?(?:[RUFLDB]w?|[rufldb])[0-9]?'?/g, // moves of the form 2Rw2, 2Rw, Rw2, Rw, 2R2, 2R, R2, R, 2r2, 2r, r2, r. Note : the matching is greedy from left
 			], 0));
