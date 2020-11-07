@@ -225,6 +225,24 @@ const deployMove = move => {
 	return moveSequence;
 };
 
+const parseOneMove = move => {
+	let movePattern = /[RUFLDBrufldbMESxyz]/g;
+	let moveInfo = {
+		prefix: move.split(movePattern)[0],
+		family:	move.match(movePattern)[0],
+		suffix:	move.split(movePattern)[1]
+	};
+	for (let familyGroup of [/[RLrlMx]/g, /[UDudEy]/g, /[FBfbSz]/g]) {
+		if (familyGroup.test(move)) {
+			moveInfo.familyGroup = familyGroup + "";
+		}
+	}
+	if (moveInfo.suffix === "") {
+		moveInfo.suffix = "1";
+	}
+	return moveInfo;
+};
+
 const getTurnAngleFromSuffix = suffix => {
 	suffix = suffix.replace("w", "");
 	if (suffix.includes("'")) {
@@ -396,22 +414,8 @@ const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
 	return {minSliceNumber, maxSliceNumber, turnAngle};
 };
 
-const parseOneMove = move => {
-	let movePattern = /[RUFLDBrufldbMESxyz]/g;
-	let moveInfo = {
-		prefix: move.split(movePattern)[0],
-		family:	move.match(movePattern)[0],
-		suffix:	move.split(movePattern)[1]
-	};
-	for (let familyGroup of [/[RLrlMx]/g, /[UDudEy]/g, /[FBfbSz]/g]) {
-		if (familyGroup.test(move)) {
-			moveInfo.familyGroup = familyGroup + "";
 		}
 	}
-	if (moveInfo.suffix === "") {
-		moveInfo.suffix = "1";
-	}
-	return moveInfo;
 };
 
 const getOutputSequenceStringFromArray = moveSequenceArray => {
