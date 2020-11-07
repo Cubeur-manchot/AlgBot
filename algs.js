@@ -225,6 +225,23 @@ const deployMove = move => {
 	return moveSequence;
 };
 
+const getTurnAngleFromSuffix = suffix => {
+	suffix = suffix.replace("w", "");
+	if (suffix.includes("'")) {
+		if (suffix.slice(0, -1) === "") {
+			return -1;
+		} else {
+			return - parseInt(suffix.slice(0, -1));
+		}
+	} else {
+		if (suffix === "") {
+			return 1;
+		} else {
+			return parseInt(suffix);
+		}
+	}
+};
+
 // move counting
 
 const countMoves = (moveSequence, shouldCountMoves) => {
@@ -403,22 +420,6 @@ const getOutputSequenceStringFromArray = moveSequenceArray => {
 		moveSequenceString += moveObject.prefix + moveObject.family + (moveObject.suffix === "1" ? "" : moveObject.suffix) + " ";
 	}
 	return moveSequenceString.slice(0, -1); // remove last space
-};
-
-const getTurnAngleFromSuffix = suffix => {
-	if (suffix.includes("'")) {
-		if (suffix.slice(0, -1) === "") {
-			return -1;
-		} else {
-			return - parseInt(suffix.slice(0, -1));
-		}
-	} else {
-		if (suffix === "") {
-			return 1;
-		} else {
-			return parseInt(suffix);
-		}
-	}
 };
 
 const getLastElementOfArray = array => {
