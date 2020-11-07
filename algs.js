@@ -264,7 +264,7 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 
 // move merging
 
-const mergeMoves = moveSequenceString => {
+const mergeMoves = (moveSequenceString, puzzle) => {
 	if (moveSequenceString.length <= 1) { // sequence is too small, moves can't be merged
 		return moveSequenceString;
 	} else {
@@ -293,7 +293,7 @@ const mergeMoves = moveSequenceString => {
 							let nonMergingMoves = [];
 							while (moveCommutingSubsequence.length !== 0) {
 								[nextMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
-								fusion = tryToMergeTwoMoves(lastMove, nextMove);
+								fusion = tryToMergeTwoMoves(lastMove, nextMove, puzzle);
 								if (fusion.length === 0) { // perfect cancellation, just reinitialize arrays and break the loop
 									moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
 									nonMergingMoves = [];
@@ -322,10 +322,10 @@ const mergeMoves = moveSequenceString => {
 	}
 };
 
-const tryToMergeTwoMoves = (lastMove, nextMove) => {
 	if (lastMove.family === nextMove.family && lastMove.prefix === nextMove.prefix && !lastMove.suffix.includes("w") && !nextMove.suffix.includes("w")) { // 2R* 2R* (simple pattern)
 		let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
 		let nextTurnAngle = getTurnAngleFromSuffix(nextMove.suffix);
+const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
 		let combinedTurnAngle = ((+lastTurnAngle + +nextTurnAngle) % 4 + 4) % 4;
 		if (combinedTurnAngle === 0) {
 			return [];

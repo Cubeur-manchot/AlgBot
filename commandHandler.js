@@ -45,7 +45,7 @@ const parseTheCommand = command => {
 	let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(cleanSequence(movesToParse.join(" "))); // parse moves
 	let {stage, view, colorScheme, puzzle, shouldCountMoves, shouldMergeMoves, unrecognizedOptions} = parseOptions(optionsToParse); // parse options
 	if (shouldMergeMoves) {
-		moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer);
+		moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +puzzle);
 	}
 	if (shouldCountMoves["htm"] || shouldCountMoves["stm"] || shouldCountMoves["etm"]) {
 		moveSequenceForAnswer += " (" + countMoves(moveSequenceForAnswer, shouldCountMoves).join(", ") + ")"; // add move count if necessary
