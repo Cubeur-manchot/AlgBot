@@ -139,6 +139,8 @@ const algCollection = {
 		leftbackantisune: "L U2 L' U' L U' L'",
 		doublesune: "R U R' U R U' R' U R U2' R'",
 		doubleantisune: "R U2 R' U' R U R' U' R U' R'",
+		doublebacksune: "R' U' R U' R' U R U' R' U2 R",
+		doublebackantisune: "R' U2 R U R' U' R U R' U R",
 		triplesune: "R U R' U R U' R' U R U' R' U R U2' R'",
 		tripleantisune: "R U2 R' U' R U R' U' R U R' U' R U' R'",
 		niklasright: "R U' L' U R' U' L",
