@@ -260,6 +260,37 @@ const getTurnAngleFromSuffix = suffix => {
 	}
 };
 
+const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
+	let orientationSense = /[RrUuFfS]/g.test(moveObject.family);
+	let isMiddleMove = /[MES]/.test(moveObject.family);
+	let hasW = moveObject.family.includes("w");
+	let minSliceNumber, maxSliceNumber, turnAngle = getTurnAngleFromSuffix(moveObject.suffix);
+	if (isMiddleMove) { // move of the form M2
+		let middleSliceNumber = (puzzle + 1)/2;
+		minSliceNumber = middleSliceNumber;
+		maxSliceNumber = middleSliceNumber;
+	} else if (moveObject.prefix.length === 0) { // move of the form R2, Rw2 or r2
+		let isSmallLetter = /[rufldb]/.test(moveObject.family);
+		minSliceNumber = 1 + (isSmallLetter && puzzle !== 3); // = 2 for r2 on 4x4+, = 1 for r2 on 3x3, R2 and Rw2
+		maxSliceNumber = 1 + (isSmallLetter || hasW); // = 1 for R2, 2 for Rw2 and r2
+	} else if (moveObject.prefix.length === 1) { // move of the form 2R2, 2Rw2 or 2r2
+		let digit = moveObject.prefix;
+		minSliceNumber = hasW ? 1 : +digit; // = 1 for 2Rw2, = digit for 2R2 and 2r2
+		maxSliceNumber = +digit; // = digit for 2Rw2, 2R2 and 2r2
+	} else { // move of the form 2-3Rw2 or 2-3R2
+		let firstDigit = +moveObject.prefix[0];
+		let secondDigit = +moveObject.prefix[2];
+		minSliceNumber = Math.min(firstDigit, secondDigit);
+		maxSliceNumber = Math.max(firstDigit, secondDigit);
+	}
+	if (!orientationSense) {
+		turnAngle = -turnAngle;
+		minSliceNumber = puzzle + 1 - minSliceNumber; // complement
+		maxSliceNumber = puzzle + 1 - maxSliceNumber; // complement
+	}
+	return {minSliceNumber, maxSliceNumber, turnAngle};
+};
+
 // move counting
 
 const countMoves = (moveSequence, shouldCountMoves) => {
@@ -377,44 +408,55 @@ const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
 			}];
 		}
 	} else {
-		return [lastMove, nextMove];
-		let lastMoveSliceNumbers = getTurnSliceNumbers(lastMove, puzzle);
-		let nextMoveSliceNumbers = getTurnSliceNumbers(nextMove, puzzle);
-	}
-};
-
-const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
-	let orientationSense = /[RrUuFfS]/g.test(moveObject.family);
-	let isMiddleMove = /[MES]/.test(moveObject.family);
-	let hasW = moveObject.family.includes("w");
-	let minSliceNumber, maxSliceNumber, turnAngle = getTurnAngleFromSuffix(moveObject.suffix);
-	if (isMiddleMove) { // move of the form M2
-		let middleSliceNumber = (puzzle + 1)/2;
-		minSliceNumber = middleSliceNumber;
-		maxSliceNumber = middleSliceNumber;
-	} else if (moveObject.prefix.length === 0) { // move of the form R2, Rw2 or r2
-		let isSmallLetter = /[rufldb]/.test(moveObject.family);
-		minSliceNumber = 1 + (isSmallLetter && puzzle !== 3); // = 2 for r2 on 4x4+, = 1 for r2 on 3x3, R2 and Rw2
-		maxSliceNumber = 1 + (isSmallLetter || hasW); // = 1 for R2, 2 for Rw2 and r2
-	} else if (moveObject.prefix.length === 1) { // move of the form 2R2, 2Rw2 or 2r2
-		let digit = moveObject.prefix;
-		minSliceNumber = hasW ? 1 : +digit; // = 1 for 2Rw2, = digit for 2R2 and 2r2
-		maxSliceNumber = +digit; // = digit for 2Rw2, 2R2 and 2r2
-	} else { // move of the form 2-3Rw2 or 2-3R2
-		let firstDigit = +moveObject.prefix[0];
-		let secondDigit = +moveObject.prefix[2];
-		minSliceNumber = Math.min(firstDigit, secondDigit);
-		maxSliceNumber = Math.max(firstDigit, secondDigit);
-	}
-	if (!orientationSense) {
-		turnAngle = -turnAngle;
-		minSliceNumber = puzzle + 1 - minSliceNumber; // complement
-		maxSliceNumber = puzzle + 1 - maxSliceNumber; // complement
-	}
-	return {minSliceNumber, maxSliceNumber, turnAngle};
-};
-
+		let lastMoveParsed = getTurnSliceNumbersAndTurnAngle(lastMove, puzzle);
+		let nextMoveParsed = getTurnSliceNumbersAndTurnAngle(nextMove, puzzle);
+		let fusionResult = {minSliceNumber: 0, maxSliceNumber: 0, turnAngle: 0, hasMerged : false};
+		if (lastMoveParsed.turnAngle === nextMoveParsed.turnAngle) { // same turn angle
+			if (lastMoveParsed.maxSliceNumber + 1 === nextMoveParsed.minSliceNumber) { // moves of the form R M'
+				fusionResult.minSliceNumber = lastMoveParsed.minSliceNumber;
+				fusionResult.maxSliceNumber = nextMoveParsed.maxSliceNumber;
+				fusionResult.turnAngle = lastMoveParsed.turnAngle;
+				fusionResult.hasMerged = true;
+			} else if (lastMoveParsed.minSliceNumber === nextMoveParsed.maxSliceNumber + 1) { // moves of the form M' R
+				fusionResult.minSliceNumber = nextMoveParsed.minSliceNumber;
+				fusionResult.maxSliceNumber = lastMoveParsed.maxSliceNumber;
+				fusionResult.turnAngle = lastMoveParsed.turnAngle;
+				fusionResult.hasMerged = true;
+			} // else no possible fusion
+			else {
+			}
 		}
+		if ((lastMoveParsed.turnAngle + nextMoveParsed.turnAngle) % 4 === 0 && !fusionResult.hasMerged) { // opposite turn angle
+			if (lastMoveParsed.minSliceNumber === nextMoveParsed.minSliceNumber) {
+				if (lastMoveParsed.maxSliceNumber < nextMoveParsed.maxSliceNumber) { // moves of the form r R'
+					fusionResult.minSliceNumber = lastMoveParsed.maxSliceNumber + 1;
+					fusionResult.maxSliceNumber = nextMoveParsed.maxSliceNumber;
+					fusionResult.turnAngle = nextMoveParsed.turnAngle;
+					fusionResult.hasMerged = true;
+				} else if (lastMoveParsed.maxSliceNumber > nextMoveParsed.maxSliceNumber) { // moves of the form R r'
+					fusionResult.minSliceNumber = nextMoveParsed.maxSliceNumber + 1;
+					fusionResult.maxSliceNumber = lastMoveParsed.maxSliceNumber;
+					fusionResult.turnAngle = lastMoveParsed.turnAngle;
+					fusionResult.hasMerged = true;
+				} else { // moves perfectly cancel, like 2R M
+					fusionResult.hasMerged = true;
+				}
+			} else if (lastMoveParsed.maxSliceNumber === nextMoveParsed.maxSliceNumber) {
+				if (lastMoveParsed.minSliceNumber < nextMoveParsed.minSliceNumber) { // moves of the form r M
+					fusionResult.minSliceNumber = lastMoveParsed.minSliceNumber;
+					fusionResult.maxSliceNumber = nextMoveParsed.minSliceNumber - 1;
+					fusionResult.turnAngle = lastMoveParsed.turnAngle;
+					fusionResult.hasMerged = true;
+				} else { // lastMoveParsed.minSliceNumber > nextMoveParsed.minSliceNumber, moves of the form M r
+					fusionResult.minSliceNumber = nextMoveParsed.minSliceNumber;
+					fusionResult.maxSliceNumber = lastMoveParsed.minSliceNumber - 1;
+					fusionResult.turnAngle = nextMoveParsed.turnAngle;
+					fusionResult.hasMerged = true;
+				}
+			} // else no possible fusion
+		}
+		// TODO build output move from fusionResult
+		return [lastMove, nextMove];
 	}
 };
 
