@@ -260,6 +260,23 @@ const getTurnAngleFromSuffix = suffix => {
 	}
 };
 
+const getSuffixFromTurnAngle = turnAngle => {
+	return getSuffixFromTurnAngleModulo(turnAngle % 4 + 4*(turnAngle < 0));
+};
+
+const getSuffixFromOppositeTurnAngle = turnAngle => {
+	return getSuffixFromTurnAngleModulo(-turnAngle % 4 + 4*(turnAngle > 0));
+};
+
+const getSuffixFromTurnAngleModulo = turnAngleModulo => {
+	switch (turnAngleModulo) {
+		case 0: return "";
+		case 1: return "";
+		case 2: return "2";
+		case 3: return "'";
+	}
+};
+
 const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
 	let orientationSense = /[RrUuFfS]/g.test(moveObject.family);
 	let isMiddleMove = /[MES]/.test(moveObject.family);
@@ -288,7 +305,11 @@ const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
 		minSliceNumber = puzzle + 1 - minSliceNumber; // complement
 		maxSliceNumber = puzzle + 1 - maxSliceNumber; // complement
 	}
-	return {minSliceNumber, maxSliceNumber, turnAngle};
+	return {
+		minSliceNumber,
+		maxSliceNumber,
+		turnAngle
+	};
 };
 
 // move counting
@@ -349,7 +370,7 @@ const mergeMoves = (moveSequenceString, puzzle) => {
 				}
 			});
 			moveSequenceArrayOutput = [];
-			let lastMove, nextMove, fusion = [];
+			let lastMove, nextMove, fusionResult = {};
 			for (let moveCommutingSubsequence of movesToMergeSplitByCommutingGroup) {
 				while (moveCommutingSubsequence.length !== 0) {
 					[lastMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
@@ -359,17 +380,17 @@ const mergeMoves = (moveSequenceString, puzzle) => {
 							let nonMergingMoves = [];
 							while (moveCommutingSubsequence.length !== 0) {
 								[nextMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
-								fusion = tryToMergeTwoMoves(lastMove, nextMove, puzzle);
-								if (fusion.length === 0) { // perfect cancellation, just reinitialize arrays and break the loop
+								fusionResult = tryToMergeTwoMoves(lastMove, nextMove, puzzle);
+								if (fusionResult.hasCancelled) { // perfect cancellation, just reinitialize arrays and break the loop
 									moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
 									nonMergingMoves = [];
 									shouldRecomputeAfter = true;
 									break tryToMergeMoves;
-								} else if (fusion.length === 1) { // normal fusion, reinitialize arrays and keep trying to merge
-									lastMove = fusion[0];
+								} else if (fusionResult.hasMerged) { // normal fusion, reinitialize arrays and keep trying to merge
+									lastMove = fusionResult.moves[0];
 									moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
 									nonMergingMoves = [];
-								} else if (fusion.length === 2) { // no merge, keep trying to merge
+								} else { // no merge, keep trying to merge
 									nonMergingMoves.push(nextMove);
 								}
 							}
@@ -389,28 +410,26 @@ const mergeMoves = (moveSequenceString, puzzle) => {
 };
 
 const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
-	let lastTurnAngle = getTurnAngleFromSuffix(lastMove.suffix);
-	let nextTurnAngle = getTurnAngleFromSuffix(nextMove.suffix);
-	if (lastMove.family === nextMove.family && lastMove.prefix === nextMove.prefix && !lastMove.suffix.includes("w") && !nextMove.suffix.includes("w")) { // 2R* 2R* : combine turn angle
-		let combinedTurnAngle = ((+lastTurnAngle + +nextTurnAngle) % 4 + 4) % 4;
-		if (combinedTurnAngle === 0) {
-			return [];
-		} else {
-			let suffixString =
-				combinedTurnAngle === 3 ? "'" :
-				combinedTurnAngle === 1 ? "" :
-				((lastMove.suffix.includes("'") && nextMove.suffix.includes("'"))) ? "2'" : "2";
-			return [{
-				prefix: lastMove.prefix,
-				family: lastMove.family,
-				suffix: suffixString,
-				familyGroup: lastMove.familyGroup
-			}];
+	let lastMoveParsed = getTurnSliceNumbersAndTurnAngle(lastMove, puzzle);
+	let nextMoveParsed = getTurnSliceNumbersAndTurnAngle(nextMove, puzzle);
+	let fusionResult = computeFusionResult(lastMoveParsed, nextMoveParsed);
+	fusionResult.familyGroup = lastMove.familyGroup;
+	return buildOutputMovesFromFusionResult(fusionResult, puzzle);
+};
+
+const computeFusionResult = (lastMoveParsed, nextMoveParsed) => {
+	let fusionResult = {minSliceNumber: 0, maxSliceNumber: 0, turnAngle: 0, hasMerged : false, hasCancelled: false};
+	if (lastMoveParsed.minSliceNumber === nextMoveParsed.minSliceNumber && lastMoveParsed.maxSliceNumber === nextMoveParsed.maxSliceNumber) { // same slice or block of slices : move merge or cancel
+		let combinedTurnAngle = lastMoveParsed.turnAngle + nextMoveParsed.turnAngle;
+		if (combinedTurnAngle % 4 === 0) { // moves perfectly cancel
+			fusionResult.hasCancelled = true;
+		} else { // normal fusion
+			fusionResult.minSliceNumber = lastMoveParsed.minSliceNumber;
+			fusionResult.maxSliceNumber = lastMoveParsed.maxSliceNumber;
+			fusionResult.turnAngle = combinedTurnAngle;
+			fusionResult.hasMerged = true;
 		}
-	} else {
-		let lastMoveParsed = getTurnSliceNumbersAndTurnAngle(lastMove, puzzle);
-		let nextMoveParsed = getTurnSliceNumbersAndTurnAngle(nextMove, puzzle);
-		let fusionResult = {minSliceNumber: 0, maxSliceNumber: 0, turnAngle: 0, hasMerged : false};
+	} else { // other cases
 		if (lastMoveParsed.turnAngle === nextMoveParsed.turnAngle) { // same turn angle
 			if (lastMoveParsed.maxSliceNumber + 1 === nextMoveParsed.minSliceNumber) { // moves of the form R M'
 				fusionResult.minSliceNumber = lastMoveParsed.minSliceNumber;
@@ -423,8 +442,6 @@ const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
 				fusionResult.turnAngle = lastMoveParsed.turnAngle;
 				fusionResult.hasMerged = true;
 			} // else no possible fusion
-			else {
-			}
 		}
 		if ((lastMoveParsed.turnAngle + nextMoveParsed.turnAngle) % 4 === 0 && !fusionResult.hasMerged) { // opposite turn angle
 			if (lastMoveParsed.minSliceNumber === nextMoveParsed.minSliceNumber) {
@@ -433,14 +450,12 @@ const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
 					fusionResult.maxSliceNumber = nextMoveParsed.maxSliceNumber;
 					fusionResult.turnAngle = nextMoveParsed.turnAngle;
 					fusionResult.hasMerged = true;
-				} else if (lastMoveParsed.maxSliceNumber > nextMoveParsed.maxSliceNumber) { // moves of the form R r'
+				} else { // lastMoveParsed.maxSliceNumber > nextMoveParsed.maxSliceNumber, moves of the form R r'
 					fusionResult.minSliceNumber = nextMoveParsed.maxSliceNumber + 1;
 					fusionResult.maxSliceNumber = lastMoveParsed.maxSliceNumber;
 					fusionResult.turnAngle = lastMoveParsed.turnAngle;
 					fusionResult.hasMerged = true;
-				} else { // moves perfectly cancel, like 2R M
-					fusionResult.hasMerged = true;
-				}
+				} // no possible else
 			} else if (lastMoveParsed.maxSliceNumber === nextMoveParsed.maxSliceNumber) {
 				if (lastMoveParsed.minSliceNumber < nextMoveParsed.minSliceNumber) { // moves of the form r M
 					fusionResult.minSliceNumber = lastMoveParsed.minSliceNumber;
@@ -455,9 +470,98 @@ const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
 				}
 			} // else no possible fusion
 		}
-		// TODO build output move from fusionResult
-		return [lastMove, nextMove];
 	}
+	return fusionResult;
+};
+
+const buildOutputMovesFromFusionResult = (fusionResult, puzzle) => {
+	let result = {
+		moves: [],
+		hasMerged: fusionResult.hasMerged,
+		hasCancelled: fusionResult.hasCancelled
+	};
+	if (fusionResult.hasMerged && !fusionResult.hasCancelled) { // if something has been merged, build resulting moves with fusionResult
+		let moveResult = {
+			familyGroup: fusionResult.familyGroup
+		};
+		if (fusionResult.minSliceNumber === 1) { // outer block from reference face
+			let suffix = getSuffixFromTurnAngle(fusionResult.turnAngle);
+			if (fusionResult.maxSliceNumber === puzzle) { // rotation
+				moveResult.prefix = "";
+				moveResult.family = fusionResult.familyGroup[7];
+				moveResult.suffix = suffix;
+			} else if (fusionResult.maxSliceNumber === 1) { // single outer slice
+				moveResult.prefix = "";
+				moveResult.family = fusionResult.familyGroup[2];
+				moveResult.suffix = suffix;
+			} else if (fusionResult.maxSliceNumber === 2) { // double outer slice
+				moveResult.prefix = "";
+				if (puzzle === 3) {
+					moveResult.family = fusionResult.familyGroup[4];
+					moveResult.suffix = suffix;
+				} else {
+					moveResult.family = fusionResult.familyGroup[2];
+					moveResult.suffix = "w" + suffix;
+				}
+			} else { // any other outer block
+				moveResult.prefix = fusionResult.maxSliceNumber + "";
+				moveResult.family = fusionResult.familyGroup[2];
+				moveResult.suffix = "w" + suffix;
+			}
+		} else if (fusionResult.maxSliceNumber === puzzle) { // outer block from opposite of reference face
+			let suffix = getSuffixFromOppositeTurnAngle(fusionResult.turnAngle);
+			if (fusionResult.minSliceNumber === puzzle) { // single outer slice
+				moveResult.prefix = "";
+				moveResult.family = fusionResult.familyGroup[3];
+				moveResult.suffix = suffix;
+			} else if (fusionResult.minSliceNumber === puzzle - 1) { // double outer slice
+				moveResult.prefix = "";
+				if (puzzle === 3) {
+					moveResult.family = fusionResult.familyGroup[5];
+					moveResult.suffix = suffix;
+				} else {
+					moveResult.family = fusionResult.familyGroup[3];
+					moveResult.suffix = "w" + suffix;
+				}
+			} else { // any other outer block
+				moveResult.prefix = puzzle + 1 - fusionResult.minSliceNumber + "";
+				moveResult.family = fusionResult.familyGroup[3];
+				moveResult.suffix = "w" + suffix;
+			}
+		} else { // inner slice move
+			if (fusionResult.minSliceNumber === fusionResult.maxSliceNumber) { // single inner slice
+				if (fusionResult.minSliceNumber === (puzzle + 1)/2) { // middle layer
+					moveResult.prefix = "";
+					moveResult.family = fusionResult.familyGroup[6];
+					if (fusionResult.familyGroup === "/[FBfbSz]/g") {
+						moveResult.suffix = getSuffixFromTurnAngle(fusionResult.turnAngle);
+					} else {
+						moveResult.suffix = getSuffixFromOppositeTurnAngle(fusionResult.turnAngle);
+					}
+				} else if (puzzle - fusionResult.maxSliceNumber < fusionResult.minSliceNumber - 1) { // inner block, nearer from opposite of reference face
+					moveResult.prefix = puzzle + 1 - fusionResult.minSliceNumber + "";
+					moveResult.family = fusionResult.familyGroup[4];
+					moveResult.suffix = getSuffixFromOppositeTurnAngle(fusionResult.turnAngle);
+				} else { // nearer from reference face, or equal in distance
+					moveResult.prefix = fusionResult.minSliceNumber;
+					moveResult.family = fusionResult.familyGroup[2];
+					moveResult.suffix = getSuffixFromTurnAngle(fusionResult.turnAngle);
+				}
+			} else { // many inner slices
+				if (puzzle - fusionResult.maxSliceNumber < fusionResult.minSliceNumber - 1) { // inner block, nearer from opposite of reference face
+					moveResult.prefix = (puzzle + 1 - fusionResult.maxSliceNumber) + "-" + (puzzle + 1 - fusionResult.minSliceNumber);
+					moveResult.family = fusionResult.familyGroup[4];
+					moveResult.suffix = "w" + getSuffixFromOppositeTurnAngle(fusionResult.turnAngle);
+				} else { // nearer from reference face, or equal in distance
+					moveResult.prefix = fusionResult.minSliceNumber + "-" + fusionResult.maxSliceNumber;
+					moveResult.family = fusionResult.familyGroup[2];
+					moveResult.suffix = "w" + getSuffixFromTurnAngle(fusionResult.turnAngle);
+				}
+			}
+		}
+		result.moves.push(moveResult);
+	} // if no merge of perfect cancellation, nothing to add
+	return result;
 };
 
 const getOutputSequenceStringFromArray = moveSequenceArray => {
