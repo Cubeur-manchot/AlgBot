@@ -6,7 +6,7 @@ const {getAlgListHelpMessage, cleanSequence, parseMoves, countMoves, mergeMoves}
 
 const getInfoFromCommand = (message, language) => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
-	if (/^\$(alg|do)(	| |$)/.test(message.content)) {
+	if (/^\$(alg|do)(	| |$)/.test(message.content)) { // $alg or $do command
 		answer.addReactions = true;
 		let {messageContent, imageUrl, unrecognizedOptions, unrecognizedPuzzle} = parseTheCommand(message.content);
 		if (unrecognizedPuzzle.length) {
@@ -19,13 +19,13 @@ const getInfoFromCommand = (message, language) => {
 			answer.answerContent = messageContent;
 			answer.answerOptions = {files: [{attachment: imageUrl, name: "cubeImage.png"}]};
 		}
-	} else if (message.content === "$help") {
+	} else if (message.content === "$help") { // $help command
 		answer.answerContent = getGeneralHelpMessage(language);
-	} else if (message.content === "$options") {
+	} else if (message.content === "$options") { // $options command
 		answer.answerContent = getOptionsHelpMessage(language);
-	} else if (message.content === "$alglist") {
+	} else if (message.content === "$alglist") { // $alglist command
 		answer.answerContent = getAlgListHelpMessage(language);
-	} else {
+	} else { // unrecognized command
 		answer.answerContent = getUnrecognizedCommandErrorMessage(message.content.split(" ")[0], language);
 		answer.errorInCommand = true;
 	}
