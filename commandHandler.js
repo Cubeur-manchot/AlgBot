@@ -49,6 +49,9 @@ const splitCommand = commandString => {
 	if (indexOfOptions !== -1) {
 		commandObject.options = commandString.slice(indexOfOptions).split(" ").filter(x => {return x !== ""}); // get options
 		commandObject.moves = commandString.substring(0, indexOfOptions); // get moves
+	} else {
+		commandObject.options = []; // get options
+		commandObject.moves = commandString; // get moves
 	}
 	return commandObject;
 };
