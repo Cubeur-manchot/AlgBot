@@ -2,7 +2,8 @@
 
 const {getGeneralHelpMessage} = require("./help.js");
 const {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions} = require("./options.js");
-const {getAlgListHelpMessage, cleanSequence, parseMoves, countMoves, mergeMoves} = require("./algs.js");
+const {getAlgListHelpMessage, cleanSequence, parseMoves, countMoves} = require("./algs.js");
+const {mergeMoves} = require("./merging.js")
 
 const getInfoFromCommand = (message, language) => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
