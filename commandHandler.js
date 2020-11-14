@@ -11,7 +11,7 @@ const getInfoFromCommand = (message, language) => {
 	if (/^\$(alg|do)(	| |$)/.test(message.content)) { // $alg or $do command
 		answer.addReactions = true;
 		let {messageContent, imageUrl, unrecognizedOptions, unrecognizedPuzzle} = parseTheCommand(message.content);
-		if (unrecognizedPuzzle.length) {
+		if (unrecognizedPuzzle) {
 			answer.answerContent = getUnsupportedPuzzleErrorMessage(unrecognizedPuzzle, language);
 			answer.errorInCommand = true;
 		} else if (unrecognizedOptions.length) {
@@ -35,17 +35,29 @@ const getInfoFromCommand = (message, language) => {
 	return answer;
 };
 
+const splitCommand = commandString => {
+	let commandObject = {};
+	let indexOfSpace = commandString.indexOf(" ");
+	commandObject.algOrDo = indexOfSpace === 4 ? "alg" : "do"; // get alg or do
+	commandString = commandString.substring(indexOfSpace + 1); // remove first word
+	let indexOfComments = commandString.indexOf("//");
+	if (indexOfComments !== -1) {
+		commandObject.comments = commandString.slice(indexOfComments + 2); // get comments
+		commandString = commandString.substring(0, indexOfComments); // remove comments
+	}
+	let indexOfOptions = commandString.indexOf("-");
+	if (indexOfOptions !== -1) {
+		commandObject.options = commandString.slice(indexOfOptions).split(" ").filter(x => {return x !== ""}); // get options
+		commandObject.moves = commandString.substring(0, indexOfOptions); // get moves
+	}
+	return commandObject;
+};
+
 const parseTheCommand = command => {
 	command = command.replace(/’/g, "'"); // replace wrong apostrophe typography
-	let comments = command.split("//").slice(1).join("");
-	command = command.split("//")[0]; // removes comments
-	let messageWords = command.split(" ");
-	let caseOrAlg = messageWords[0] === "$alg" ? "case" : "alg"; // $alg/$do command in AlgBot is respectively case/alg in VisualCube
-	messageWords = messageWords.slice(1); // remove first word
-	let movesToParse = messageWords.filter(word => !word.startsWith("-"));
-	let optionsToParse = messageWords.filter(word => word.startsWith("-"));
-	let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(cleanSequence(movesToParse.join(" "))); // parse moves
-	let {stage, view, colorScheme, puzzle, shouldCountMoves, shouldMergeMoves, unrecognizedOptions} = parseOptions(optionsToParse); // parse options
+	let parsedCommand = splitCommand(command);
+	let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(cleanSequence(parsedCommand.moves)); // parse moves
+	let {stage, view, colorScheme, puzzle, shouldCountMoves, shouldMergeMoves, unrecognizedOptions} = parseOptions(parsedCommand.options); // parse options
 	if (shouldMergeMoves) {
 		moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +puzzle);
 	}
@@ -55,10 +67,11 @@ const parseTheCommand = command => {
 	view = view === "normal" ? "" : `&view=${view}`; // adjust view for url
 	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
 		return {
-			messageContent: moveSequenceForAnswer + (comments ? " //" + comments : ""),
+			messageContent: moveSequenceForAnswer + (parsedCommand.comments ? " //" + parsedCommand.comments : ""),
 			imageUrl: "http://cube.rider.biz//visualcube.php?fmt=png&bg=t&size=150"
 				+ `${view}&pzl=${puzzle}&sch=${colorScheme}&stage=${stage}`
-				+ `&${caseOrAlg}=${moveSequenceForVisualCube.replace(/'/g, "%27").replace(/&/g, "")}`,
+				+ `&${parsedCommand.algOrDo === "alg" ? "case" : "alg"}=` // $alg/$do command in AlgBot is respectively case/alg in VisualCube
+				+ `${moveSequenceForVisualCube.replace(/'/g, "%27").replace(/&/g, "")}`,
 			unrecognizedOptions: unrecognizedOptions,
 			unrecognizedPuzzle: ""
 		};
