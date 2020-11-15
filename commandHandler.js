@@ -14,7 +14,7 @@ const getInfoFromCommand = (message, language) => {
 		if (unrecognizedPuzzle) {
 			answer.answerContent = getUnsupportedPuzzleErrorMessage(unrecognizedPuzzle, language);
 			answer.errorInCommand = true;
-		} else if (unrecognizedOptions.length) {
+		} else if (unrecognizedOptions) {
 			answer.answerContent = getUnrecognizedOptionsErrorMessage(unrecognizedOptions.join("\n"), language);
 			answer.errorInCommand = true;
 		} else {
@@ -59,28 +59,35 @@ const splitCommand = commandString => {
 const parseTheCommand = command => {
 	command = command.replace(/’/g, "'"); // replace wrong apostrophe typography
 	let parsedCommand = splitCommand(command);
-	let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(cleanSequence(parsedCommand.moves)); // parse moves
-	let {stage, view, colorScheme, puzzle, shouldCountMoves, shouldMergeMoves, unrecognizedOptions} = parseOptions(parsedCommand.options); // parse options
-	if (shouldMergeMoves) {
-		moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +puzzle);
-	}
-	if (shouldCountMoves["htm"] || shouldCountMoves["stm"] || shouldCountMoves["etm"]) {
-		moveSequenceForAnswer += " (" + countMoves(moveSequenceForAnswer, shouldCountMoves).join(", ") + ")"; // add move count if necessary
-	}
-	view = view === "normal" ? "" : `&view=${view}`; // adjust view for url
-	if (/^([1-9]|10)$/.test(puzzle)) { // cubes (1-10)
+	let options = parseOptions(parsedCommand.options); // parse options
+	if (options.unrecognizedOptions.length || !/^([1-9]|10)$/.test(options.puzzle)) { // problem in options
+		return {
+			unrecognizedOptions: options.unrecognizedOptions,
+			unrecognizedPuzzle: options.puzzle
+		};
+	} else { // everything is right, continue
+		let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(cleanSequence(parsedCommand.moves)); // parse moves
+		if (options.shouldMergeMoves) {
+			moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +options.puzzle);
+		}
+		if (options.shouldCountMoves["htm"] || options.shouldCountMoves["stm"] || options.shouldCountMoves["etm"]) {
+			moveSequenceForAnswer += " (" + countMoves(moveSequenceForAnswer, options.shouldCountMoves).join(", ") + ")"; // add move count if necessary
+		}
 		return {
 			messageContent: moveSequenceForAnswer + (parsedCommand.comments ? " //" + parsedCommand.comments : ""),
-			imageUrl: "http://cube.rider.biz//visualcube.php?fmt=png&bg=t&size=150"
-				+ `${view}&pzl=${puzzle}&sch=${colorScheme}&stage=${stage}`
-				+ `&${parsedCommand.algOrDo === "alg" ? "case" : "alg"}=` // $alg/$do command in AlgBot is respectively case/alg in VisualCube
-				+ `${moveSequenceForVisualCube.replace(/'/g, "%27").replace(/&/g, "")}`,
-			unrecognizedOptions: unrecognizedOptions,
-			unrecognizedPuzzle: ""
+			imageUrl: buildImageUrl(moveSequenceForVisualCube, options, parsedCommand.algOrDo)
 		};
-	} else { // puzzle not yet supported
-		return {unrecognizedPuzzle: puzzle};
 	}
+};
+
+const buildImageUrl = (moveSequence, options, algOrDo) => {
+	return "http://cube.rider.biz//visualcube.php?fmt=png&bg=t&size=150"
+		+ `${options.view === "normal" ? "" : "&view=" + options.view}`
+		+ `&pzl=${options.puzzle}`
+		+ `&sch=${options.colorScheme}`
+		+ `&stage=${options.stage}`
+		+ `&${algOrDo === "alg" ? "case" : "alg"}=` // $alg/$do command in AlgBot is respectively case/alg in VisualCube
+		+ `${moveSequence.replace(/'/g, "%27").replace(/&/g, "")}`;
 };
 
 const getUnrecognizedCommandErrorMessage = (command, language) => {
