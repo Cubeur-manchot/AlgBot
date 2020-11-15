@@ -6,7 +6,7 @@ const {cleanSequence, parseMoves, countMoves} = require("./algs.js");
 const {getAlgListHelpMessage} = require("./algCollection.js");
 const {mergeMoves} = require("./merging.js");
 
-const getInfoFromCommand = (message, language) => {
+const getResultOfCommand = (message, language) => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
 	if (/^\$(alg|do)(	| |$)/.test(message.content)) { // $alg or $do command
 		answer.addReactions = true;
@@ -98,4 +98,4 @@ const getUnrecognizedCommandErrorMessage = (command, language) => {
 	}
 };
 
-module.exports = {getInfoFromCommand};
+module.exports = {getResultOfCommand};

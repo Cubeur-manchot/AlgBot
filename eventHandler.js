@@ -1,6 +1,6 @@
 "use strict";
 
-const {getInfoFromCommand} = require("./commandHandler.js");
+const {getResultOfCommand} = require("./commandHandler.js");
 const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage} = require("./messageHandler.js");
 
 const onReady = (AlgBot, language) => {
@@ -12,7 +12,7 @@ const onReady = (AlgBot, language) => {
 
 const onMessage = (message, language) => {
 	if (messageIsAlgBotCommand(message)) {
-		let commandInfo = getInfoFromCommand(message, language);
+		let commandInfo = getResultOfCommand(message, language);
 		sendMessageToChannel(message.channel, commandInfo.answerContent, commandInfo.answerOptions, commandInfo.addReactions);
 		if (commandInfo.errorInCommand) {
 			deleteMessageAfterSomeSeconds(message);
@@ -22,14 +22,14 @@ const onMessage = (message, language) => {
 
 const onMessageUpdate = (oldMessage, newMessage, language) => {
 	if (messageIsAlgBotCommand(oldMessage)) { // if previous message was already a command, delete the previous answer
-		deleteNextAlgBotCorrespondingMessage(newMessage, getInfoFromCommand(oldMessage, language));
+		deleteNextAlgBotCorrespondingMessage(newMessage, getResultOfCommand(oldMessage, language));
 	}
 	onMessage(newMessage, language); // treat the message as if it was send
 };
 
 const onMessageDelete = (message, language) => {
 	if (messageIsAlgBotCommand(message)) {
-		deleteNextAlgBotCorrespondingMessage(message, getInfoFromCommand(message, language));
+		deleteNextAlgBotCorrespondingMessage(message, getResultOfCommand(message, language));
 	}
 };
 
