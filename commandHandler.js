@@ -10,16 +10,16 @@ const getResultOfCommand = (message, language) => {
 	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
 	if (/^\$(alg|do)(	| |$)/.test(message.content)) { // $alg or $do command
 		answer.addReactions = true;
-		let {messageContent, imageUrl, unrecognizedOptions, unrecognizedPuzzle} = parseTheCommand(message.content);
-		if (unrecognizedPuzzle) {
-			answer.answerContent = getUnsupportedPuzzleErrorMessage(unrecognizedPuzzle, language);
+		let resultOfAlgOrDoCommand = getResultOfAlgOrDoCommand(message.content);
+		if (resultOfAlgOrDoCommand.unrecognizedPuzzle) {
+			answer.answerContent = getUnsupportedPuzzleErrorMessage(resultOfAlgOrDoCommand.unrecognizedPuzzle, language);
 			answer.errorInCommand = true;
-		} else if (unrecognizedOptions) {
-			answer.answerContent = getUnrecognizedOptionsErrorMessage(unrecognizedOptions.join("\n"), language);
+		} else if (resultOfAlgOrDoCommand.unrecognizedOptions) {
+			answer.answerContent = getUnrecognizedOptionsErrorMessage(resultOfAlgOrDoCommand.unrecognizedOptions.join("\n"), language);
 			answer.errorInCommand = true;
 		} else {
-			answer.answerContent = messageContent;
-			answer.answerOptions = {files: [{attachment: imageUrl, name: "cubeImage.png"}]};
+			answer.answerContent = resultOfAlgOrDoCommand.messageContent;
+			answer.answerOptions = {files: [{attachment: resultOfAlgOrDoCommand.imageUrl, name: "cubeImage.png"}]};
 		}
 	} else if (message.content === "$help") { // $help command
 		answer.answerContent = getGeneralHelpMessage(language);
@@ -56,7 +56,7 @@ const splitCommand = commandString => {
 	return commandObject;
 };
 
-const parseTheCommand = command => {
+const getResultOfAlgOrDoCommand = command => {
 	command = command.replace(/’/g, "'"); // replace wrong apostrophe typography
 	let parsedCommand = splitCommand(command);
 	let options = parseOptions(parsedCommand.options); // parse options
