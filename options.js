@@ -1,49 +1,54 @@
 "use strict";
 
-const parseOptions = options => {
-	let result = {
+const parseOptions = optionsList => {
+	let optionObject = {
 		stage: "pll",
 		view: undefined,
 		puzzle: "3",
 		colorScheme: "wrgyob",
-		shouldCountMoves: [],
+		shouldCountMoves: {
+			htm: false,
+			stm: false,
+			etm: false,
+			qtm: false
+		},
 		shouldMergeMoves: false,
 		unrecognizedOptions: []
 	}; // default parameters
-	result.shouldCountMoves["htm"] = false;
-	result.shouldCountMoves["stm"] = false;
-	result.shouldCountMoves["etm"] = false;
-	for (let option of options) {
+	for (let option of optionsList) {
 		option = option.toLowerCase();
 		if (option === "-yellow") {
-			result.colorScheme = "yogwrb";
+			optionObject.colorScheme = "yogwrb";
 		} else if (isPuzzleOption(option)) {
-			result.puzzle = getPuzzleFromOption(option);
+			optionObject.puzzle = getPuzzleFromOption(option);
 		} else if (isViewOption(option)) {
-			result.view = option.slice(1);
+			optionObject.view = option.slice(1);
 		} else if (isStageOption(option)) {
-			result.stage = getStageFromOption(option);
-			if (result.view === undefined) {
-				result.view = getViewFromStageOption(option);
+			optionObject.stage = getStageFromOption(option);
+			if (optionObject.view === undefined) {
+				optionObject.view = getViewFromStageOption(option);
 			}
 		} else if (isCountOption(option)) {
 			if (option === "-count") {
-				result.shouldCountMoves["htm"] = true;
-				result.shouldCountMoves["stm"] = true;
-				result.shouldCountMoves["etm"] = true;
+				optionObject.shouldCountMoves = {
+					htm: true,
+					stm: true,
+					etm: true,
+					qtm: true
+				};
 			} else {
-				result.shouldCountMoves[option.substring(1)] = true;
+				optionObject.shouldCountMoves[option.substring(1)] = true;
 			}
 		} else if (option === "-merge") {
-			result.shouldMergeMoves = true;
+			optionObject.shouldMergeMoves = true;
 		} else {
-			result.unrecognizedOptions.push(option);
+			optionObject.unrecognizedOptions.push(option);
 		}
 	}
-	if (result.view === undefined) {
-		result.view = "plan";
+	if (optionObject.view === undefined) {
+		optionObject.view = "plan";
 	}
-	return result;
+	return optionObject;
 };
 
 const getUnrecognizedOptionsErrorMessage = (unrecognizedOptions, language) => {
