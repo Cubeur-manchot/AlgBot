@@ -317,14 +317,14 @@ const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
 const countMoves = (moveSequence, shouldCountMoves) => {
 	let moveCount = [];
 	let result = [];
-	if (moveSequence === "") {
+	if (moveSequence.length === 0) {
 		moveCount["htm"] = 0;
 		moveCount["stm"] = 0;
 		moveCount["etm"] = 0;
 		moveCount["qtm"] = 0;
 	} else {
 		let simpleMovesCount = 0, quarterSimpleMovesCount = 0, sliceMovesCount = 0, quarterSliceMovesCount = 0, rotationMovesCount = 0;
-		for (let move of moveSequence.split(" ")) {
+		for (let move of moveSequence) {
 			if (/[xyz][0-9]?'?/g.test(move)) { // moves of the form x
 				rotationMovesCount++;
 			} else if (/[MES][0-9]?'?/g.test(move) // moves of the form M

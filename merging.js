@@ -2,13 +2,15 @@
 
 const {parseOneMove, getTurnSliceNumbersAndTurnAngle, getSuffixFromTurnAngle, getSuffixFromOppositeTurnAngle} = require("./algs.js");
 
-const mergeMoves = (moveSequenceString, puzzle) => {
-	if (moveSequenceString.length <= 1) { // sequence is too small, moves can't be merged
-		return moveSequenceString;
+const mergeMoves = (moveSequenceArray, puzzle) => {
+	if (moveSequenceArray.length <= 1) { // sequence is too small, moves can't be merged
+		return moveSequenceArray;
 	} else {
 		let shouldRecomputeAfter;
 		let movesToMergeSplitByCommutingGroup, moveSequenceArrayOutput, parsedMoveSequence = [];
-		moveSequenceString.split(" ").forEach(moveString => parsedMoveSequence.push(parseOneMove(moveString))); // parse prefix, family and suffix on each move
+		for (let moveString of moveSequenceArray) {
+			parsedMoveSequence.push(parseOneMove(moveString)); // parse prefix, family and suffix on each move
+		}
 		do {
 			shouldRecomputeAfter = false;
 			movesToMergeSplitByCommutingGroup = [];
@@ -56,7 +58,11 @@ const mergeMoves = (moveSequenceString, puzzle) => {
 			}
 			parsedMoveSequence = moveSequenceArrayOutput.slice(0); // copy moveSequenceArrayOutput into parsedMoveSequence
 		} while (shouldRecomputeAfter);
-		return getOutputSequenceStringFromArray(moveSequenceArrayOutput);
+		let moveArrayOutput = [];
+		for (let moveObject of moveSequenceArrayOutput) {
+			moveArrayOutput.push(buildMoveStringFromObject(moveObject));
+		}
+		return moveArrayOutput;
 	}
 };
 
@@ -213,6 +219,10 @@ const buildOutputMovesFromFusionResult = (fusionResult, puzzle) => {
 		result.moves.push(moveResult);
 	} // if no merge or perfect cancellation, nothing to add
 	return result;
+};
+
+const buildMoveStringFromObject = moveObject => {
+	return moveObject.prefix + moveObject.family + (moveObject.suffix === "1" ? "" : moveObject.suffix);
 };
 
 const getOutputSequenceStringFromArray = moveSequenceArray => {
