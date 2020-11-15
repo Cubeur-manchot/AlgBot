@@ -35,27 +35,6 @@ const getResultOfCommand = (message, language) => {
 	return answer;
 };
 
-const splitCommand = commandString => {
-	let commandObject = {};
-	let indexOfSpace = commandString.indexOf(" ");
-	commandObject.algOrDo = indexOfSpace === 4 ? "alg" : "do"; // get alg or do
-	commandString = commandString.substring(indexOfSpace + 1); // remove first word
-	let indexOfComments = commandString.indexOf("//");
-	if (indexOfComments !== -1) {
-		commandObject.comments = commandString.slice(indexOfComments + 2); // get comments
-		commandString = commandString.substring(0, indexOfComments); // remove comments
-	}
-	let indexOfOptions = commandString.indexOf("-");
-	if (indexOfOptions !== -1) {
-		commandObject.options = commandString.slice(indexOfOptions).split(" ").filter(x => {return x !== ""}); // get options
-		commandObject.moves = commandString.substring(0, indexOfOptions); // get moves
-	} else {
-		commandObject.options = []; // get options
-		commandObject.moves = commandString; // get moves
-	}
-	return commandObject;
-};
-
 const getResultOfAlgOrDoCommand = command => {
 	command = command.replace(/’/g, "'"); // replace wrong apostrophe typography
 	let parsedCommand = splitCommand(command);
@@ -78,6 +57,27 @@ const getResultOfAlgOrDoCommand = command => {
 			imageUrl: buildImageUrl(moveSequenceForVisualCube, options, parsedCommand.algOrDo)
 		};
 	}
+};
+
+const splitCommand = commandString => {
+	let commandObject = {};
+	let indexOfSpace = commandString.indexOf(" ");
+	commandObject.algOrDo = indexOfSpace === 4 ? "alg" : "do"; // get alg or do
+	commandString = commandString.substring(indexOfSpace + 1); // remove first word
+	let indexOfComments = commandString.indexOf("//");
+	if (indexOfComments !== -1) {
+		commandObject.comments = commandString.slice(indexOfComments + 2); // get comments
+		commandString = commandString.substring(0, indexOfComments); // remove comments
+	}
+	let indexOfOptions = commandString.indexOf("-");
+	if (indexOfOptions !== -1) {
+		commandObject.options = commandString.slice(indexOfOptions).split(" ").filter(x => {return x !== ""}); // get options
+		commandObject.moves = commandString.substring(0, indexOfOptions); // get moves
+	} else {
+		commandObject.options = []; // get options
+		commandObject.moves = commandString; // get moves
+	}
+	return commandObject;
 };
 
 const buildImageUrl = (moveSequence, options, algOrDo) => {
