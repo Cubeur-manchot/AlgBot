@@ -49,7 +49,7 @@ const getResultOfAlgOrDoCommand = command => {
 		if (options.shouldMergeMoves) {
 			moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +options.puzzle);
 		}
-		if (options.shouldCountMoves["htm"] || options.shouldCountMoves["stm"] || options.shouldCountMoves["etm"]) {
+		if (options.shouldCountMoves["htm"] || options.shouldCountMoves["stm"] || options.shouldCountMoves["etm"] || options.shouldCountMoves["qtm"]) {
 			moveSequenceForAnswer += " (" + countMoves(moveSequenceForAnswer, options.shouldCountMoves).join(", ") + ")"; // add move count if necessary
 		}
 		return {

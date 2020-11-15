@@ -120,7 +120,7 @@ const getUnsupportedPuzzleErrorMessage = (puzzle, language) => {
 // move count option
 
 const isCountOption = option => {
-	return /-(count|[hse]tm)/.test(option);
+	return /-(count|[hseq]tm)/.test(option);
 };
 
 // option help message
