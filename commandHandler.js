@@ -2,7 +2,7 @@
 
 const {getGeneralHelpMessage} = require("./help.js");
 const {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions} = require("./options.js");
-const {cleanSequence, parseMoves, countMoves} = require("./algs.js");
+const {cleanSequence, parseMoves, buildMoveSequenceForVisualCube, parseStructureNew, deploySequenceNew, countMoves} = require("./algs.js");
 const {getAlgListHelpMessage} = require("./algCollection.js");
 const {mergeMoves} = require("./merging.js");
 
@@ -45,8 +45,9 @@ const getResultOfAlgOrDoCommand = command => {
 			unrecognizedPuzzle: options.puzzle
 		};
 	} else { // everything is right, continue
-		let {moveSequenceForAnswer, moveSequenceForVisualCube} = parseMoves(cleanSequence(parsedCommand.moves)); // parse moves
-		moveSequenceForAnswer = moveSequenceForAnswer.split(" ");
+		let moveSequenceArray = parseStructureNew(parsedCommand.moves);
+		let moveSequenceForAnswer = deploySequenceNew(moveSequenceArray);
+		let moveSequenceForVisualCubeNew = buildMoveSequenceForVisualCube(moveSequenceForAnswer);
 		if (options.shouldMergeMoves) {
 			moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +options.puzzle);
 		}
@@ -56,7 +57,7 @@ const getResultOfAlgOrDoCommand = command => {
 		}
 		return {
 			messageContent: moveSequenceForAnswer + (parsedCommand.comments ? " //" + parsedCommand.comments : ""),
-			imageUrl: buildImageUrl(moveSequenceForVisualCube, options, parsedCommand.algOrDo)
+			imageUrl: buildImageUrl(moveSequenceForVisualCubeNew, options, parsedCommand.algOrDo)
 		};
 	}
 };
@@ -71,7 +72,7 @@ const splitCommand = commandString => {
 		commandObject.comments = commandString.slice(indexOfComments + 2); // get comments
 		commandString = commandString.substring(0, indexOfComments); // remove comments
 	}
-	let indexOfOptions = commandString.indexOf("-");
+	let indexOfOptions = commandString.indexOf(" -");
 	if (indexOfOptions !== -1) {
 		commandObject.options = commandString.slice(indexOfOptions).split(" ").filter(x => {return x !== ""}); // get options
 		commandObject.moves = commandString.substring(0, indexOfOptions); // get moves
@@ -89,7 +90,7 @@ const buildImageUrl = (moveSequence, options, algOrDo) => {
 		+ `&sch=${options.colorScheme}`
 		+ `&stage=${options.stage}`
 		+ `&${algOrDo === "alg" ? "case" : "alg"}=` // $alg/$do command in AlgBot is respectively case/alg in VisualCube
-		+ `${moveSequence.replace(/'/g, "%27").replace(/&/g, "")}`;
+		+ `${moveSequence.join("%20").replace(/'/g, "%27")}`;
 };
 
 const getUnrecognizedCommandErrorMessage = (command, language) => {

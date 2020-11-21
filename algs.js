@@ -5,19 +5,94 @@ const {algCollection} = require("./algCollection.js");
 // sequence parsing
 
 const invertSequence = moves => {
-	let invertedSequence = [];
 	if (moves === "") {
 		return "";
 	} else {
-		for (let move of moves.split(" ")) {
-			if (move.includes("'")) {
-				invertedSequence.unshift(move.substring(0, move.length - 1));
+		return invertSequenceNew(moves.split(" ")).join(" ");
+	}
+};
+
+const invertMove = move => {
+	if (move.includes("'")) {
+		return move.slice(0, -1);
+	} else {
+		return move + "'";
+	}
+};
+
+const invertSequenceNew = moves => {
+	let invertedSequence = [];
+	for (let move of moves) {
+		invertedSequence.unshift(invertMove(move));
+	}
+	return invertedSequence;
+};
+
+const parseStructureNew = movesString => {
+	let newDepthObject = type => { return { type: type, subsequenceString: "", moves: [[]] } };
+	let pushAtDepth = (content, depth) => {
+		informationAtDepth[depth].moves[informationAtDepth[depth].moves.length - 1].push(...content);
+	};
+	let depth = 0;
+	let informationAtDepth = [newDepthObject("")];
+	for (let characterIndex = 0; characterIndex < movesString.length; characterIndex++) {
+		let character = movesString[characterIndex];
+		if (character === "[" || character === "(") { // opening subsequence
+			pushAtDepth(parseMovesNew(informationAtDepth[depth].subsequenceString), depth); // append current moves
+			informationAtDepth[depth].subsequenceString = "";
+			depth++;
+			informationAtDepth[depth] = newDepthObject(character);
+		} else if (character === "]") { // closing subsequence (brackets)
+			if (informationAtDepth[depth].type === "[:") { // [A : B]
+				pushAtDepth(informationAtDepth[depth].moves[0], depth - 1); // A
+				pushAtDepth(informationAtDepth[depth].moves[1], depth - 1); // begin of B
+				pushAtDepth(parseMovesNew(informationAtDepth[depth].subsequenceString), depth - 1); // end of B
+				pushAtDepth(invertSequenceNew(informationAtDepth[depth].moves[0]), depth - 1); // A'
+				depth--;
+			} else if (informationAtDepth[depth].type === "[,") { // [A, B]
+				pushAtDepth(informationAtDepth[depth].moves[0], depth - 1); // A
+				let secondSubsequenceMoves = parseMovesNew(informationAtDepth[depth].subsequenceString);
+				pushAtDepth(informationAtDepth[depth].moves[1], depth - 1); // begin of B
+				pushAtDepth(secondSubsequenceMoves, depth - 1); // end of B
+				pushAtDepth(invertSequenceNew(informationAtDepth[depth].moves[0]), depth - 1); // A'
+				pushAtDepth(invertSequenceNew(secondSubsequenceMoves), depth - 1); // (end of B)'
+				pushAtDepth(invertSequenceNew(informationAtDepth[depth].moves[1]), depth - 1); // (begin of B)'
+				depth--;
 			} else {
-				invertedSequence.unshift(move + "'");
+				return "Error : Bad parsing";
 			}
+		} else if (character === ")") { // closing subsequence (parenthesis)
+			pushAtDepth(parseMovesNew(informationAtDepth[depth].subsequenceString), depth); // append current moves
+			let factor = movesString.slice(characterIndex + 1).match(/^\d*'?/)[0];
+			characterIndex += factor.length;
+			let isInverse = factor.includes("'");
+			if (isInverse) {
+				factor = factor.slice(0, -1); // remove apostrophe at the end
+				informationAtDepth[depth].moves[0] = invertSequenceNew(informationAtDepth[depth].moves[0]);
+			}
+			factor = factor === "" ? 1 : +factor;
+			for (let time = 0; time < factor; time++) {
+				pushAtDepth(informationAtDepth[depth].moves[0], depth - 1);
+			}
+			depth--;
+		} else if (character === "," || character === ":") { // middle of subsequence
+			if (informationAtDepth[depth].type === "[") {
+				informationAtDepth[depth].type += character;
+				informationAtDepth[depth].moves[0] = parseMovesNew(informationAtDepth[depth].subsequenceString);
+				informationAtDepth[depth].moves[1] = [];
+				informationAtDepth[depth].subsequenceString = "";
+			} else {
+				return "Error : Bad parsing";
+			}
+		} else { // normal characters, to be parsed as a simple sequence
+			informationAtDepth[depth].subsequenceString += character;
 		}
 	}
-	return invertedSequence.join(" ");
+	if (depth !== 0) {
+		return "Error : Bad parsing";
+	}
+	pushAtDepth(parseMovesNew(informationAtDepth[0].subsequenceString), 0);
+	return informationAtDepth[0].moves[0];
 };
 
 const parseMoves = moves => {
@@ -160,6 +235,89 @@ const getMoveSequenceFromStructure = (type, factor, subSequenceBefore, subSequen
 	moveSequenceForAnswer = moveSequenceForAnswer.trim();
 	moveSequenceForVisualCube = moveSequenceForVisualCube.trim();
 	return {moveSequenceForAnswer, moveSequenceForVisualCube};
+};
+
+const deploySequenceNew = moveSequence => {
+	let moveSequenceForAnswer = [];
+	for (let move of moveSequence) {
+		let deployedMove = deployMoveNew(move);
+		moveSequenceForAnswer.push(...deployedMove.movesForAnswer);
+	}
+	return moveSequenceForAnswer;
+};
+
+const buildMoveSequenceForVisualCube = moveSequence => {
+	let moveSequenceForVisualCube = [];
+	for (let move of moveSequence) {
+		if (/^[0-9]/.test(move)) { // move of the form 2-4Rw', 3R2 or 3Rw2
+			let movesForVisualCube = [];
+			if (/^[0-9]-[0-9]/.test(move)) { // move of the form 2-4Rw'
+				let {biggerSliceNumber, smallerSliceNumber} = {
+					biggerSliceNumber: Math.max(move[0], move[2]),
+					smallerSliceNumber: Math.min(move[0], move[2])
+				};
+				moveSequenceForVisualCube.push(biggerSliceNumber + move.substring(3)); // keep bigger block identical
+				if (smallerSliceNumber > 1 && move.length > 3) {
+					moveSequenceForVisualCube.push(invertMove(smallerSliceNumber - 1 + move.substring(3).replace("w", ""))); // add smaller move in reverse sense
+				} // else move is weird, ignore reverse sense move
+			} else { // move of the form 3R2 or 3Rw2
+				moveSequenceForVisualCube.push(move); // keep bigger block identical
+				if (!move.includes("w")) { // move of the form 3R2
+					let sliceNumber = move[0];
+					moveSequenceForVisualCube.push(invertMove(sliceNumber - 1 + move.substring(1).replace("w", ""))); // add smaller move in reverse sense
+				}
+			}
+		} else { // normal move
+			moveSequenceForVisualCube.push(move);
+		}
+	}
+	return moveSequenceForVisualCube;
+};
+
+const deployMoveNew = move => {
+	let moveLower = move.toLowerCase();
+	if (/^[0-9]/.test(move)) { // move of the form 2-4Rw', 3R2 or 3Rw2
+		let movesForAnswer = [move];
+		let movesForVisualCube = [];
+		if (/^[0-9]-[0-9]/.test(move)) { // move of the form 2-4Rw'
+			let {biggerSliceNumber, smallerSliceNumber} = {
+				biggerSliceNumber: Math.max(move[0], move[2]),
+				smallerSliceNumber: Math.min(move[0], move[2])
+			};
+			movesForVisualCube.push(biggerSliceNumber + move.substring(3)); // keep bigger block identical
+			if (smallerSliceNumber > 1 && move.length > 3) {
+				movesForVisualCube.push(invertMove(smallerSliceNumber - 1 + move.substring(3).replace("w", ""))); // add smaller move in reverse sense
+			} // else move is weird, ignore return move
+		} else { // move of the form 3R2 or 3Rw2
+			movesForVisualCube.push(move); // keep bigger block identical
+			if (!move.includes("w")) { // move of the form 3R2
+				let sliceNumber = move[0];
+				movesForVisualCube.push(invertMove(sliceNumber - 1 + move.substring(1).replace("w", ""))); // add smaller move in reverse sense
+			}
+		}
+		return {
+			movesForAnswer: movesForAnswer,
+			movesForVisualCube: movesForVisualCube
+		};
+	} else {
+		let sequence;
+		if (/(p|o|cm)ll_/.test(move)) { // move is either a PLL, or an OLL, or a CMLL
+			sequence = algCollection[move.slice(0, -1).toUpperCase() + "Collection"][moveLower];
+		} else if (moveLower.includes("sune") || moveLower.includes("niklas")) { // move is a basic alg
+			sequence = algCollection.basicAlgsCollection[moveLower];
+		} else if (moveLower.includes("parity")) { // move is a 4x4 parity
+			sequence = algCollection.parity4x4x4Collection[moveLower];
+		} else if (moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a trigger or composition
+			sequence = algCollection.triggerCollection[moveLower];
+		} else { // normal move
+			sequence = move;
+		}
+		sequence = sequence.split(" ");
+		return {
+			movesForAnswer: sequence,
+			movesForVisualCube: sequence
+		};
+	}
 };
 
 const deployMove = move => {
@@ -376,6 +534,24 @@ const cleanSequence = moveSequence => {
 	return moveSequenceOutput.filter(string => { return string !== ""; }); // remove empty moves
 };
 
+const parseMovesNew = movesString => {
+	let wordList = movesString.replace(/'/g, "' ").split(" ").filter(string => { return string !== ""; });
+	let moveArray = [];
+	for (let word of wordList) {
+		if (word.match(/(p|o|cm)ll_|sune|parity|niklas|sexy|edge/gi)) {
+			moveArray.push(word); // consider the whole word as a single move (will be fully parsed later)
+		} else {
+			moveArray.push(...splitSequence(word, [
+				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
+				/[0-9]-[0-9][RUFLDB]w?[0-9]'?(?!-)/g, // moves of the form 2-3Rw2, 2-3R2, not followed by a -
+				/[0-9]-[0-9][RUFLDB]w?'?/g, // moves of the form 2-3Rw. Note : if a number follows this sequence, it will be treated with the rest of the sequence
+				/[0-9]?(?:[RUFLDB]w?|[rufldb])[0-9]?'?/g, // moves of the form 2Rw2, 2Rw, Rw2, Rw, 2R2, 2R, R2, R, 2r2, 2r, r2, r. Note : the matching is greedy from left
+			], 0));
+		}
+	}
+	return moveArray;
+};
+
 const splitSequence = (moveSequenceString, patternList, priority) => {
 	if (moveSequenceString === "") {
 		return [];
@@ -404,4 +580,4 @@ const splitSequence = (moveSequenceString, patternList, priority) => {
 
 // help messages
 
-module.exports = {cleanSequence, parseMoves, parseOneMove, countMoves, getSuffixFromTurnAngle, getSuffixFromOppositeTurnAngle, getTurnSliceNumbersAndTurnAngle};
+module.exports = {cleanSequence, parseMoves, parseOneMove, buildMoveSequenceForVisualCube, deploySequenceNew, parseStructureNew, countMoves, getSuffixFromTurnAngle, getSuffixFromOppositeTurnAngle, getTurnSliceNumbersAndTurnAngle};
