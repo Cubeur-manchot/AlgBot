@@ -4,7 +4,7 @@ const {algCollection} = require("./algCollection.js");
 
 // sequence parsing
 
-const parseStructureNew = movesString => {
+const parseMoves = movesString => {
 	let newDepthObject = type => { return { type: type, subsequenceString: "", moves: [[]] } };
 	let pushAtDepth = (content, depth) => { informationAtDepth[depth].moves[informationAtDepth[depth].moves.length - 1].push(...content); };
 	let depth = 0;
@@ -12,7 +12,7 @@ const parseStructureNew = movesString => {
 	for (let characterIndex = 0; characterIndex < movesString.length; characterIndex++) {
 		let character = movesString[characterIndex];
 		if (character === "[" || character === "(") { // opening subsequence
-			pushAtDepth(parseMovesNew(informationAtDepth[depth].subsequenceString), depth); // append current moves
+			pushAtDepth(parseSimpleSequence(informationAtDepth[depth].subsequenceString), depth); // append current moves
 			informationAtDepth[depth].subsequenceString = "";
 			depth++;
 			informationAtDepth[depth] = newDepthObject(character);
@@ -20,12 +20,12 @@ const parseStructureNew = movesString => {
 			if (informationAtDepth[depth].type === "[:") { // [A : B]
 				pushAtDepth(informationAtDepth[depth].moves[0], depth - 1); // A
 				pushAtDepth(informationAtDepth[depth].moves[1], depth - 1); // begin of B
-				pushAtDepth(parseMovesNew(informationAtDepth[depth].subsequenceString), depth - 1); // end of B
+				pushAtDepth(parseSimpleSequence(informationAtDepth[depth].subsequenceString), depth - 1); // end of B
 				pushAtDepth(invertSequenceNew(informationAtDepth[depth].moves[0]), depth - 1); // A'
 				depth--;
 			} else if (informationAtDepth[depth].type === "[,") { // [A, B]
 				pushAtDepth(informationAtDepth[depth].moves[0], depth - 1); // A
-				let secondSubsequenceMoves = parseMovesNew(informationAtDepth[depth].subsequenceString);
+				let secondSubsequenceMoves = parseSimpleSequence(informationAtDepth[depth].subsequenceString);
 				pushAtDepth(informationAtDepth[depth].moves[1], depth - 1); // begin of B
 				pushAtDepth(secondSubsequenceMoves, depth - 1); // end of B
 				pushAtDepth(invertSequenceNew(informationAtDepth[depth].moves[0]), depth - 1); // A'
@@ -36,7 +36,7 @@ const parseStructureNew = movesString => {
 				return "Error : Bad parsing";
 			}
 		} else if (character === ")") { // closing subsequence (parenthesis)
-			pushAtDepth(parseMovesNew(informationAtDepth[depth].subsequenceString), depth); // append current moves
+			pushAtDepth(parseSimpleSequence(informationAtDepth[depth].subsequenceString), depth); // append current moves
 			let factor = movesString.slice(characterIndex + 1).match(/^\d*'?/)[0];
 			characterIndex += factor.length;
 			let isInverse = factor.includes("'");
@@ -52,7 +52,7 @@ const parseStructureNew = movesString => {
 		} else if (character === "," || character === ":") { // middle of subsequence
 			if (informationAtDepth[depth].type === "[") {
 				informationAtDepth[depth].type += character;
-				informationAtDepth[depth].moves[0] = parseMovesNew(informationAtDepth[depth].subsequenceString);
+				informationAtDepth[depth].moves[0] = parseSimpleSequence(informationAtDepth[depth].subsequenceString);
 				informationAtDepth[depth].moves[1] = [];
 				informationAtDepth[depth].subsequenceString = "";
 			} else {
@@ -65,18 +65,18 @@ const parseStructureNew = movesString => {
 	if (depth !== 0) {
 		return "Error : Bad parsing";
 	}
-	pushAtDepth(parseMovesNew(informationAtDepth[0].subsequenceString), 0);
+	pushAtDepth(parseSimpleSequence(informationAtDepth[0].subsequenceString), 0);
 	return informationAtDepth[0].moves[0];
 };
 
-const parseMovesNew = movesString => {
+const parseSimpleSequence = movesString => {
 	let wordList = movesString.replace(/'/g, "' ").split(" ").filter(string => { return string !== ""; });
 	let moveArray = [];
 	for (let word of wordList) {
 		if (word.match(/(p|o|cm)ll_|sune|parity|niklas|sexy|edge/gi)) {
 			moveArray.push(...deployMoveNew(word));
 		} else {
-			moveArray.push(...splitSequence(word, [
+			moveArray.push(...splitSequenceWithPatternList(word, [
 				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
 				/[0-9]-[0-9][RUFLDB]w?[0-9]'?(?!-)/g, // moves of the form 2-3Rw2, 2-3R2, not followed by a -
 				/[0-9]-[0-9][RUFLDB]w?'?/g, // moves of the form 2-3Rw. Note : if a number follows this sequence, it will be treated with the rest of the sequence
@@ -87,7 +87,7 @@ const parseMovesNew = movesString => {
 	return moveArray;
 };
 
-const splitSequence = (moveSequenceString, patternList, priority) => {
+const splitSequenceWithPatternList = (moveSequenceString, patternList, priority) => {
 	if (moveSequenceString === "") {
 		return [];
 	} else if (priority === patternList.length) {
@@ -99,11 +99,11 @@ const splitSequence = (moveSequenceString, patternList, priority) => {
 		let nbMatches = matches === null ? 0 : matches.length;
 		if (nbMatches !== 0) {
 			for (let matchIndex = 0; matchIndex < nbMatches; matchIndex++) {
-				moveSequenceArray.push(...splitSequence(antiMatches[matchIndex], patternList, priority + 1));
+				moveSequenceArray.push(...splitSequenceWithPatternList(antiMatches[matchIndex], patternList, priority + 1));
 				moveSequenceArray.push(matches[matchIndex]);
 			}
 		}
-		moveSequenceArray.push(...splitSequence(antiMatches[nbMatches], patternList, priority + 1)); // antiMatches has always 1 more element than matches
+		moveSequenceArray.push(...splitSequenceWithPatternList(antiMatches[nbMatches], patternList, priority + 1)); // antiMatches has always 1 more element than matches
 		return moveSequenceArray;
 	}
 };
@@ -211,4 +211,4 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 
 // help messages
 
-module.exports = {buildMoveSequenceForVisualCube, parseStructureNew, countMoves};
+module.exports = {buildMoveSequenceForVisualCube, parseMoves, countMoves};
