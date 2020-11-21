@@ -110,20 +110,20 @@ const splitSequence = (moveSequenceString, patternList, priority) => {
 
 // sequence manipulating
 
-const invertMove = move => {
-	if (move.includes("'")) {
-		return move.slice(0, -1);
-	} else {
-		return move + "'";
-	}
-};
-
 const invertSequenceNew = moves => {
 	let invertedSequence = [];
 	for (let move of moves) {
 		invertedSequence.unshift(invertMove(move));
 	}
 	return invertedSequence;
+};
+
+const invertMove = move => {
+	if (move.includes("'")) {
+		return move.slice(0, -1);
+	} else {
+		return move + "'";
+	}
 };
 
 const deploySequenceNew = moveSequence => {
