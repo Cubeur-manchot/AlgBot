@@ -69,6 +69,24 @@ const parseStructureNew = movesString => {
 	return informationAtDepth[0].moves[0];
 };
 
+const parseMovesNew = movesString => {
+	let wordList = movesString.replace(/'/g, "' ").split(" ").filter(string => { return string !== ""; });
+	let moveArray = [];
+	for (let word of wordList) {
+		if (word.match(/(p|o|cm)ll_|sune|parity|niklas|sexy|edge/gi)) {
+			moveArray.push(word); // consider the whole word as a single move (will be fully parsed later) // todo
+		} else {
+			moveArray.push(...splitSequence(word, [
+				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
+				/[0-9]-[0-9][RUFLDB]w?[0-9]'?(?!-)/g, // moves of the form 2-3Rw2, 2-3R2, not followed by a -
+				/[0-9]-[0-9][RUFLDB]w?'?/g, // moves of the form 2-3Rw. Note : if a number follows this sequence, it will be treated with the rest of the sequence
+				/[0-9]?(?:[RUFLDB]w?|[rufldb])[0-9]?'?/g, // moves of the form 2Rw2, 2Rw, Rw2, Rw, 2R2, 2R, R2, R, 2r2, 2r, r2, r. Note : the matching is greedy from left
+			], 0));
+		}
+	}
+	return moveArray;
+};
+
 // sequence manipulating
 
 const invertMove = move => {
@@ -259,26 +277,6 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 		}
 	}
 	return " (" + resultArray.join(", ") + ")";
-};
-
-// sequence cleaning
-
-const parseMovesNew = movesString => {
-	let wordList = movesString.replace(/'/g, "' ").split(" ").filter(string => { return string !== ""; });
-	let moveArray = [];
-	for (let word of wordList) {
-		if (word.match(/(p|o|cm)ll_|sune|parity|niklas|sexy|edge/gi)) {
-			moveArray.push(word); // consider the whole word as a single move (will be fully parsed later)
-		} else {
-			moveArray.push(...splitSequence(word, [
-				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
-				/[0-9]-[0-9][RUFLDB]w?[0-9]'?(?!-)/g, // moves of the form 2-3Rw2, 2-3R2, not followed by a -
-				/[0-9]-[0-9][RUFLDB]w?'?/g, // moves of the form 2-3Rw. Note : if a number follows this sequence, it will be treated with the rest of the sequence
-				/[0-9]?(?:[RUFLDB]w?|[rufldb])[0-9]?'?/g, // moves of the form 2Rw2, 2Rw, Rw2, Rw, 2R2, 2R, R2, R, 2r2, 2r, r2, r. Note : the matching is greedy from left
-			], 0));
-		}
-	}
-	return moveArray;
 };
 
 const splitSequence = (moveSequenceString, patternList, priority) => {
