@@ -1,6 +1,6 @@
 "use strict";
 
-const {parseOneMove, getTurnSliceNumbersAndTurnAngle, getSuffixFromTurnAngle, getSuffixFromOppositeTurnAngle} = require("./algs.js");
+const {getTurnSliceNumbersAndTurnAngle, getSuffixFromTurnAngle, getSuffixFromOppositeTurnAngle} = require("./algs.js");
 
 const mergeMoves = (moveSequenceArray, puzzle) => {
 	if (moveSequenceArray.length <= 1) { // sequence is too small, moves can't be merged
@@ -223,6 +223,24 @@ const buildOutputMovesFromFusionResult = (fusionResult, puzzle) => {
 
 const buildMoveStringFromObject = moveObject => {
 	return moveObject.prefix + moveObject.family + (moveObject.suffix === "1" ? "" : moveObject.suffix);
+};
+
+const parseOneMove = move => {
+	let movePattern = /[RUFLDBrufldbMESxyz]/g;
+	let moveInfo = {
+		prefix: move.split(movePattern)[0],
+		family:	move.match(movePattern)[0],
+		suffix:	move.split(movePattern)[1]
+	};
+	for (let familyGroup of [/[RLrlMx]/g, /[UDudEy]/g, /[FBfbSz]/g]) {
+		if (familyGroup.test(move)) {
+			moveInfo.familyGroup = familyGroup + "";
+		}
+	}
+	if (moveInfo.suffix === "") {
+		moveInfo.suffix = "1";
+	}
+	return moveInfo;
 };
 
 const getLastElementOfArray = array => {
