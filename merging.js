@@ -225,14 +225,6 @@ const buildMoveStringFromObject = moveObject => {
 	return moveObject.prefix + moveObject.family + (moveObject.suffix === "1" ? "" : moveObject.suffix);
 };
 
-const getOutputSequenceStringFromArray = moveSequenceArray => {
-	let moveSequenceString = "";
-	for (let moveObject of moveSequenceArray) {
-		moveSequenceString += moveObject.prefix + moveObject.family + (moveObject.suffix === "1" ? "" : moveObject.suffix) + " ";
-	}
-	return moveSequenceString.slice(0, -1); // remove last space
-};
-
 const getLastElementOfArray = array => {
 	return array.slice(-1)[0];
 };
