@@ -51,9 +51,10 @@ const getResultOfAlgOrDoCommand = command => {
 		if (options.shouldMergeMoves) {
 			moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +options.puzzle);
 		}
-		moveSequenceForAnswer = moveSequenceForAnswer.join(" ");
 		if (options.shouldCountMoves["htm"] || options.shouldCountMoves["stm"] || options.shouldCountMoves["etm"] || options.shouldCountMoves["qtm"]) {
-			moveSequenceForAnswer += " (" + countMoves(moveSequenceForAnswer, options.shouldCountMoves).join(", ") + ")"; // add move count if necessary
+			moveSequenceForAnswer = moveSequenceForAnswer.join(" ") + countMoves(moveSequenceForAnswer, options.shouldCountMoves);
+		} else {
+			moveSequenceForAnswer = moveSequenceForAnswer.join(" ");
 		}
 		return {
 			messageContent: moveSequenceForAnswer + (parsedCommand.comments ? " //" + parsedCommand.comments : ""),

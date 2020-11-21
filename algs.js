@@ -261,7 +261,6 @@ const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
 
 const countMoves = (moveSequence, shouldCountMoves) => {
 	let moveCount = [];
-	let result = [];
 	if (moveSequence.length === 0) {
 		moveCount["htm"] = 0;
 		moveCount["stm"] = 0;
@@ -290,12 +289,13 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 		moveCount["etm"] = simpleMovesCount + sliceMovesCount + rotationMovesCount;
 		moveCount["qtm"] = quarterSimpleMovesCount + 2*quarterSliceMovesCount;
 	}
+	let resultArray = [];
 	for (let metric of ["htm", "stm", "etm", "qtm"]) {
 		if (shouldCountMoves[metric]) {
-			result.push(`${moveCount[metric]} ${metric.toUpperCase()}`);
+			resultArray.push(`${moveCount[metric]} ${metric.toUpperCase()}`);
 		}
 	}
-	return result;
+	return " (" + resultArray.join(", ") + ")";
 };
 
 // sequence cleaning
