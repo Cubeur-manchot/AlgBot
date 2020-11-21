@@ -22,9 +22,7 @@ const invertSequenceNew = moves => {
 
 const parseStructureNew = movesString => {
 	let newDepthObject = type => { return { type: type, subsequenceString: "", moves: [[]] } };
-	let pushAtDepth = (content, depth) => {
-		informationAtDepth[depth].moves[informationAtDepth[depth].moves.length - 1].push(...content);
-	};
+	let pushAtDepth = (content, depth) => { informationAtDepth[depth].moves[informationAtDepth[depth].moves.length - 1].push(...content); };
 	let depth = 0;
 	let informationAtDepth = [newDepthObject("")];
 	for (let characterIndex = 0; characterIndex < movesString.length; characterIndex++) {
@@ -90,8 +88,18 @@ const parseStructureNew = movesString => {
 const deploySequenceNew = moveSequence => {
 	let moveSequenceForAnswer = [];
 	for (let move of moveSequence) {
-		let deployedMove = deployMoveNew(move);
-		moveSequenceForAnswer.push(...deployedMove.movesForAnswer);
+		let moveLower = move.toLowerCase();
+		if (/(p|o|cm)ll_/.test(move)) { // move is either a PLL, or an OLL, or a CMLL
+			moveSequenceForAnswer.push(...algCollection[move.slice(0, -1).toUpperCase() + "Collection"][moveLower].split(" "));
+		} else if (moveLower.includes("sune") || moveLower.includes("niklas")) { // move is a basic alg
+			moveSequenceForAnswer.push(...algCollection.basicAlgsCollection[moveLower].split(" "));
+		} else if (moveLower.includes("parity")) { // move is a 4x4 parity
+			moveSequenceForAnswer.push(...algCollection.parity4x4x4Collection[moveLower].split(" "));
+		} else if (moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a trigger or composition
+			moveSequenceForAnswer.push(...algCollection.triggerCollection[moveLower].split(" "));
+		} else { // normal move
+			moveSequenceForAnswer.push(move);
+		}
 	}
 	return moveSequenceForAnswer;
 };
@@ -100,7 +108,6 @@ const buildMoveSequenceForVisualCube = moveSequence => {
 	let moveSequenceForVisualCube = [];
 	for (let move of moveSequence) {
 		if (/^[0-9]/.test(move)) { // move of the form 2-4Rw', 3R2 or 3Rw2
-			let movesForVisualCube = [];
 			if (/^[0-9]-[0-9]/.test(move)) { // move of the form 2-4Rw'
 				let {biggerSliceNumber, smallerSliceNumber} = {
 					biggerSliceNumber: Math.max(move[0], move[2]),
@@ -122,52 +129,6 @@ const buildMoveSequenceForVisualCube = moveSequence => {
 		}
 	}
 	return moveSequenceForVisualCube;
-};
-
-const deployMoveNew = move => {
-	let moveLower = move.toLowerCase();
-	if (/^[0-9]/.test(move)) { // move of the form 2-4Rw', 3R2 or 3Rw2
-		let movesForAnswer = [move];
-		let movesForVisualCube = [];
-		if (/^[0-9]-[0-9]/.test(move)) { // move of the form 2-4Rw'
-			let {biggerSliceNumber, smallerSliceNumber} = {
-				biggerSliceNumber: Math.max(move[0], move[2]),
-				smallerSliceNumber: Math.min(move[0], move[2])
-			};
-			movesForVisualCube.push(biggerSliceNumber + move.substring(3)); // keep bigger block identical
-			if (smallerSliceNumber > 1 && move.length > 3) {
-				movesForVisualCube.push(invertMove(smallerSliceNumber - 1 + move.substring(3).replace("w", ""))); // add smaller move in reverse sense
-			} // else move is weird, ignore return move
-		} else { // move of the form 3R2 or 3Rw2
-			movesForVisualCube.push(move); // keep bigger block identical
-			if (!move.includes("w")) { // move of the form 3R2
-				let sliceNumber = move[0];
-				movesForVisualCube.push(invertMove(sliceNumber - 1 + move.substring(1).replace("w", ""))); // add smaller move in reverse sense
-			}
-		}
-		return {
-			movesForAnswer: movesForAnswer,
-			movesForVisualCube: movesForVisualCube
-		};
-	} else {
-		let sequence;
-		if (/(p|o|cm)ll_/.test(move)) { // move is either a PLL, or an OLL, or a CMLL
-			sequence = algCollection[move.slice(0, -1).toUpperCase() + "Collection"][moveLower];
-		} else if (moveLower.includes("sune") || moveLower.includes("niklas")) { // move is a basic alg
-			sequence = algCollection.basicAlgsCollection[moveLower];
-		} else if (moveLower.includes("parity")) { // move is a 4x4 parity
-			sequence = algCollection.parity4x4x4Collection[moveLower];
-		} else if (moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a trigger or composition
-			sequence = algCollection.triggerCollection[moveLower];
-		} else { // normal move
-			sequence = move;
-		}
-		sequence = sequence.split(" ");
-		return {
-			movesForAnswer: sequence,
-			movesForVisualCube: sequence
-		};
-	}
 };
 
 const parseOneMove = move => {
