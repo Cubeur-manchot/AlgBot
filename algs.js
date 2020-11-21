@@ -4,22 +4,6 @@ const {algCollection} = require("./algCollection.js");
 
 // sequence parsing
 
-const invertMove = move => {
-	if (move.includes("'")) {
-		return move.slice(0, -1);
-	} else {
-		return move + "'";
-	}
-};
-
-const invertSequenceNew = moves => {
-	let invertedSequence = [];
-	for (let move of moves) {
-		invertedSequence.unshift(invertMove(move));
-	}
-	return invertedSequence;
-};
-
 const parseStructureNew = movesString => {
 	let newDepthObject = type => { return { type: type, subsequenceString: "", moves: [[]] } };
 	let pushAtDepth = (content, depth) => { informationAtDepth[depth].moves[informationAtDepth[depth].moves.length - 1].push(...content); };
@@ -83,6 +67,24 @@ const parseStructureNew = movesString => {
 	}
 	pushAtDepth(parseMovesNew(informationAtDepth[0].subsequenceString), 0);
 	return informationAtDepth[0].moves[0];
+};
+
+// sequence manipulating
+
+const invertMove = move => {
+	if (move.includes("'")) {
+		return move.slice(0, -1);
+	} else {
+		return move + "'";
+	}
+};
+
+const invertSequenceNew = moves => {
+	let invertedSequence = [];
+	for (let move of moves) {
+		invertedSequence.unshift(invertMove(move));
+	}
+	return invertedSequence;
 };
 
 const deploySequenceNew = moveSequence => {
