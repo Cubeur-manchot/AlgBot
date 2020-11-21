@@ -74,8 +74,7 @@ const parseMovesNew = movesString => {
 	let moveArray = [];
 	for (let word of wordList) {
 		if (word.match(/(p|o|cm)ll_|sune|parity|niklas|sexy|edge/gi)) {
-
-			moveArray.push(word); // consider the whole word as a single move (will be fully parsed later)
+			moveArray.push(...deployMoveNew(word));
 		} else {
 			moveArray.push(...splitSequence(word, [
 				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
@@ -127,21 +126,28 @@ const invertMove = move => {
 	}
 };
 
+const deployMoveNew = move => {
+	let moveSequence = [];
+	let moveLower = move.toLowerCase();
+	if (/(p|o|cm)ll_/.test(move)) { // move is either a PLL, or an OLL, or a CMLL
+		moveSequence.push(...algCollection[move.slice(0, -1).toUpperCase() + "Collection"][moveLower].split(" "));
+	} else if (moveLower.includes("sune") || moveLower.includes("niklas")) { // move is a basic alg
+		moveSequence.push(...algCollection.basicAlgsCollection[moveLower].split(" "));
+	} else if (moveLower.includes("parity")) { // move is a 4x4 parity
+		moveSequence.push(...algCollection.parity4x4x4Collection[moveLower].split(" "));
+	} else if (moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a trigger or composition
+		moveSequence.push(...algCollection.triggerCollection[moveLower].split(" "));
+	} else { // normal move
+		moveSequence.push(move);
+	}
+	return moveSequence;
+
+};
+
 const deploySequenceNew = moveSequence => {
 	let moveSequenceForAnswer = [];
 	for (let move of moveSequence) {
-		let moveLower = move.toLowerCase();
-		if (/(p|o|cm)ll_/.test(move)) { // move is either a PLL, or an OLL, or a CMLL
-			moveSequenceForAnswer.push(...algCollection[move.slice(0, -1).toUpperCase() + "Collection"][moveLower].split(" "));
-		} else if (moveLower.includes("sune") || moveLower.includes("niklas")) { // move is a basic alg
-			moveSequenceForAnswer.push(...algCollection.basicAlgsCollection[moveLower].split(" "));
-		} else if (moveLower.includes("parity")) { // move is a 4x4 parity
-			moveSequenceForAnswer.push(...algCollection.parity4x4x4Collection[moveLower].split(" "));
-		} else if (moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a trigger or composition
-			moveSequenceForAnswer.push(...algCollection.triggerCollection[moveLower].split(" "));
-		} else { // normal move
-			moveSequenceForAnswer.push(move);
-		}
+		moveSequenceForAnswer.push(...deployMoveNew(move));
 	}
 	return moveSequenceForAnswer;
 };
