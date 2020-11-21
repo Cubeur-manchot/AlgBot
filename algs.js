@@ -209,4 +209,4 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 
 // help messages
 
-module.exports = {buildMoveSequenceForVisualCube, parseMoves, countMoves};
+module.exports = {parseMoves, buildMoveSequenceForVisualCube, countMoves};
