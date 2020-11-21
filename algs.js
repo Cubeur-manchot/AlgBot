@@ -21,16 +21,16 @@ const parseMoves = movesString => {
 				pushAtDepth(informationAtDepth[depth].moves[0], depth - 1); // A
 				pushAtDepth(informationAtDepth[depth].moves[1], depth - 1); // begin of B
 				pushAtDepth(parseSimpleSequence(informationAtDepth[depth].subsequenceString), depth - 1); // end of B
-				pushAtDepth(invertSequenceNew(informationAtDepth[depth].moves[0]), depth - 1); // A'
+				pushAtDepth(invertSequence(informationAtDepth[depth].moves[0]), depth - 1); // A'
 				depth--;
 			} else if (informationAtDepth[depth].type === "[,") { // [A, B]
 				pushAtDepth(informationAtDepth[depth].moves[0], depth - 1); // A
 				let secondSubsequenceMoves = parseSimpleSequence(informationAtDepth[depth].subsequenceString);
 				pushAtDepth(informationAtDepth[depth].moves[1], depth - 1); // begin of B
 				pushAtDepth(secondSubsequenceMoves, depth - 1); // end of B
-				pushAtDepth(invertSequenceNew(informationAtDepth[depth].moves[0]), depth - 1); // A'
-				pushAtDepth(invertSequenceNew(secondSubsequenceMoves), depth - 1); // (end of B)'
-				pushAtDepth(invertSequenceNew(informationAtDepth[depth].moves[1]), depth - 1); // (begin of B)'
+				pushAtDepth(invertSequence(informationAtDepth[depth].moves[0]), depth - 1); // A'
+				pushAtDepth(invertSequence(secondSubsequenceMoves), depth - 1); // (end of B)'
+				pushAtDepth(invertSequence(informationAtDepth[depth].moves[1]), depth - 1); // (begin of B)'
 				depth--;
 			} else {
 				return "Error : Bad parsing";
@@ -42,7 +42,7 @@ const parseMoves = movesString => {
 			let isInverse = factor.includes("'");
 			if (isInverse) {
 				factor = factor.slice(0, -1); // remove apostrophe at the end
-				informationAtDepth[depth].moves[0] = invertSequenceNew(informationAtDepth[depth].moves[0]);
+				informationAtDepth[depth].moves[0] = invertSequence(informationAtDepth[depth].moves[0]);
 			}
 			factor = factor === "" ? 1 : +factor;
 			for (let time = 0; time < factor; time++) {
@@ -123,7 +123,7 @@ const splitSequenceWithPatternList = (moveSequenceString, patternList, priority)
 
 // sequence manipulating
 
-const invertSequenceNew = moves => {
+const invertSequence = moves => {
 	let invertedSequence = [];
 	for (let move of moves) {
 		invertedSequence.unshift(invertMove(move));
