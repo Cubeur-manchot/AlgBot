@@ -2,7 +2,7 @@
 
 const {getGeneralHelpMessage} = require("./help.js");
 const {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions} = require("./options.js");
-const {buildMoveSequenceForVisualCube, parseStructureNew, deploySequenceNew, countMoves} = require("./algs.js");
+const {buildMoveSequenceForVisualCube, parseStructureNew, countMoves} = require("./algs.js");
 const {getAlgListHelpMessage} = require("./algCollection.js");
 const {mergeMoves} = require("./merging.js");
 
@@ -45,8 +45,7 @@ const getResultOfAlgOrDoCommand = command => {
 			unrecognizedPuzzle: options.puzzle
 		};
 	} else { // everything is right, continue
-		let moveSequenceArray = parseStructureNew(parsedCommand.moves);
-		let moveSequenceForAnswer = deploySequenceNew(moveSequenceArray);
+		let moveSequenceForAnswer = parseStructureNew(parsedCommand.moves);
 		let moveSequenceForVisualCubeNew = buildMoveSequenceForVisualCube(moveSequenceForAnswer);
 		if (options.shouldMergeMoves) {
 			moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +options.puzzle);

@@ -127,29 +127,18 @@ const invertMove = move => {
 };
 
 const deployMoveNew = move => {
-	let moveSequence = [];
 	let moveLower = move.toLowerCase();
 	if (/(p|o|cm)ll_/.test(move)) { // move is either a PLL, or an OLL, or a CMLL
-		moveSequence.push(...algCollection[move.slice(0, -1).toUpperCase() + "Collection"][moveLower].split(" "));
+		return algCollection[move.slice(0, -1).toUpperCase() + "Collection"][moveLower].split(" ");
 	} else if (moveLower.includes("sune") || moveLower.includes("niklas")) { // move is a basic alg
-		moveSequence.push(...algCollection.basicAlgsCollection[moveLower].split(" "));
+		return algCollection.basicAlgsCollection[moveLower].split(" ");
 	} else if (moveLower.includes("parity")) { // move is a 4x4 parity
-		moveSequence.push(...algCollection.parity4x4x4Collection[moveLower].split(" "));
+		return algCollection.parity4x4x4Collection[moveLower].split(" ");
 	} else if (moveLower.includes("edge") || moveLower.includes("sexy")) { // move is a trigger or composition
-		moveSequence.push(...algCollection.triggerCollection[moveLower].split(" "));
+		return algCollection.triggerCollection[moveLower].split(" ");
 	} else { // normal move
-		moveSequence.push(move);
+		return [move];
 	}
-	return moveSequence;
-
-};
-
-const deploySequenceNew = moveSequence => {
-	let moveSequenceForAnswer = [];
-	for (let move of moveSequence) {
-		moveSequenceForAnswer.push(...deployMoveNew(move));
-	}
-	return moveSequenceForAnswer;
 };
 
 const buildMoveSequenceForVisualCube = moveSequence => {
@@ -222,4 +211,4 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 
 // help messages
 
-module.exports = {buildMoveSequenceForVisualCube, deploySequenceNew, parseStructureNew, countMoves};
+module.exports = {buildMoveSequenceForVisualCube, parseStructureNew, countMoves};
