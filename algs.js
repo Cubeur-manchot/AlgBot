@@ -87,6 +87,27 @@ const parseMovesNew = movesString => {
 	return moveArray;
 };
 
+const splitSequence = (moveSequenceString, patternList, priority) => {
+	if (moveSequenceString === "") {
+		return [];
+	} else if (priority === patternList.length) {
+		return []; // ignore remaining characters
+	} else {
+		let moveSequenceArray = [];
+		let matches = moveSequenceString.match(patternList[priority]); // all matching subsequences
+		let antiMatches = moveSequenceString.split(patternList[priority]); // all subsequences between matching ones
+		let nbMatches = matches === null ? 0 : matches.length;
+		if (nbMatches !== 0) {
+			for (let matchIndex = 0; matchIndex < nbMatches; matchIndex++) {
+				moveSequenceArray.push(...splitSequence(antiMatches[matchIndex], patternList, priority + 1));
+				moveSequenceArray.push(matches[matchIndex]);
+			}
+		}
+		moveSequenceArray.push(...splitSequence(antiMatches[nbMatches], patternList, priority + 1)); // antiMatches has always 1 more element than matches
+		return moveSequenceArray;
+	}
+};
+
 // sequence manipulating
 
 const invertMove = move => {
@@ -277,32 +298,6 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 		}
 	}
 	return " (" + resultArray.join(", ") + ")";
-};
-
-const splitSequence = (moveSequenceString, patternList, priority) => {
-	if (moveSequenceString === "") {
-		return [];
-	} else if (priority === patternList.length) {
-		moveSequenceString = moveSequenceString.replace(/(?![,:\[\](]|\)[0-9]*)/g, ""); // keep only characters [ ] , : ( and )\d* which are necessary for structure parsing
-		if (moveSequenceString === "") {
-			return [];
-		} else {
-			return [moveSequenceString];
-		}
-	} else {
-		let moveSequenceArray = [];
-		let matches = moveSequenceString.match(patternList[priority]); // all matching subsequences
-		let antiMatches = moveSequenceString.split(patternList[priority]); // all non-matching subsequences
-		let nbMatches = matches === null ? 0 : matches.length;
-		if (nbMatches !== 0) {
-			for (let matchIndex = 0; matchIndex < nbMatches; matchIndex++) {
-				moveSequenceArray.push(...splitSequence(antiMatches[matchIndex], patternList, priority + 1));
-				moveSequenceArray.push(matches[matchIndex]);
-			}
-		}
-		moveSequenceArray.push(...splitSequence(antiMatches[nbMatches], patternList, priority + 1)); // antiMatches has always 1 more element than matches
-		return moveSequenceArray;
-	}
 };
 
 // help messages
