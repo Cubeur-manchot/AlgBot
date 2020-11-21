@@ -513,27 +513,6 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 
 // sequence cleaning
 
-const cleanSequence = moveSequence => {
-	let moveSequenceWork = moveSequence.
-		replace(/'/g, "' "). // split by apostrophe
-		split(" "). // split by space
-		filter(string => { return string !== ""; }); // remove empty moves
-	let moveSequenceOutput = [];
-	for (let subsequence of moveSequenceWork) {
-		if (subsequence.match(/(p|o|cm)ll_|sune|parity|niklas|sexy|edge/gi)) {
-			moveSequenceOutput.push(subsequence); // consider the whole word as a single move (will be fully parsed later)
-		} else {
-			moveSequenceOutput.push(...splitSequence(subsequence, [
-				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
-				/[0-9]-[0-9][RUFLDB]w?[0-9]'?(?!-)/g, // moves of the form 2-3Rw2, 2-3R2, not followed by a -
-				/[0-9]-[0-9][RUFLDB]w?'?/g, // moves of the form 2-3Rw. Note : if a number follows this sequence, it will be treated with the rest of the sequence
-				/[0-9]?(?:[RUFLDB]w?|[rufldb])[0-9]?'?/g, // moves of the form 2Rw2, 2Rw, Rw2, Rw, 2R2, 2R, R2, R, 2r2, 2r, r2, r. Note : the matching is greedy from left
-			], 0));
-		}
-	}
-	return moveSequenceOutput.filter(string => { return string !== ""; }); // remove empty moves
-};
-
 const parseMovesNew = movesString => {
 	let wordList = movesString.replace(/'/g, "' ").split(" ").filter(string => { return string !== ""; });
 	let moveArray = [];
