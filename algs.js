@@ -74,7 +74,8 @@ const parseMovesNew = movesString => {
 	let moveArray = [];
 	for (let word of wordList) {
 		if (word.match(/(p|o|cm)ll_|sune|parity|niklas|sexy|edge/gi)) {
-			moveArray.push(word); // consider the whole word as a single move (will be fully parsed later) // todo
+
+			moveArray.push(word); // consider the whole word as a single move (will be fully parsed later)
 		} else {
 			moveArray.push(...splitSequence(word, [
 				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
@@ -172,75 +173,6 @@ const buildMoveSequenceForVisualCube = moveSequence => {
 	return moveSequenceForVisualCube;
 };
 
-const getTurnAngleFromSuffix = suffix => {
-	suffix = suffix.replace("w", "");
-	if (suffix.includes("'")) {
-		if (suffix.slice(0, -1) === "") {
-			return -1;
-		} else {
-			return - parseInt(suffix.slice(0, -1));
-		}
-	} else {
-		if (suffix === "") {
-			return 1;
-		} else {
-			return parseInt(suffix);
-		}
-	}
-};
-
-const getSuffixFromTurnAngle = turnAngle => {
-	return getSuffixFromTurnAngleModulo(turnAngle % 4 + 4*(turnAngle < 0));
-};
-
-const getSuffixFromOppositeTurnAngle = turnAngle => {
-	return getSuffixFromTurnAngleModulo(-turnAngle % 4 + 4*(turnAngle > 0));
-};
-
-const getSuffixFromTurnAngleModulo = turnAngleModulo => {
-	switch (turnAngleModulo) {
-		case 0: return "";
-		case 1: return "";
-		case 2: return "2";
-		case 3: return "'";
-	}
-};
-
-const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
-	let orientationSense = /[RrUuFfS]/g.test(moveObject.family);
-	let isMiddleMove = /[MES]/.test(moveObject.family);
-	let hasW = moveObject.family.includes("w");
-	let minSliceNumber, maxSliceNumber, turnAngle = getTurnAngleFromSuffix(moveObject.suffix);
-	if (isMiddleMove) { // move of the form M2
-		let middleSliceNumber = (puzzle + 1)/2;
-		minSliceNumber = middleSliceNumber;
-		maxSliceNumber = middleSliceNumber;
-	} else if (moveObject.prefix.length === 0) { // move of the form R2, Rw2 or r2
-		let isSmallLetter = /[rufldb]/.test(moveObject.family);
-		minSliceNumber = 1 + (isSmallLetter && puzzle !== 3); // = 2 for r2 on 4x4+, = 1 for r2 on 3x3, R2 and Rw2
-		maxSliceNumber = 1 + (isSmallLetter || hasW); // = 1 for R2, 2 for Rw2 and r2
-	} else if (moveObject.prefix.length === 1) { // move of the form 2R2, 2Rw2 or 2r2
-		let digit = moveObject.prefix;
-		minSliceNumber = hasW ? 1 : +digit; // = 1 for 2Rw2, = digit for 2R2 and 2r2
-		maxSliceNumber = +digit; // = digit for 2Rw2, 2R2 and 2r2
-	} else { // move of the form 2-3Rw2 or 2-3R2
-		let firstDigit = +moveObject.prefix[0];
-		let secondDigit = +moveObject.prefix[2];
-		minSliceNumber = Math.min(firstDigit, secondDigit);
-		maxSliceNumber = Math.max(firstDigit, secondDigit);
-	}
-	if (!orientationSense) {
-		turnAngle = -turnAngle;
-		minSliceNumber = puzzle + 1 - minSliceNumber; // complement
-		maxSliceNumber = puzzle + 1 - maxSliceNumber; // complement
-	}
-	return {
-		minSliceNumber,
-		maxSliceNumber,
-		turnAngle
-	};
-};
-
 // move counting
 
 const countMoves = (moveSequence, shouldCountMoves) => {
@@ -284,4 +216,4 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 
 // help messages
 
-module.exports = {parseOneMove, buildMoveSequenceForVisualCube, deploySequenceNew, parseStructureNew, countMoves, getSuffixFromTurnAngle, getSuffixFromOppositeTurnAngle, getTurnSliceNumbersAndTurnAngle};
+module.exports = {buildMoveSequenceForVisualCube, deploySequenceNew, parseStructureNew, countMoves};
