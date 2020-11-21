@@ -2,7 +2,7 @@
 
 const {getGeneralHelpMessage} = require("./help.js");
 const {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions} = require("./options.js");
-const {cleanSequence, parseMoves, buildMoveSequenceForVisualCube, parseStructureNew, deploySequenceNew, countMoves} = require("./algs.js");
+const {buildMoveSequenceForVisualCube, parseStructureNew, deploySequenceNew, countMoves} = require("./algs.js");
 const {getAlgListHelpMessage} = require("./algCollection.js");
 const {mergeMoves} = require("./merging.js");
 
