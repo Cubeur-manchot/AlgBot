@@ -2,7 +2,7 @@
 
 const {getGeneralHelpMessage} = require("./help.js");
 const {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions} = require("./options.js");
-const {buildMoveSequenceForVisualCube, parseMoves, countMoves} = require("./algs.js");
+const {buildMoveSequenceForVisualCube, parseMoves, countMoves, getBadParsingErrorMessage} = require("./algs.js");
 const {getAlgListHelpMessage} = require("./algCollection.js");
 const {mergeMoves} = require("./merging.js");
 
@@ -16,6 +16,9 @@ const getResultOfCommand = (message, language) => {
 			answer.errorInCommand = true;
 		} else if (resultOfAlgOrDoCommand.unrecognizedOptions) {
 			answer.answerContent = getUnrecognizedOptionsErrorMessage(resultOfAlgOrDoCommand.unrecognizedOptions.join("\n"), language);
+			answer.errorInCommand = true;
+		} else if (resultOfAlgOrDoCommand.badParsing) {
+			answer.answerContent = getBadParsingErrorMessage(language);
 			answer.errorInCommand = true;
 		} else {
 			answer.answerContent = resultOfAlgOrDoCommand.messageContent;
@@ -46,19 +49,25 @@ const getResultOfAlgOrDoCommand = command => {
 		};
 	} else { // everything is right, continue
 		let moveSequenceForAnswer = parseMoves(parsedCommand.moves);
-		let moveSequenceForVisualCubeNew = buildMoveSequenceForVisualCube(moveSequenceForAnswer);
-		if (options.shouldMergeMoves) {
-			moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +options.puzzle);
-		}
-		if (options.shouldCountMoves["htm"] || options.shouldCountMoves["stm"] || options.shouldCountMoves["etm"] || options.shouldCountMoves["qtm"]) {
-			moveSequenceForAnswer = moveSequenceForAnswer.join(" ") + countMoves(moveSequenceForAnswer, options.shouldCountMoves);
+		if (moveSequenceForAnswer === "Error : Bad parsing") {
+			return {
+				badParsing: true
+			};
 		} else {
-			moveSequenceForAnswer = moveSequenceForAnswer.join(" ");
+			let moveSequenceForVisualCubeNew = buildMoveSequenceForVisualCube(moveSequenceForAnswer);
+			if (options.shouldMergeMoves) {
+				moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +options.puzzle);
+			}
+			if (options.shouldCountMoves["htm"] || options.shouldCountMoves["stm"] || options.shouldCountMoves["etm"] || options.shouldCountMoves["qtm"]) {
+				moveSequenceForAnswer = moveSequenceForAnswer.join(" ") + countMoves(moveSequenceForAnswer, options.shouldCountMoves);
+			} else {
+				moveSequenceForAnswer = moveSequenceForAnswer.join(" ");
+			}
+			return {
+				messageContent: moveSequenceForAnswer + (parsedCommand.comments ? " //" + parsedCommand.comments : ""),
+				imageUrl: buildImageUrl(moveSequenceForVisualCubeNew, options, parsedCommand.algOrDo)
+			};
 		}
-		return {
-			messageContent: moveSequenceForAnswer + (parsedCommand.comments ? " //" + parsedCommand.comments : ""),
-			imageUrl: buildImageUrl(moveSequenceForVisualCubeNew, options, parsedCommand.algOrDo)
-		};
 	}
 };
 

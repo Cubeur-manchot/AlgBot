@@ -207,6 +207,14 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 	return " (" + resultArray.join(", ") + ")";
 };
 
-// help messages
+// error messages
 
-module.exports = {parseMoves, buildMoveSequenceForVisualCube, countMoves};
+const getBadParsingErrorMessage = (language) => {
+	if (language === "french") {
+		return ":x: Mauvaise structure d'algo";
+	} else {
+		return ":x: Bad alg structure";
+	}
+};
+
+module.exports = {parseMoves, buildMoveSequenceForVisualCube, countMoves, getBadParsingErrorMessage};
