@@ -52,7 +52,7 @@ const parseMoves = movesString => {
 		} else if (character === "," || character === ":") { // middle of subsequence
 			if (informationAtDepth[depth].type === "[") {
 				informationAtDepth[depth].type += character;
-				informationAtDepth[depth].moves[0] = parseSimpleSequence(informationAtDepth[depth].subsequenceString);
+				informationAtDepth[depth].moves[0].push(...parseSimpleSequence(informationAtDepth[depth].subsequenceString));
 				informationAtDepth[depth].moves[1] = [];
 				informationAtDepth[depth].subsequenceString = "";
 			} else {
