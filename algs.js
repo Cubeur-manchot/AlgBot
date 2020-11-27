@@ -199,7 +199,7 @@ const countMoves = (moveSequence, shouldCountMoves) => {
 		moveCount["qtm"] = quarterSimpleMovesCount + 2*quarterSliceMovesCount;
 	}
 	let resultArray = [];
-	for (let metric of ["htm", "stm", "etm", "qtm"]) {
+	for (let metric of Object.keys(moveCount)) {
 		if (shouldCountMoves[metric]) {
 			resultArray.push(`${moveCount[metric]} ${metric.toUpperCase()}`);
 		}
