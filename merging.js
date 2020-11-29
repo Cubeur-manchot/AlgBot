@@ -248,76 +248,76 @@ const tryToMergeMovesInCommutingGroup = (commutingGroup, puzzle) => {
 	}
 };
 
-const computeFusionResult = (lastMoveParsed, nextMoveParsed) => {
-	if (lastMoveParsed.minSliceNumber === nextMoveParsed.minSliceNumber && lastMoveParsed.maxSliceNumber === nextMoveParsed.maxSliceNumber) { // same slice or block of slices : move merge or cancel
-		let combinedTurnAngle = lastMoveParsed.turnAngle + nextMoveParsed.turnAngle;
+const computeFusionResult = (lastMove, nextMove) => {
+	if (lastMove.minSliceNumber === nextMove.minSliceNumber && lastMove.maxSliceNumber === nextMove.maxSliceNumber) { // same slice or block of slices : move merge or cancel
+		let combinedTurnAngle = lastMove.turnAngle + nextMove.turnAngle;
 		if (combinedTurnAngle % 4 === 0) { // moves perfectly cancel
 			return {
 				hasCancelled: true
 			};
 		} else { // normal fusion
 			return {
-				minSliceNumber: lastMoveParsed.minSliceNumber,
-				maxSliceNumber: lastMoveParsed.maxSliceNumber,
+				minSliceNumber: lastMove.minSliceNumber,
+				maxSliceNumber: lastMove.maxSliceNumber,
 				turnAngle: combinedTurnAngle,
-				familyGroup: lastMoveParsed.familyGroup,
+				familyGroup: lastMove.familyGroup,
 				hasMerged: true
 			};
 		}
 	} else { // other cases
-		if (lastMoveParsed.turnAngle === nextMoveParsed.turnAngle) { // same turn angle
-			if (lastMoveParsed.maxSliceNumber + 1 === nextMoveParsed.minSliceNumber) { // moves of the form R M'
+		if (lastMove.turnAngle === nextMove.turnAngle) { // same turn angle
+			if (lastMove.maxSliceNumber + 1 === nextMove.minSliceNumber) { // moves of the form R M'
 				return {
-					minSliceNumber: lastMoveParsed.minSliceNumber,
-					maxSliceNumber: nextMoveParsed.maxSliceNumber,
-					turnAngle: lastMoveParsed.turnAngle,
-					familyGroup: lastMoveParsed.familyGroup,
+					minSliceNumber: lastMove.minSliceNumber,
+					maxSliceNumber: nextMove.maxSliceNumber,
+					turnAngle: lastMove.turnAngle,
+					familyGroup: lastMove.familyGroup,
 					hasMerged: true
 				};
-			} else if (lastMoveParsed.minSliceNumber === nextMoveParsed.maxSliceNumber + 1) { // moves of the form M' R
+			} else if (lastMove.minSliceNumber === nextMove.maxSliceNumber + 1) { // moves of the form M' R
 				return {
-					minSliceNumber: nextMoveParsed.minSliceNumber,
-					maxSliceNumber: lastMoveParsed.maxSliceNumber,
-					turnAngle: lastMoveParsed.turnAngle,
-					familyGroup: lastMoveParsed.familyGroup,
+					minSliceNumber: nextMove.minSliceNumber,
+					maxSliceNumber: lastMove.maxSliceNumber,
+					turnAngle: lastMove.turnAngle,
+					familyGroup: lastMove.familyGroup,
 					hasMerged: true
 				};
 			} // else no possible fusion
 		}
-		if ((lastMoveParsed.turnAngle + nextMoveParsed.turnAngle) % 4 === 0) { // opposite turn angle
-			if (lastMoveParsed.minSliceNumber === nextMoveParsed.minSliceNumber) {
-				if (lastMoveParsed.maxSliceNumber < nextMoveParsed.maxSliceNumber) { // moves of the form r R'
+		if ((lastMove.turnAngle + nextMove.turnAngle) % 4 === 0) { // opposite turn angle
+			if (lastMove.minSliceNumber === nextMove.minSliceNumber) {
+				if (lastMove.maxSliceNumber < nextMove.maxSliceNumber) { // moves of the form r R'
 					return {
-						minSliceNumber: lastMoveParsed.maxSliceNumber + 1,
-						maxSliceNumber: nextMoveParsed.maxSliceNumber,
-						turnAngle: nextMoveParsed.turnAngle,
-						familyGroup: lastMoveParsed.familyGroup,
+						minSliceNumber: lastMove.maxSliceNumber + 1,
+						maxSliceNumber: nextMove.maxSliceNumber,
+						turnAngle: nextMove.turnAngle,
+						familyGroup: lastMove.familyGroup,
 						hasMerged: true
 					};
 				} else { // lastMoveParsed.maxSliceNumber > nextMoveParsed.maxSliceNumber, moves of the form R r'
 					return {
-						minSliceNumber: nextMoveParsed.maxSliceNumber + 1,
-						maxSliceNumber: lastMoveParsed.maxSliceNumber,
-						turnAngle: lastMoveParsed.turnAngle,
-						familyGroup: lastMoveParsed.familyGroup,
+						minSliceNumber: nextMove.maxSliceNumber + 1,
+						maxSliceNumber: lastMove.maxSliceNumber,
+						turnAngle: lastMove.turnAngle,
+						familyGroup: lastMove.familyGroup,
 						hasMerged: true
 					};
 				} // no possible else
-			} else if (lastMoveParsed.maxSliceNumber === nextMoveParsed.maxSliceNumber) {
-				if (lastMoveParsed.minSliceNumber < nextMoveParsed.minSliceNumber) { // moves of the form r M
+			} else if (lastMove.maxSliceNumber === nextMove.maxSliceNumber) {
+				if (lastMove.minSliceNumber < nextMove.minSliceNumber) { // moves of the form r M
 					return {
-						minSliceNumber: lastMoveParsed.minSliceNumber,
-						maxSliceNumber: nextMoveParsed.minSliceNumber - 1,
-						turnAngle: lastMoveParsed.turnAngle,
-						familyGroup: lastMoveParsed.familyGroup,
+						minSliceNumber: lastMove.minSliceNumber,
+						maxSliceNumber: nextMove.minSliceNumber - 1,
+						turnAngle: lastMove.turnAngle,
+						familyGroup: lastMove.familyGroup,
 						hasMerged: true
 					};
 				} else { // lastMoveParsed.minSliceNumber > nextMoveParsed.minSliceNumber, moves of the form M r
 					return {
-						minSliceNumber: nextMoveParsed.minSliceNumber,
-						maxSliceNumber: lastMoveParsed.minSliceNumber - 1,
-						turnAngle: nextMoveParsed.turnAngle,
-						familyGroup: lastMoveParsed.familyGroup,
+						minSliceNumber: nextMove.minSliceNumber,
+						maxSliceNumber: lastMove.minSliceNumber - 1,
+						turnAngle: nextMove.turnAngle,
+						familyGroup: lastMove.familyGroup,
 						hasMerged: true
 					};
 				}
