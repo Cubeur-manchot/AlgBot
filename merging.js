@@ -1,37 +1,6 @@
 "use strict";
 
-const movePattern = /[RUFLDBrufldbMESxyz]/g;
-
-const getSuffixFromTurnAngleModulo = {
-	0: "",
-	1: "",
-	2: "2",
-	3: "'",
-	"-1": "'",
-	"-2": "2",
-	"-3": ""
-};
-
-const isMiddleMove = {
-	M: true,
-	E: true,
-	S: true
-};
-
-const isRotationMove = {
-	x: true,
-	y: true,
-	z: true
-};
-
-const isLowerLetter = {
-	r: true,
-	u: true,
-	f: true,
-	l: true,
-	d: true,
-	b: true
-};
+// sequence parsing, first level
 
 const getMoveObjectSequenceFromMoveStringSequence = moveStringSequence => {
 	let moveObjectSequence = [];
@@ -69,16 +38,51 @@ const getCommutingGroups = moveObjectSequence => {
 	}
 };
 
-const parseSuffixForMerging = suffix => {
-	suffix = suffix.replace("w", "");
-	if (suffix === "") {
-		return 1;
-	} else if (suffix === "'") {
-		return -1;
-	} else if (suffix.includes("'")) {
-		return -parseInt(suffix.slice(0, -1));
-	} else {
-		return parseInt(suffix);
+// sequence parsing, second level
+
+const movePattern = /[RUFLDBrufldbMESxyz]/g;
+
+const isMiddleMove = {
+	M: true,
+	E: true,
+	S: true
+};
+
+const isRotationMove = {
+	x: true,
+	y: true,
+	z: true
+};
+
+const isLowerLetter = {
+	r: true,
+	u: true,
+	f: true,
+	l: true,
+	d: true,
+	b: true
+};
+
+const isFromReferenceFace = {
+	R: true,
+	r: true,
+	U: true,
+	u: true,
+	F: true,
+	f: true,
+	S: true
+};
+
+const parseMovesForMerging = (moveObjectSequence, puzzle) => {
+	for (let moveObject of moveObjectSequence) {
+		if (!moveObject.turnAngle) { // if move has already been parsed, no need to parse it again
+			parseOneMoveForMerging(moveObject, puzzle);
+			if (!isFromReferenceFace[moveObject.family]) { // if move is opposite from reference, move has to be adapted
+				moveObject.turnAngle = -moveObject.turnAngle;
+				moveObject.minSliceNumber = puzzle + 1 - moveObject.minSliceNumber; // complement to puzzle
+				moveObject.maxSliceNumber = puzzle + 1 - moveObject.maxSliceNumber; // complement to puzzle
+			}
+		}
 	}
 };
 
@@ -121,75 +125,29 @@ const parseOneMoveForMerging = (moveObject, puzzle) => {
 	}
 };
 
-const parseMovesForMerging = (moveObjectSequence, puzzle) => {
-	for (let moveObject of moveObjectSequence) {
-		if (!moveObject.turnAngle) { // if move has already been parsed, no need to parse it again
-			parseOneMoveForMerging(moveObject, puzzle);
-			if (/[LlDdBbM]/g.test(moveObject.family)) { // if move is opposite from reference, move has to be adapted
-				moveObject.turnAngle = -moveObject.turnAngle;
-				moveObject.minSliceNumber = puzzle + 1 - moveObject.minSliceNumber; // complement to puzzle
-				moveObject.maxSliceNumber = puzzle + 1 - moveObject.maxSliceNumber; // complement to puzzle
-			}
-		}
+const parseSuffixForMerging = suffix => {
+	suffix = suffix.replace("w", "");
+	if (suffix === "") {
+		return 1;
+	} else if (suffix === "'") {
+		return -1;
+	} else if (suffix.includes("'")) {
+		return -parseInt(suffix.slice(0, -1));
+	} else {
+		return parseInt(suffix);
 	}
 };
 
-const tryToMergeMovesInCommutingGroup = (commutingGroup, puzzle) => {
-	if (commutingGroup.length === 1) { // group is too small, no possible merge
-		return commutingGroup;
-	} else {
-		parseMovesForMerging(commutingGroup, puzzle);
-		for (let lastMoveIndex = 0; lastMoveIndex < commutingGroup.length; lastMoveIndex++) {
-			let lastMove = commutingGroup[lastMoveIndex];
-			for (let nextMoveIndex = lastMoveIndex + 1; nextMoveIndex < commutingGroup.length; nextMoveIndex++) {
-				let nextMove = commutingGroup[nextMoveIndex];
-				let fusionResult = computeFusionResult(lastMove, nextMove);
-				if (fusionResult.hasCancelled) { // perfect cancellation
-					commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
-					commutingGroup.splice(lastMoveIndex, 1); // remove lastMove
-					break; // stop trying to merge this move, because it has been cancelled, we can't do better
-				} else if (fusionResult.hasMerged) { // normal fusion
-					commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
-					lastMove = fusionResult; // update lastMove
-					commutingGroup[lastMoveIndex] = lastMove; // update lastMove in array
-				} // else no merge, simply ignore
-			}
-		}
-	}
-};
+// sequence recomposition
 
-const mergePreviousAndNextGroups = (commutingGroups, commutingGroupIndex, puzzle) => {
-	let lastGroupIndex, lastGroup, nextGroupIndex, nextGroup;
-	if (commutingGroupIndex === 0) {
-		commutingGroups.splice(0, 1);
-		return 0;
-	} else {
-		lastGroupIndex = commutingGroupIndex - 1;
-		lastGroup = commutingGroups[lastGroupIndex];
-	}
-	findNextNonEmptyGroup: {
-		for (nextGroupIndex = commutingGroupIndex + 1; nextGroupIndex < commutingGroups.length; nextGroupIndex++) {
-			if (commutingGroups[nextGroupIndex].length !== 0) {
-				nextGroup = commutingGroups[nextGroupIndex];
-				break findNextNonEmptyGroup;
-			}
-		}
-		return commutingGroupIndex;
-	}
-	if (lastGroup[0].familyGroup === nextGroup[0].familyGroup) { // groups can be merged
-		lastGroup.push(...nextGroup);
-		commutingGroups.splice(lastGroupIndex + 1, nextGroupIndex - lastGroupIndex); // remove empty groups
-		tryToMergeMovesInCommutingGroup(commutingGroups[lastGroupIndex], puzzle);
-		if (commutingGroups[lastGroupIndex].length === 0) { // group has completely cancelled
-			let lastNonEmptyGroup = mergePreviousAndNextGroups(commutingGroups, lastGroupIndex, puzzle);
-			return lastNonEmptyGroup;
-		} else {
-			return lastGroupIndex;
-		}
-	} else { // groups can't be merged
-		commutingGroups.splice(lastGroupIndex + 1, nextGroupIndex - 1 - lastGroupIndex); // remove empty groups
-		return lastGroupIndex;
-	}
+const getSuffixFromTurnAngleModulo = {
+	0: "",
+	1: "",
+	2: "2",
+	3: "'",
+	"-1": "'",
+	"-2": "2",
+	"-3": ""
 };
 
 const buildOutputSequenceFromMergedCommutingGroups = (commutingGroups, puzzle) => {
@@ -249,6 +207,76 @@ const buildOutputSequenceFromMergedCommutingGroups = (commutingGroups, puzzle) =
 	}
 	return moveStringSequence;
 };
+
+const getSuffixFromTurnAngle = turnAngle => {
+	return getSuffixFromTurnAngleModulo[turnAngle % 4];
+};
+
+
+/* -------------------------------------------------- */
+
+
+
+
+const tryToMergeMovesInCommutingGroup = (commutingGroup, puzzle) => {
+	if (commutingGroup.length === 1) { // group is too small, no possible merge
+		return commutingGroup;
+	} else {
+		parseMovesForMerging(commutingGroup, puzzle);
+		for (let lastMoveIndex = 0; lastMoveIndex < commutingGroup.length; lastMoveIndex++) {
+			let lastMove = commutingGroup[lastMoveIndex];
+			for (let nextMoveIndex = lastMoveIndex + 1; nextMoveIndex < commutingGroup.length; nextMoveIndex++) {
+				let nextMove = commutingGroup[nextMoveIndex];
+				let fusionResult = computeFusionResult(lastMove, nextMove);
+				if (fusionResult.hasCancelled) { // perfect cancellation
+					commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
+					commutingGroup.splice(lastMoveIndex, 1); // remove lastMove
+					break; // stop trying to merge this move, because it has been cancelled, we can't do better
+				} else if (fusionResult.hasMerged) { // normal fusion
+					commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
+					lastMove = fusionResult; // update lastMove
+					commutingGroup[lastMoveIndex] = lastMove; // update lastMove in array
+				} // else no merge, simply ignore
+			}
+		}
+	}
+};
+
+const mergePreviousAndNextGroups = (commutingGroups, commutingGroupIndex, puzzle) => {
+	let lastGroupIndex, lastGroup, nextGroupIndex, nextGroup;
+	if (commutingGroupIndex === 0) {
+		commutingGroups.splice(0, 1);
+		return 0;
+	} else {
+		lastGroupIndex = commutingGroupIndex - 1;
+		lastGroup = commutingGroups[lastGroupIndex];
+	}
+	findNextNonEmptyGroup: {
+		for (nextGroupIndex = commutingGroupIndex + 1; nextGroupIndex < commutingGroups.length; nextGroupIndex++) {
+			if (commutingGroups[nextGroupIndex].length !== 0) {
+				nextGroup = commutingGroups[nextGroupIndex];
+				break findNextNonEmptyGroup;
+			}
+		}
+		return commutingGroupIndex;
+	}
+	if (lastGroup[0].familyGroup === nextGroup[0].familyGroup) { // groups can be merged
+		lastGroup.push(...nextGroup);
+		commutingGroups.splice(lastGroupIndex + 1, nextGroupIndex - lastGroupIndex); // remove empty groups
+		tryToMergeMovesInCommutingGroup(commutingGroups[lastGroupIndex], puzzle);
+		if (commutingGroups[lastGroupIndex].length === 0) { // group has completely cancelled
+			let lastNonEmptyGroup = mergePreviousAndNextGroups(commutingGroups, lastGroupIndex, puzzle);
+			return lastNonEmptyGroup;
+		} else {
+			return lastGroupIndex;
+		}
+	} else { // groups can't be merged
+		commutingGroups.splice(lastGroupIndex + 1, nextGroupIndex - 1 - lastGroupIndex); // remove empty groups
+		return lastGroupIndex;
+	}
+};
+
+
 
 const mergeMoves = (moveStringSequence, puzzle) => {
 	let moveObjectSequence = getMoveObjectSequenceFromMoveStringSequence(moveStringSequence);
@@ -321,8 +349,5 @@ const computeFusionResult = (lastMoveParsed, nextMoveParsed) => {
 	return fusionResult;
 };
 
-const getSuffixFromTurnAngle = turnAngle => {
-	return getSuffixFromTurnAngleModulo[turnAngle % 4];
-};
 
 module.exports = {mergeMoves};
