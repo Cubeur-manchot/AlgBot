@@ -1,5 +1,17 @@
 "use strict";
 
+const movePattern = /[RUFLDBrufldbMESxyz]/g;
+
+const suffixFromTurnAngleModulo = {
+	0: "",
+	1: "",
+	2: "2",
+	3: "'",
+	"-1": "'",
+	"-2": "2",
+	"-3": ""
+};
+
 const getMoveObjectSequenceFromMoveStringSequence = moveStringSequence => {
 	let moveObjectSequence = [];
 	let familyGroupFromFamily = {
@@ -226,8 +238,6 @@ const mergeMovesNew = (moveStringSequence, puzzle) => {
 	return buildOutputSequenceFromMergedCommutingGroups(commutingGroups, puzzle);
 };
 
-const movePattern = /[RUFLDBrufldbMESxyz]/g;
-
 const computeFusionResult = (lastMoveParsed, nextMoveParsed) => {
 	let fusionResult = {minSliceNumber: 0, maxSliceNumber: 0, turnAngle: 0, familyGroup: lastMoveParsed.familyGroup, hasMerged : false, hasCancelled: false};
 	if (lastMoveParsed.minSliceNumber === nextMoveParsed.minSliceNumber && lastMoveParsed.maxSliceNumber === nextMoveParsed.maxSliceNumber) { // same slice or block of slices : move merge or cancel
@@ -283,16 +293,6 @@ const computeFusionResult = (lastMoveParsed, nextMoveParsed) => {
 		}
 	}
 	return fusionResult;
-};
-
-const suffixFromTurnAngleModulo = {
-	0: "",
-	1: "",
-	2: "2",
-	3: "'",
-	"-1": "'",
-	"-2": "2",
-	"-3": ""
 };
 
 const getSuffixFromTurnAngle = turnAngle => {
