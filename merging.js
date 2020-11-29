@@ -31,17 +31,21 @@ const getMoveObjectSequenceFromMoveStringSequence = moveStringSequence => {
 };
 
 const getCommutingGroups = moveObjectSequence => {
-	let commutingGroups = [];
-	let lastFamilyGroup = "";
-	for (let moveObject of moveObjectSequence) {
-		if (commutingGroups.length === 0 || moveObject.familyGroup !== lastFamilyGroup) {
-			commutingGroups.push([moveObject]); // start new commutingGroup
-			lastFamilyGroup = moveObject.familyGroup;
-		} else {
-			commutingGroups.slice(-1)[0].push(moveObject); // push move to last commutingGroup
+	if (moveObjectSequence.length === 0) {
+		return [];
+	} else {
+		let commutingGroups = [[moveObjectSequence[0]]];
+		let lastFamilyGroup = moveObjectSequence[0].familyGroup;
+		for (let moveObject of moveObjectSequence.slice(1)) {
+			if (moveObject.familyGroup !== lastFamilyGroup) {
+				commutingGroups.push([moveObject]); // start new commutingGroup
+				lastFamilyGroup = moveObject.familyGroup;
+			} else {
+				commutingGroups.slice(-1)[0].push(moveObject); // push move to last commutingGroup
+			}
 		}
+		return commutingGroups;
 	}
-	return commutingGroups;
 };
 
 const parseSuffixForMerging = suffix => {
