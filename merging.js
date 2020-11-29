@@ -158,32 +158,30 @@ const buildOutputSequenceFromMergedCommutingGroups = (commutingGroups, puzzle) =
 				moveStringSequence.push(moveObject.name);
 			} else { // rebuild move name from object
 				if (moveObject.minSliceNumber === 1) { // outer block from reference face
-					let suffix = getSuffixFromTurnAngle(moveObject.turnAngle);
 					if (moveObject.maxSliceNumber === puzzle) { // rotation
-						moveStringSequence.push(moveObject.familyGroup[7] + suffix);
+						moveStringSequence.push(moveObject.familyGroup[7] + getSuffixFromTurnAngle(moveObject.turnAngle));
 					} else if (moveObject.maxSliceNumber === 1) { // single outer slice
-						moveStringSequence.push(moveObject.familyGroup[2] + suffix);
+						moveStringSequence.push(moveObject.familyGroup[2] + getSuffixFromTurnAngle(moveObject.turnAngle));
 					} else if (moveObject.maxSliceNumber === 2) { // double outer slice
 						if (puzzle === 3) {
-							moveStringSequence.push(moveObject.familyGroup[4] + suffix);
+							moveStringSequence.push(moveObject.familyGroup[4] + getSuffixFromTurnAngle(moveObject.turnAngle));
 						} else {
-							moveStringSequence.push(moveObject.familyGroup[2] + "w" + suffix);
+							moveStringSequence.push(moveObject.familyGroup[2] + "w" + getSuffixFromTurnAngle(moveObject.turnAngle));
 						}
 					} else { // any other outer block
-						moveStringSequence.push(moveObject.maxSliceNumber + moveObject.familyGroup[2] + "w" + suffix);
+						moveStringSequence.push(moveObject.maxSliceNumber + moveObject.familyGroup[2] + "w" + getSuffixFromTurnAngle(moveObject.turnAngle));
 					}
 				} else if (moveObject.maxSliceNumber === puzzle) { // outer block from opposite of reference face
-					let suffix = getSuffixFromTurnAngle(-moveObject.turnAngle);
 					if (moveObject.minSliceNumber === puzzle) { // single outer slice
-						moveStringSequence.push(moveObject.familyGroup[3] + suffix);
+						moveStringSequence.push(moveObject.familyGroup[3] + getSuffixFromTurnAngle(-moveObject.turnAngle));
 					} else if (moveObject.minSliceNumber === puzzle - 1) { // double outer slice
 						if (puzzle === 3) {
-							moveStringSequence.push(moveObject.familyGroup[5] + suffix);
+							moveStringSequence.push(moveObject.familyGroup[5] + getSuffixFromTurnAngle(-moveObject.turnAngle));
 						} else {
-							moveStringSequence.push(moveObject.familyGroup[3] + "w" + suffix);
+							moveStringSequence.push(moveObject.familyGroup[3] + "w" + getSuffixFromTurnAngle(-moveObject.turnAngle));
 						}
 					} else { // any other outer block
-						moveStringSequence.push(puzzle + 1 - moveObject.minSliceNumber + moveObject.familyGroup[3] + "w" + suffix);
+						moveStringSequence.push(puzzle + 1 - moveObject.minSliceNumber + moveObject.familyGroup[3] + "w" + getSuffixFromTurnAngle(-moveObject.turnAngle));
 					}
 				} else { // inner slice move
 					if (moveObject.minSliceNumber === moveObject.maxSliceNumber) { // single inner slice
