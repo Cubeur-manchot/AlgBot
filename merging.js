@@ -226,70 +226,6 @@ const mergeMovesNew = (moveStringSequence, puzzle) => {
 	return buildOutputSequenceFromMergedCommutingGroups(commutingGroups, puzzle);
 };
 
-const mergeMoves = (moveSequenceArray, puzzle) => {
-	if (moveSequenceArray.length <= 1) { // sequence is too small, moves can't be merged
-		return moveSequenceArray;
-	} else {
-		let shouldRecomputeAfter;
-		let movesToMergeSplitByCommutingGroup, moveSequenceArrayOutput, parsedMoveSequence = [];
-		for (let moveString of moveSequenceArray) {
-			parsedMoveSequence.push(parseOneMove(moveString)); // parse prefix, family and suffix on each move
-		}
-		do {
-			shouldRecomputeAfter = false;
-			movesToMergeSplitByCommutingGroup = [];
-			parsedMoveSequence.forEach(moveObject => { // join moves by commuting groups
-				if (movesToMergeSplitByCommutingGroup.length === 0
-					|| moveObject.familyGroup !== getLastElementOfArray(getLastElementOfArray(movesToMergeSplitByCommutingGroup)).familyGroup) {
-					movesToMergeSplitByCommutingGroup.push([moveObject]);
-				} else {
-					getLastElementOfArray(movesToMergeSplitByCommutingGroup).push(moveObject);
-				}
-			});
-			moveSequenceArrayOutput = [];
-			let lastMove, nextMove, fusionResult = {};
-			for (let moveCommutingSubsequence of movesToMergeSplitByCommutingGroup) {
-				while (moveCommutingSubsequence.length !== 0) {
-					[lastMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
-					if (moveCommutingSubsequence.length !== 0) { // move is not alone in commuting group, try to merge moves
-						tryToMergeMoves:
-						{
-							let nonMergingMoves = [];
-							while (moveCommutingSubsequence.length !== 0) {
-								[nextMove, ...moveCommutingSubsequence] = moveCommutingSubsequence;
-								fusionResult = tryToMergeTwoMoves(lastMove, nextMove, puzzle);
-								if (fusionResult.hasCancelled) { // perfect cancellation, just reinitialize arrays and break the loop
-									moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
-									nonMergingMoves = [];
-									shouldRecomputeAfter = true;
-									break tryToMergeMoves;
-								} else if (fusionResult.hasMerged) { // normal fusion, reinitialize arrays and keep trying to merge
-									lastMove = fusionResult.moves[0];
-									moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
-									nonMergingMoves = [];
-								} else { // no merge, keep trying to merge
-									nonMergingMoves.push(nextMove);
-								}
-							}
-							moveCommutingSubsequence = [...nonMergingMoves, ...moveCommutingSubsequence];
-							nonMergingMoves = [];
-							moveSequenceArrayOutput.push(lastMove);
-						}
-					} else { // move is alone in commuting group, it should simply be added
-						moveSequenceArrayOutput.push(lastMove);
-					}
-				}
-			}
-			parsedMoveSequence = moveSequenceArrayOutput.slice(0); // copy moveSequenceArrayOutput into parsedMoveSequence
-		} while (shouldRecomputeAfter);
-		let moveArrayOutput = [];
-		for (let moveObject of moveSequenceArrayOutput) {
-			moveArrayOutput.push(buildMoveStringFromObject(moveObject));
-		}
-		return moveArrayOutput;
-	}
-};
-
 const movePattern = /[RUFLDBrufldbMESxyz]/g;
 
 const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
@@ -542,4 +478,4 @@ const getLastElementOfArray = array => {
 	return array.slice(-1)[0];
 };
 
-module.exports = {mergeMoves, mergeMovesNew};
+module.exports = {mergeMovesNew};
