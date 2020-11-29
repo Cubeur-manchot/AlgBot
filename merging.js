@@ -2,7 +2,7 @@
 
 const movePattern = /[RUFLDBrufldbMESxyz]/g;
 
-const suffixFromTurnAngleModulo = {
+const getSuffixFromTurnAngleModulo = {
 	0: "",
 	1: "",
 	2: "2",
@@ -10,6 +10,27 @@ const suffixFromTurnAngleModulo = {
 	"-1": "'",
 	"-2": "2",
 	"-3": ""
+};
+
+const isMiddleMove = {
+	M: true,
+	E: true,
+	S: true
+};
+
+const isRotationMove = {
+	x: true,
+	y: true,
+	z: true
+};
+
+const isLowerLetter = {
+	r: true,
+	u: true,
+	f: true,
+	l: true,
+	d: true,
+	b: true
 };
 
 const getMoveObjectSequenceFromMoveStringSequence = moveStringSequence => {
@@ -61,32 +82,41 @@ const parseSuffixForMerging = suffix => {
 	}
 };
 
-const parsePrefixAndFamilyForMerging = (prefix, family, puzzle) => {
-	if (/[MES]/.test(family)) { // move of the form M2
-		return {
-			minSliceNumber: (puzzle + 1)/2,
-			maxSliceNumber: (puzzle + 1)/2
-		};
-	} else if (/[xyz]/.test(family)) { // move of the form x2
-		return {
-			minSliceNumber: 1,
-			maxSliceNumber: puzzle
-		};
-	} else if (prefix === "") { // move of the form R2, Rw2 or r2
-		let isSmallLetter = /[rufldb]/.test(family);
-		return {
-			minSliceNumber: 1 + (isSmallLetter && puzzle !== 3), // = 2 for r2 on 4x4+, = 1 for r2 on 3x3, R2 and Rw2
-			maxSliceNumber: 1 + (isSmallLetter || family.includes("w")) // = 1 for R2, 2 for Rw2 and r2
-		};
-	} else if (prefix.length === 1) { // move of the form 2R2, 2Rw2 or 2r2
-		return {
-			minSliceNumber: family.includes("w") ? 1 : +prefix, // = 1 for 2Rw2, = digit for 2R2 and 2r2
-			maxSliceNumber: +prefix // = digit for 2Rw2, 2R2 and 2r2
-		};
+const parseOneMoveForMerging = (moveObject, puzzle) => {
+	let splitsByMoveFamily = moveObject.name.split(movePattern);
+	moveObject.turnAngle = parseSuffixForMerging(splitsByMoveFamily[1].replace("w" ,""));
+	if (isMiddleMove[moveObject.family]) { // move of the form M2
+		moveObject.minSliceNumber = (puzzle + 1)/2;
+		moveObject.maxSliceNumber = (puzzle + 1)/2;
+	} else if (isRotationMove[moveObject.family]) { // move of the form x2
+		moveObject.minSliceNumber = 1;
+		moveObject.maxSliceNumber = puzzle;
+	} else if (splitsByMoveFamily[0] === "") { // move of the form R2, Rw2 or r2
+		if (isLowerLetter[moveObject.family] && puzzle !== 3) { // r2 on 4x4+
+			moveObject.minSliceNumber = 2;
+		} else { // r2 on 3x3, R2 and Rw2
+			moveObject.minSliceNumber = 1;
+		}
+		if (isLowerLetter[moveObject.family] || moveObject.family.includes("w")) { // r2 or Rw2
+			moveObject.maxSliceNumber = 2;
+		} else { // R2
+			moveObject.maxSliceNumber = 1;
+		}
+	} else if (splitsByMoveFamily[0].length === 1) { // move of the form 2R2, 2Rw2 or 2r2
+		let prefixNumber = parseInt(splitsByMoveFamily[0]);
+		if (moveObject.family.includes("w")) { // 2Rw2
+			moveObject.minSliceNumber = 1;
+		} else { // 2R2 or 2r2
+			moveObject.minSliceNumber = prefixNumber;
+		}
+		moveObject.maxSliceNumber = prefixNumber; // = prefix digit for 2Rw2, 2R2 and 2r2
 	} else { // move of the form 2-3Rw2 or 2-3R2
-		return {
-			minSliceNumber: Math.min(+prefix[0], +prefix[2]),
-			maxSliceNumber: Math.max(+prefix[0], +prefix[2])
+		if (splitsByMoveFamily[0][0] < splitsByMoveFamily[0][2]) {
+			moveObject.minSliceNumber = parseInt(splitsByMoveFamily[0][0]);
+			moveObject.maxSliceNumber = parseInt(splitsByMoveFamily[0][2]);
+		} else {
+			moveObject.minSliceNumber = parseInt(splitsByMoveFamily[0][2]);
+			moveObject.maxSliceNumber = parseInt(splitsByMoveFamily[0][0]);
 		}
 	}
 };
@@ -94,11 +124,7 @@ const parsePrefixAndFamilyForMerging = (prefix, family, puzzle) => {
 const parseMovesForMerging = (moveObjectSequence, puzzle) => {
 	for (let moveObject of moveObjectSequence) {
 		if (!moveObject.turnAngle) { // if move has already been parsed, no need to parse it again
-			let splitsByMoveFamily = moveObject.name.split(movePattern);
-			let prefix = splitsByMoveFamily[0];
-			let suffix = (splitsByMoveFamily[1] === "" ? "1" : splitsByMoveFamily[1].replace("w", ""));
-			moveObject.turnAngle = parseSuffixForMerging(suffix); // parse suffix for turn angle
-			Object.assign(moveObject, parsePrefixAndFamilyForMerging(prefix, moveObject.family, puzzle)); // parse prefix and family for slice numbers
+			parseOneMoveForMerging(moveObject, puzzle);
 			if (/[LlDdBbM]/g.test(moveObject.family)) { // if move is opposite from reference, move has to be adapted
 				moveObject.turnAngle = -moveObject.turnAngle;
 				moveObject.minSliceNumber = puzzle + 1 - moveObject.minSliceNumber; // complement to puzzle
@@ -232,8 +258,7 @@ const mergeMoves = (moveStringSequence, puzzle) => {
 	}
 	for (let commutingGroupIndex = 0; commutingGroupIndex < commutingGroups.length; commutingGroupIndex++) {
 		if (commutingGroups[commutingGroupIndex].length === 0) { // group has entirely cancelled, try to merge previous and next group
-			let lastNonEmptyGroup = mergePreviousAndNextGroups(commutingGroups, commutingGroupIndex, puzzle);
-			commutingGroupIndex = lastNonEmptyGroup;
+			commutingGroupIndex = mergePreviousAndNextGroups(commutingGroups, commutingGroupIndex, puzzle);
 		}
 	}
 	return buildOutputSequenceFromMergedCommutingGroups(commutingGroups, puzzle);
@@ -297,7 +322,7 @@ const computeFusionResult = (lastMoveParsed, nextMoveParsed) => {
 };
 
 const getSuffixFromTurnAngle = turnAngle => {
-	return suffixFromTurnAngleModulo[turnAngle % 4];
+	return getSuffixFromTurnAngleModulo[turnAngle % 4];
 };
 
 module.exports = {mergeMoves};
