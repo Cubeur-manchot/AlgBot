@@ -176,7 +176,7 @@ const buildOutputSequenceFromMergedCommutingGroups = (commutingGroups, puzzle) =
 						moveStringSequence.push(moveObject.maxSliceNumber + moveObject.familyGroup[2] + "w" + suffix);
 					}
 				} else if (moveObject.maxSliceNumber === puzzle) { // outer block from opposite of reference face
-					let suffix = getSuffixFromOppositeTurnAngle(moveObject.turnAngle);
+					let suffix = getSuffixFromTurnAngle(-moveObject.turnAngle);
 					if (moveObject.minSliceNumber === puzzle) { // single outer slice
 						moveStringSequence.push(moveObject.familyGroup[3] + suffix);
 					} else if (moveObject.minSliceNumber === puzzle - 1) { // double outer slice
@@ -285,21 +285,18 @@ const computeFusionResult = (lastMoveParsed, nextMoveParsed) => {
 	return fusionResult;
 };
 
+const suffixFromTurnAngleModulo = {
+	0: "",
+	1: "",
+	2: "2",
+	3: "'",
+	"-1": "'",
+	"-2": "2",
+	"-3": ""
+};
+
 const getSuffixFromTurnAngle = turnAngle => {
-	return getSuffixFromTurnAngleModulo(turnAngle % 4 + 4*(turnAngle < 0));
-};
-
-const getSuffixFromOppositeTurnAngle = turnAngle => {
-	return getSuffixFromTurnAngleModulo(-turnAngle % 4 + 4*(turnAngle > 0));
-};
-
-const getSuffixFromTurnAngleModulo = turnAngleModulo => {
-	switch (turnAngleModulo) {
-		case 0: return "";
-		case 1: return "";
-		case 2: return "2";
-		case 3: return "'";
-	}
+	return suffixFromTurnAngleModulo[turnAngle % 4];
 };
 
 module.exports = {mergeMovesNew};
