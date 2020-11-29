@@ -49,18 +49,15 @@ const getCommutingGroups = moveObjectSequence => {
 };
 
 const parseSuffixForMerging = suffix => {
-	if (suffix.includes("'")) {
-		if (suffix.slice(0, -1) === "") {
-			return -1;
-		} else {
-			return - parseInt(suffix.slice(0, -1));
-		}
+	suffix = suffix.replace("w", "");
+	if (suffix === "") {
+		return 1;
+	} else if (suffix === "'") {
+		return -1;
+	} else if (suffix.includes("'")) {
+		return -parseInt(suffix.slice(0, -1));
 	} else {
-		if (suffix === "") {
-			return 1;
-		} else {
-			return parseInt(suffix);
-		}
+		return parseInt(suffix);
 	}
 };
 
