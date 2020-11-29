@@ -223,7 +223,7 @@ const buildOutputSequenceFromMergedCommutingGroups = (commutingGroups, puzzle) =
 	return moveStringSequence;
 };
 
-const mergeMovesNew = (moveStringSequence, puzzle) => {
+const mergeMoves = (moveStringSequence, puzzle) => {
 	let moveObjectSequence = getMoveObjectSequenceFromMoveStringSequence(moveStringSequence);
 	let commutingGroups = getCommutingGroups(moveObjectSequence);
 	for (let commutingGroup of commutingGroups) {
@@ -299,4 +299,4 @@ const getSuffixFromTurnAngle = turnAngle => {
 	return suffixFromTurnAngleModulo[turnAngle % 4];
 };
 
-module.exports = {mergeMovesNew};
+module.exports = {mergeMoves};
