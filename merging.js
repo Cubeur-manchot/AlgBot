@@ -228,14 +228,6 @@ const mergeMovesNew = (moveStringSequence, puzzle) => {
 
 const movePattern = /[RUFLDBrufldbMESxyz]/g;
 
-const tryToMergeTwoMoves = (lastMove, nextMove, puzzle) => {
-	let lastMoveParsed = getTurnSliceNumbersAndTurnAngle(lastMove, puzzle);
-	let nextMoveParsed = getTurnSliceNumbersAndTurnAngle(nextMove, puzzle);
-	let fusionResult = computeFusionResult(lastMoveParsed, nextMoveParsed);
-	fusionResult.familyGroup = lastMove.familyGroup;
-	return buildOutputMovesFromFusionResult(fusionResult, puzzle);
-};
-
 const computeFusionResult = (lastMoveParsed, nextMoveParsed) => {
 	let fusionResult = {minSliceNumber: 0, maxSliceNumber: 0, turnAngle: 0, familyGroup: lastMoveParsed.familyGroup, hasMerged : false, hasCancelled: false};
 	if (lastMoveParsed.minSliceNumber === nextMoveParsed.minSliceNumber && lastMoveParsed.maxSliceNumber === nextMoveParsed.maxSliceNumber) { // same slice or block of slices : move merge or cancel
@@ -293,148 +285,6 @@ const computeFusionResult = (lastMoveParsed, nextMoveParsed) => {
 	return fusionResult;
 };
 
-const buildOutputMovesFromFusionResult = (fusionResult, puzzle) => {
-	let result = {
-		moves: [],
-		hasMerged: fusionResult.hasMerged,
-		hasCancelled: fusionResult.hasCancelled
-	};
-	if (fusionResult.hasMerged && !fusionResult.hasCancelled) { // if something has been merged, build resulting moves with fusionResult
-		let moveResult = {
-			familyGroup: fusionResult.familyGroup
-		};
-		if (fusionResult.minSliceNumber === 1) { // outer block from reference face
-			let suffix = getSuffixFromTurnAngle(fusionResult.turnAngle);
-			if (fusionResult.maxSliceNumber === puzzle) { // rotation
-				moveResult.prefix = "";
-				moveResult.family = fusionResult.familyGroup[7];
-				moveResult.suffix = suffix;
-			} else if (fusionResult.maxSliceNumber === 1) { // single outer slice
-				moveResult.prefix = "";
-				moveResult.family = fusionResult.familyGroup[2];
-				moveResult.suffix = suffix;
-			} else if (fusionResult.maxSliceNumber === 2) { // double outer slice
-				moveResult.prefix = "";
-				if (puzzle === 3) {
-					moveResult.family = fusionResult.familyGroup[4];
-					moveResult.suffix = suffix;
-				} else {
-					moveResult.family = fusionResult.familyGroup[2];
-					moveResult.suffix = "w" + suffix;
-				}
-			} else { // any other outer block
-				moveResult.prefix = fusionResult.maxSliceNumber + "";
-				moveResult.family = fusionResult.familyGroup[2];
-				moveResult.suffix = "w" + suffix;
-			}
-		} else if (fusionResult.maxSliceNumber === puzzle) { // outer block from opposite of reference face
-			let suffix = getSuffixFromOppositeTurnAngle(fusionResult.turnAngle);
-			if (fusionResult.minSliceNumber === puzzle) { // single outer slice
-				moveResult.prefix = "";
-				moveResult.family = fusionResult.familyGroup[3];
-				moveResult.suffix = suffix;
-			} else if (fusionResult.minSliceNumber === puzzle - 1) { // double outer slice
-				moveResult.prefix = "";
-				if (puzzle === 3) {
-					moveResult.family = fusionResult.familyGroup[5];
-					moveResult.suffix = suffix;
-				} else {
-					moveResult.family = fusionResult.familyGroup[3];
-					moveResult.suffix = "w" + suffix;
-				}
-			} else { // any other outer block
-				moveResult.prefix = puzzle + 1 - fusionResult.minSliceNumber + "";
-				moveResult.family = fusionResult.familyGroup[3];
-				moveResult.suffix = "w" + suffix;
-			}
-		} else { // inner slice move
-			if (fusionResult.minSliceNumber === fusionResult.maxSliceNumber) { // single inner slice
-				if (fusionResult.minSliceNumber === (puzzle + 1)/2) { // middle layer
-					moveResult.prefix = "";
-					moveResult.family = fusionResult.familyGroup[6];
-					if (fusionResult.familyGroup === "/[FBfbSz]/g") {
-						moveResult.suffix = getSuffixFromTurnAngle(fusionResult.turnAngle);
-					} else {
-						moveResult.suffix = getSuffixFromOppositeTurnAngle(fusionResult.turnAngle);
-					}
-				} else if (puzzle - fusionResult.maxSliceNumber < fusionResult.minSliceNumber - 1) { // inner block, nearer from opposite of reference face
-					moveResult.prefix = puzzle + 1 - fusionResult.minSliceNumber + "";
-					moveResult.family = fusionResult.familyGroup[4];
-					moveResult.suffix = getSuffixFromOppositeTurnAngle(fusionResult.turnAngle);
-				} else { // nearer from reference face, or equal in distance
-					moveResult.prefix = fusionResult.minSliceNumber;
-					moveResult.family = fusionResult.familyGroup[2];
-					moveResult.suffix = getSuffixFromTurnAngle(fusionResult.turnAngle);
-				}
-			} else { // many inner slices
-				if (puzzle - fusionResult.maxSliceNumber < fusionResult.minSliceNumber - 1) { // inner block, nearer from opposite of reference face
-					moveResult.prefix = (puzzle + 1 - fusionResult.maxSliceNumber) + "-" + (puzzle + 1 - fusionResult.minSliceNumber);
-					moveResult.family = fusionResult.familyGroup[4];
-					moveResult.suffix = "w" + getSuffixFromOppositeTurnAngle(fusionResult.turnAngle);
-				} else { // nearer from reference face, or equal in distance
-					moveResult.prefix = fusionResult.minSliceNumber + "-" + fusionResult.maxSliceNumber;
-					moveResult.family = fusionResult.familyGroup[2];
-					moveResult.suffix = "w" + getSuffixFromTurnAngle(fusionResult.turnAngle);
-				}
-			}
-		}
-		result.moves.push(moveResult);
-	} // if no merge or perfect cancellation, nothing to add
-	return result;
-};
-
-const getTurnSliceNumbersAndTurnAngle = (moveObject, puzzle) => {
-	let orientationSense = /[RrUuFfS]/g.test(moveObject.family);
-	let isMiddleMove = /[MES]/.test(moveObject.family);
-	let hasW = moveObject.family.includes("w");
-	let minSliceNumber, maxSliceNumber, turnAngle = getTurnAngleFromSuffix(moveObject.suffix);
-	if (isMiddleMove) { // move of the form M2
-		let middleSliceNumber = (puzzle + 1)/2;
-		minSliceNumber = middleSliceNumber;
-		maxSliceNumber = middleSliceNumber;
-	} else if (moveObject.prefix.length === 0) { // move of the form R2, Rw2 or r2
-		let isSmallLetter = /[rufldb]/.test(moveObject.family);
-		minSliceNumber = 1 + (isSmallLetter && puzzle !== 3); // = 2 for r2 on 4x4+, = 1 for r2 on 3x3, R2 and Rw2
-		maxSliceNumber = 1 + (isSmallLetter || hasW); // = 1 for R2, 2 for Rw2 and r2
-	} else if (moveObject.prefix.length === 1) { // move of the form 2R2, 2Rw2 or 2r2
-		let digit = moveObject.prefix;
-		minSliceNumber = hasW ? 1 : +digit; // = 1 for 2Rw2, = digit for 2R2 and 2r2
-		maxSliceNumber = +digit; // = digit for 2Rw2, 2R2 and 2r2
-	} else { // move of the form 2-3Rw2 or 2-3R2
-		let firstDigit = +moveObject.prefix[0];
-		let secondDigit = +moveObject.prefix[2];
-		minSliceNumber = Math.min(firstDigit, secondDigit);
-		maxSliceNumber = Math.max(firstDigit, secondDigit);
-	}
-	if (!orientationSense) {
-		turnAngle = -turnAngle;
-		minSliceNumber = puzzle + 1 - minSliceNumber; // complement
-		maxSliceNumber = puzzle + 1 - maxSliceNumber; // complement
-	}
-	return {
-		minSliceNumber,
-		maxSliceNumber,
-		turnAngle
-	};
-};
-
-const getTurnAngleFromSuffix = suffix => {
-	suffix = suffix.replace("w", "");
-	if (suffix.includes("'")) {
-		if (suffix.slice(0, -1) === "") {
-			return -1;
-		} else {
-			return - parseInt(suffix.slice(0, -1));
-		}
-	} else {
-		if (suffix === "") {
-			return 1;
-		} else {
-			return parseInt(suffix);
-		}
-	}
-};
-
 const getSuffixFromTurnAngle = turnAngle => {
 	return getSuffixFromTurnAngleModulo(turnAngle % 4 + 4*(turnAngle < 0));
 };
@@ -450,32 +300,6 @@ const getSuffixFromTurnAngleModulo = turnAngleModulo => {
 		case 2: return "2";
 		case 3: return "'";
 	}
-};
-
-const buildMoveStringFromObject = moveObject => {
-	return moveObject.prefix + moveObject.family + (moveObject.suffix === "1" ? "" : moveObject.suffix);
-};
-
-const parseOneMove = move => {
-	let movePattern = /[RUFLDBrufldbMESxyz]/g;
-	let moveInfo = {
-		prefix: move.split(movePattern)[0],
-		family:	move.match(movePattern)[0],
-		suffix:	move.split(movePattern)[1]
-	};
-	for (let familyGroup of [/[RLrlMx]/g, /[UDudEy]/g, /[FBfbSz]/g]) {
-		if (familyGroup.test(move)) {
-			moveInfo.familyGroup = familyGroup + "";
-		}
-	}
-	if (moveInfo.suffix === "") {
-		moveInfo.suffix = "1";
-	}
-	return moveInfo;
-};
-
-const getLastElementOfArray = array => {
-	return array.slice(-1)[0];
 };
 
 module.exports = {mergeMovesNew};
