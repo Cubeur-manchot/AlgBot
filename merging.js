@@ -225,16 +225,8 @@ const mergeMoves = (moveStringSequence, puzzle) => {
 	return buildOutputSequenceFromMergedCommutingGroups(commutingGroups, puzzle);
 };
 
-
-/* -------------------------------------------------- */
-
-
-
-
 const tryToMergeMovesInCommutingGroup = (commutingGroup, puzzle) => {
-	if (commutingGroup.length === 1) { // group is too small, no possible merge
-		return commutingGroup;
-	} else {
+	if (commutingGroup.length !== 1) { // if group is too small, no possible merge
 		parseMovesForMerging(commutingGroup, puzzle);
 		for (let lastMoveIndex = 0; lastMoveIndex < commutingGroup.length; lastMoveIndex++) {
 			let lastMove = commutingGroup[lastMoveIndex];
@@ -244,6 +236,7 @@ const tryToMergeMovesInCommutingGroup = (commutingGroup, puzzle) => {
 				if (fusionResult.hasCancelled) { // perfect cancellation
 					commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
 					commutingGroup.splice(lastMoveIndex, 1); // remove lastMove
+					lastMoveIndex--; // next lastMove will be at the same index as the current one
 					break; // stop trying to merge this move, because it has been cancelled, we can't do better
 				} else if (fusionResult.hasMerged) { // normal fusion
 					commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
@@ -254,6 +247,14 @@ const tryToMergeMovesInCommutingGroup = (commutingGroup, puzzle) => {
 		}
 	}
 };
+
+
+/* -------------------------------------------------- */
+
+
+
+
+
 
 const mergePreviousAndNextGroups = (commutingGroups, commutingGroupIndex, puzzle) => {
 	let lastGroupIndex, lastGroup, nextGroupIndex, nextGroup;
