@@ -330,50 +330,38 @@ const computeFusionResult = (lastMove, nextMove) => {
 	};
 };
 
-/* -------------------------------------------------- */
-
-
-
-
-
-
 const mergePreviousAndNextGroups = (commutingGroups, commutingGroupIndex, puzzle) => {
-	let lastGroupIndex, lastGroup, nextGroupIndex, nextGroup;
-	if (commutingGroupIndex === 0) {
-		commutingGroups.splice(0, 1);
-		return 0;
+	if (commutingGroupIndex === 0) { // if first commuting group, there is no group before
+		commutingGroups.splice(0, 1); // remove current empty group
+		return -1;
 	} else {
-		lastGroupIndex = commutingGroupIndex - 1;
-		lastGroup = commutingGroups[lastGroupIndex];
-	}
-	findNextNonEmptyGroup: {
-		for (nextGroupIndex = commutingGroupIndex + 1; nextGroupIndex < commutingGroups.length; nextGroupIndex++) {
-			if (commutingGroups[nextGroupIndex].length !== 0) {
-				nextGroup = commutingGroups[nextGroupIndex];
-				break findNextNonEmptyGroup;
+		let lastGroupIndex = commutingGroupIndex - 1; // as we go through commuting groups and stop at first empty group, the previous one is always non-empty
+		let lastGroup = commutingGroups[lastGroupIndex];
+		let nextGroupIndex, nextGroup;
+		findNextNonEmptyGroup: {
+			for (nextGroupIndex = commutingGroupIndex + 1; nextGroupIndex < commutingGroups.length; nextGroupIndex++) {
+				if (commutingGroups[nextGroupIndex].length !== 0) { // found next non-empty group
+					nextGroup = commutingGroups[nextGroupIndex];
+					break findNextNonEmptyGroup;
+				}
 			}
-		}
-		return commutingGroupIndex;
-	}
-	if (lastGroup[0].familyGroup === nextGroup[0].familyGroup) { // groups can be merged
-		lastGroup.push(...nextGroup);
-		commutingGroups.splice(lastGroupIndex + 1, nextGroupIndex - lastGroupIndex); // remove empty groups
-		tryToMergeMovesInCommutingGroup(commutingGroups[lastGroupIndex], puzzle);
-		if (commutingGroups[lastGroupIndex].length === 0) { // group has completely cancelled
-			let lastNonEmptyGroup = mergePreviousAndNextGroups(commutingGroups, lastGroupIndex, puzzle);
-			return lastNonEmptyGroup;
-		} else {
+			commutingGroups.splice(commutingGroupIndex); // remove empty group and all next groups because they are empty
 			return lastGroupIndex;
 		}
-	} else { // groups can't be merged
-		commutingGroups.splice(lastGroupIndex + 1, nextGroupIndex - 1 - lastGroupIndex); // remove empty groups
-		return lastGroupIndex;
+		if (lastGroup[0].familyGroup === nextGroup[0].familyGroup) { // last and next non-empty groups have the same familyGroup, they can be merged
+			lastGroup.push(...nextGroup);
+			commutingGroups.splice(commutingGroupIndex, nextGroupIndex - lastGroupIndex); // remove empty groups and next non-empty group
+			tryToMergeMovesInCommutingGroup(commutingGroups[lastGroupIndex], puzzle);
+			if (commutingGroups[lastGroupIndex].length === 0) { // group has completely cancelled
+				return mergePreviousAndNextGroups(commutingGroups, lastGroupIndex, puzzle); // recursively try to merge groups
+			} else { // simply return
+				return lastGroupIndex;
+			}
+		} else { // groups can't be merged
+			commutingGroups.splice(commutingGroupIndex, nextGroupIndex - commutingGroupIndex); // remove empty groups
+			return lastGroupIndex;
+		}
 	}
 };
-
-
-
-
-
 
 module.exports = {mergeMoves};
