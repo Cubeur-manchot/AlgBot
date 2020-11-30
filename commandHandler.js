@@ -75,7 +75,7 @@ const splitCommand = commandString => {
 	let commandObject = {};
 	let indexOfSpace = commandString.indexOf(" ");
 	commandObject.algOrDo = indexOfSpace === 4 ? "alg" : "do"; // get alg or do
-	commandString = commandString.substring(indexOfSpace + 1); // remove first word
+	commandString = commandString.substring(indexOfSpace); // remove first word
 	let indexOfComments = commandString.indexOf("//");
 	if (indexOfComments !== -1) {
 		commandObject.comments = commandString.slice(indexOfComments + 2); // get comments
