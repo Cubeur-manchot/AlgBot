@@ -78,9 +78,11 @@ const parseMovesForMerging = (moveObjectSequence, puzzle) => {
 		if (!moveObject.turnAngle) { // if move has already been parsed, no need to parse it again
 			parseOneMoveForMerging(moveObject, puzzle);
 			if (!isFromReferenceFace[moveObject.family]) { // if move is opposite from reference, move has to be adapted
-				moveObject.turnAngle = -moveObject.turnAngle;
-				moveObject.minSliceNumber = puzzle + 1 - moveObject.minSliceNumber; // complement to puzzle
-				moveObject.maxSliceNumber = puzzle + 1 - moveObject.maxSliceNumber; // complement to puzzle
+				moveObject.turnAngle = -moveObject.turnAngle; // invert rotation sense
+				Object.assign(moveObject, { // take complement values + swap min and max
+					minSliceNumber: puzzle + 1 - moveObject.maxSliceNumber,
+					maxSliceNumber: puzzle + 1 - moveObject.minSliceNumber
+				});
 			}
 		}
 	}
