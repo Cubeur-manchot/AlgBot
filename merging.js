@@ -103,14 +103,14 @@ const parseOneMoveForMerging = (moveObject, puzzle) => {
 		} else { // r2 on 3x3, R2 and Rw2
 			moveObject.minSliceNumber = 1;
 		}
-		if (isLowerLetter[moveObject.family] || moveObject.family.includes("w")) { // r2 or Rw2
+		if (isLowerLetter[moveObject.family] || splitsByMoveFamily[1].includes("w")) { // r2 or Rw2
 			moveObject.maxSliceNumber = 2;
 		} else { // R2
 			moveObject.maxSliceNumber = 1;
 		}
 	} else if (splitsByMoveFamily[0].length === 1) { // move of the form 2R2, 2Rw2 or 2r2
 		let prefixNumber = parseInt(splitsByMoveFamily[0]);
-		if (moveObject.family.includes("w")) { // 2Rw2
+		if (splitsByMoveFamily[1].includes("w")) { // 2Rw2
 			moveObject.minSliceNumber = 1;
 		} else { // 2R2 or 2r2
 			moveObject.minSliceNumber = prefixNumber;
