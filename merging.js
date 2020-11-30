@@ -5,9 +5,9 @@
 const getMoveObjectSequenceFromMoveStringSequence = moveStringSequence => {
 	let moveObjectSequence = [];
 	let familyGroupFromFamily = {
-		R: "/[RLrlMx]/g", L: "/[RLrlMx]/g", r: "/[RLrlMx]/g", l: "/[RLrlMx]/g", M: "/[RLrlMx]/g", x: "/[RLrlMx]/g",
-		U: "/[UDudEy]/g", D: "/[UDudEy]/g", u: "/[UDudEy]/g", d: "/[UDudEy]/g", E: "/[UDudEy]/g", y: "/[UDudEy]/g",
-		F: "/[FBfbSz]/g", B: "/[FBfbSz]/g", f: "/[FBfbSz]/g", b: "/[FBfbSz]/g", S: "/[FBfbSz]/g", z: "/[FBfbSz]/g"
+		R: "RLrlMx", L: "RLrlMx", r: "RLrlMx", l: "RLrlMx", M: "RLrlMx", x: "RLrlMx",
+		U: "UDudEy", D: "UDudEy", u: "UDudEy", d: "UDudEy", E: "UDudEy", y: "UDudEy",
+		F: "FBfbSz", B: "FBfbSz", f: "FBfbSz", b: "FBfbSz", S: "FBfbSz", z: "FBfbSz"
 	};
 	for (let moveString of moveStringSequence) {
 		let family = moveString.match(movePattern)[0];
@@ -159,44 +159,44 @@ const buildOutputSequenceFromMergedCommutingGroups = (commutingGroups, puzzle) =
 			} else { // rebuild move name from object
 				if (moveObject.minSliceNumber === 1) { // outer block from reference face
 					if (moveObject.maxSliceNumber === puzzle) { // rotation
-						moveStringSequence.push(moveObject.familyGroup[7] + getSuffixFromTurnAngle(moveObject.turnAngle));
+						moveStringSequence.push(moveObject.familyGroup[5] + getSuffixFromTurnAngle(moveObject.turnAngle));
 					} else if (moveObject.maxSliceNumber === 1) { // single outer slice
-						moveStringSequence.push(moveObject.familyGroup[2] + getSuffixFromTurnAngle(moveObject.turnAngle));
+						moveStringSequence.push(moveObject.familyGroup[0] + getSuffixFromTurnAngle(moveObject.turnAngle));
 					} else if (moveObject.maxSliceNumber === 2) { // double outer slice
 						if (puzzle === 3) {
-							moveStringSequence.push(moveObject.familyGroup[4] + getSuffixFromTurnAngle(moveObject.turnAngle));
+							moveStringSequence.push(moveObject.familyGroup[2] + getSuffixFromTurnAngle(moveObject.turnAngle));
 						} else {
-							moveStringSequence.push(moveObject.familyGroup[2] + "w" + getSuffixFromTurnAngle(moveObject.turnAngle));
+							moveStringSequence.push(moveObject.familyGroup[0] + "w" + getSuffixFromTurnAngle(moveObject.turnAngle));
 						}
 					} else { // any other outer block
-						moveStringSequence.push(moveObject.maxSliceNumber + moveObject.familyGroup[2] + "w" + getSuffixFromTurnAngle(moveObject.turnAngle));
+						moveStringSequence.push(moveObject.maxSliceNumber + moveObject.familyGroup[0] + "w" + getSuffixFromTurnAngle(moveObject.turnAngle));
 					}
 				} else if (moveObject.maxSliceNumber === puzzle) { // outer block from opposite of reference face
 					if (moveObject.minSliceNumber === puzzle) { // single outer slice
-						moveStringSequence.push(moveObject.familyGroup[3] + getSuffixFromTurnAngle(-moveObject.turnAngle));
+						moveStringSequence.push(moveObject.familyGroup[1] + getSuffixFromTurnAngle(-moveObject.turnAngle));
 					} else if (moveObject.minSliceNumber === puzzle - 1) { // double outer slice
 						if (puzzle === 3) {
-							moveStringSequence.push(moveObject.familyGroup[5] + getSuffixFromTurnAngle(-moveObject.turnAngle));
+							moveStringSequence.push(moveObject.familyGroup[3] + getSuffixFromTurnAngle(-moveObject.turnAngle));
 						} else {
-							moveStringSequence.push(moveObject.familyGroup[3] + "w" + getSuffixFromTurnAngle(-moveObject.turnAngle));
+							moveStringSequence.push(moveObject.familyGroup[1] + "w" + getSuffixFromTurnAngle(-moveObject.turnAngle));
 						}
 					} else { // any other outer block
-						moveStringSequence.push(puzzle + 1 - moveObject.minSliceNumber + moveObject.familyGroup[3] + "w" + getSuffixFromTurnAngle(-moveObject.turnAngle));
+						moveStringSequence.push(puzzle + 1 - moveObject.minSliceNumber + moveObject.familyGroup[1] + "w" + getSuffixFromTurnAngle(-moveObject.turnAngle));
 					}
 				} else { // inner slice move
 					if (moveObject.minSliceNumber === moveObject.maxSliceNumber) { // single inner slice
 						if (moveObject.minSliceNumber === (puzzle + 1)/2) { // middle layer
-							moveStringSequence.push(moveObject.familyGroup[6] + getSuffixFromTurnAngle(moveObject.familyGroup[6] === "S" ? moveObject.turnAngle : -moveObject.turnAngle));
+							moveStringSequence.push(moveObject.familyGroup[4] + getSuffixFromTurnAngle(moveObject.familyGroup[4] === "S" ? moveObject.turnAngle : -moveObject.turnAngle));
 						} else if (puzzle - moveObject.minSliceNumber < moveObject.minSliceNumber - 1) { // inner slice, nearer the opposite of reference face
-							moveStringSequence.push(puzzle + 1 - moveObject.minSliceNumber + moveObject.familyGroup[4] + getSuffixFromTurnAngle(-moveObject.turnAngle));
+							moveStringSequence.push(puzzle + 1 - moveObject.minSliceNumber + moveObject.familyGroup[1] + getSuffixFromTurnAngle(-moveObject.turnAngle));
 						} else { // inner slice, nearer the reference face or equal in distance
-							moveStringSequence.push(moveObject.minSliceNumber + moveObject.familyGroup[2] + getSuffixFromTurnAngle(moveObject.turnAngle));
+							moveStringSequence.push(moveObject.minSliceNumber + moveObject.familyGroup[0] + getSuffixFromTurnAngle(moveObject.turnAngle));
 						}
 					} else { // many inner slices
 						if (puzzle - moveObject.maxSliceNumber < moveObject.minSliceNumber - 1) { // inner block, nearer the opposite of reference face
-							moveStringSequence.push(puzzle + 1 - moveObject.maxSliceNumber + "-" + (puzzle + 1 - moveObject.minSliceNumber) + moveObject.familyGroup[4] + "w" + getSuffixFromTurnAngle(-moveObject.turnAngle));
+							moveStringSequence.push(puzzle + 1 - moveObject.maxSliceNumber + "-" + (puzzle + 1 - moveObject.minSliceNumber) + moveObject.familyGroup[1] + "w" + getSuffixFromTurnAngle(-moveObject.turnAngle));
 						} else { // inner block, nearer the reference face or equal in distance
-							moveStringSequence.push(moveObject.minSliceNumber + "-" + moveObject.maxSliceNumber + moveObject.familyGroup[2] + "w" + getSuffixFromTurnAngle(moveObject.turnAngle));
+							moveStringSequence.push(moveObject.minSliceNumber + "-" + moveObject.maxSliceNumber + moveObject.familyGroup[0] + "w" + getSuffixFromTurnAngle(moveObject.turnAngle));
 						}
 					}
 				}
