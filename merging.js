@@ -242,6 +242,7 @@ const tryToMergeMovesInCommutingGroup = (commutingGroup, puzzle) => {
 					break; // stop trying to merge this move, because it has been cancelled, we can't do better
 				} else if (fusionResult.hasMerged) { // normal fusion
 					commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
+					nextMoveIndex--; // remove one rank to nextMoveIndex for recursivity
 					lastMove = fusionResult; // update lastMove
 					commutingGroup[lastMoveIndex] = lastMove; // update lastMove in array
 				} // else no merge, simply ignore
