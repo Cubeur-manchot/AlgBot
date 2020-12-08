@@ -1,26 +1,19 @@
 {
-  "name": "discord",
-  "version": "12.2.0",
+  "name": "algbot",
+  "author": "Cubeur-manchot",
+  "description": "Discord bot to display rubik's cube images with a given sequence.",
+  "version": "1.0.0",
   "main": "index.js",
-  "dependencies": {
-    "discord.js": "^12.2.0",
-    "dotenv": "^8.2.0",
-    "pm2": "^4.4.0",
-    "pm2-windows-startup": "^1.0.3"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "homepage": "https://github.com/Cubeur-manchot/AlgBot#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Cubeur-manchot/AlgBot.git"
   },
-  "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/Cubeur-manchot/AlgBot/issues"
   },
-  "homepage": "https://github.com/Cubeur-manchot/AlgBot#readme",
-  "description": ""
+  "dependencies": {
+    "discord.js": "^12.2.0"
+  },
+  "license": "ISC"
 }
