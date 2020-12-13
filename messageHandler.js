@@ -1,5 +1,7 @@
 "use strict";
 
+const Discord = require("discord.js");
+
 // general information about message
 
 const messageIsAlgBotCommand = message => {
