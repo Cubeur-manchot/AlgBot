@@ -97,7 +97,7 @@ const buildImageUrl = (moveSequence, options, algOrDo) => {
 		+ `${options.view === "normal" ? "" : "&view=" + options.view}`
 		+ `&pzl=${options.puzzle}`
 		+ `&sch=${options.colorScheme}`
-		+ `&stage=${options.stage}`
+		+ (options.faceletDefinition ? `&fd=${options.faceletDefinition}` : `&stage=${options.stage}`)
 		+ `&${algOrDo === "alg" ? "case" : "alg"}=` // $alg/$do command in AlgBot is respectively case/alg in VisualCube
 		+ `${moveSequence.join("%20").replace(/'/g, "%27")}`;
 };

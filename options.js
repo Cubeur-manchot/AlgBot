@@ -24,7 +24,7 @@ const parseOptions = optionsList => {
 		} else if (isViewOption(option)) {
 			optionObject.view = option.slice(1);
 		} else if (isStageOption(option)) {
-			optionObject.stage = getStageFromOption(option);
+			Object.assign(optionObject, getStageFromOption(option));
 			if (optionObject.view === undefined) {
 				optionObject.view = getViewFromStageOption(option);
 			}
@@ -76,7 +76,7 @@ const getViewFromStageOption = option => {
 // stage options
 
 const isStageOption = option => {
-	return isStageOptionWithPlanView(option) || /^-(cross|fl|f2l(_1|_2|_3|_sm)?|(e|c|zb)ls|line|2x2x2|2x2x3|f2b|vh|vls)$/i.test(option);
+	return isStageOptionWithPlanView(option) || /^-(cross|fl|f2l(_1|_2|_3|_sm)?|(c|co|e|v|zb)ls|line|2x2x2|2x2x3|f2b|vh)$/i.test(option);
 };
 
 const isStageOptionWithPlanView = option => {
@@ -85,11 +85,12 @@ const isStageOptionWithPlanView = option => {
 
 const getStageFromOption = option => {
 	switch(option) {
-		case "-zbll": case "-1lll": return "pll";
-		case "-ollcp": return "coll";
-		case "-zbls": return "vh";
-		case "-vls": return "wv";
-		default: return option.slice(1); // just remove "-" at the beginning
+		case "-zbll": case "-1lll": return {stage: "pll"};
+		case "-ollcp": return {stage: "coll"};
+		case "-zbls": return {stage: "vh"};
+		case "-vls": return {stage: "wv"};
+		case "-cols": return {faceletDefinition: "unununununnnrrrrrrnnnffffffdddddddddnnnllllllnnnbbbbbb"}; // custom coloring
+		default: return {stage: option.slice(1)}; // just remove "-" at the beginning
 	}
 };
 
@@ -135,7 +136,7 @@ const getOptionsHelpMessage = language => {
 			+ "```yaml\n$alg R' F R U R' U' F' U R -oll```"
 			+ "Stages valides :\n"
 			+ "`cll`, `cmll`, `coll`, `ell`, `ll`, `ocll`, `ocell`, `oell`, `oll`, `ollcp`, `pll`, `wv`, `zbll`, `1lll` (appliquent une vue \"plan\")\n"
-			+ "`cls`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `vls`, `zbls`, `2x2x2`, `2x2x3` (appliquent une vue \"normal\")\n"
+			+ "`cls`, `cols`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `vls`, `zbls`, `2x2x2`, `2x2x3` (appliquent une vue \"normal\")\n"
 			+ "\n`-view` : permet de modifier la vue :"
 			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
 			+ "Vues valides : plan, normal, trans.\n"
@@ -154,7 +155,7 @@ const getOptionsHelpMessage = language => {
 			+ "```yaml\n$alg R' F R U R' U' F' U R -oll```"
 			+ "Valid stages :\n"
 			+ "`cll`, `cmll`, `coll`, `ell`, `ll`, `ocll`, `ocell`, `oell`, `oll`, `ollcp`, `pll`, `wv`, `zbll`, `1lll` (apply a \"plan\" view)\n"
-			+ "`cls`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `vls`, `zbls`, `2x2x2`, `2x2x3` (apply a \"normal\" view)\n"
+			+ "`cls`, `cols`, `cross`, `els`, `fl`, `f2b`, `f2l`, `f2l_1`, `f2l_2`, `f2l_sm`, `f2l_3`, `line`, `vh`, `vls`, `zbls`, `2x2x2`, `2x2x3` (apply a \"normal\" view)\n"
 			+ "\n`-view` : allows to change the view :"
 			+ "```yaml\n$alg R U R' U' R' F R2 U' R' U' R U R' F' -normal```"
 			+ "Valid views : plan, normal, trans.\n"
