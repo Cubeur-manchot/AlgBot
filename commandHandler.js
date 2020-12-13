@@ -3,38 +3,37 @@
 const {getGeneralHelpMessage} = require("./help.js");
 const {getOptionsHelpMessage, getUnrecognizedOptionsErrorMessage, getUnsupportedPuzzleErrorMessage, parseOptions} = require("./options.js");
 const {buildMoveSequenceForVisualCube, parseMoves, countMoves, getBadParsingErrorMessage} = require("./algs.js");
+const {buildEmbed} = require("./messageHandler.js");
 const {getAlgListHelpMessage} = require("./algCollection.js");
 const {mergeMoves} = require("./merging.js");
 
 const getResultOfCommand = (message, language) => {
-	let answer = {answerContent: "", answerOptions: {}, errorInCommand: false, addReactions: false};
+	let answer = {errorInCommand: false, isAlgOrDoCommandWithoutError: false};
 	if (/^\$(alg|do)(	| |$)/.test(message.content)) { // $alg or $do command
-		answer.addReactions = true;
 		let resultOfAlgOrDoCommand = getResultOfAlgOrDoCommand(message.content);
 		if (resultOfAlgOrDoCommand.unrecognizedPuzzle) {
-			answer.answerContent = getUnsupportedPuzzleErrorMessage(resultOfAlgOrDoCommand.unrecognizedPuzzle, language);
+			answer.answerTextContent = getUnsupportedPuzzleErrorMessage(resultOfAlgOrDoCommand.unrecognizedPuzzle, language);
 			answer.errorInCommand = true;
 		} else if (resultOfAlgOrDoCommand.unrecognizedOptions) {
-			answer.answerContent = getUnrecognizedOptionsErrorMessage(resultOfAlgOrDoCommand.unrecognizedOptions.join("\n"), language);
+			answer.answerTextContent = getUnrecognizedOptionsErrorMessage(resultOfAlgOrDoCommand.unrecognizedOptions.join("\n"), language);
 			answer.errorInCommand = true;
 		} else if (resultOfAlgOrDoCommand.badParsing) {
-			answer.answerContent = getBadParsingErrorMessage(language);
+			answer.answerTextContent = getBadParsingErrorMessage(language);
 			answer.errorInCommand = true;
-		} else {
-			answer.answerContent = resultOfAlgOrDoCommand.messageContent;
-			answer.answerOptions = {files: [{attachment: resultOfAlgOrDoCommand.imageUrl, name: "cubeImage.png"}]};
+		} else { // normal case, no error
+			answer.isAlgOrDoCommandWithoutError = true;
+			answer.answerEmbed = buildEmbed(resultOfAlgOrDoCommand);
 		}
 	} else if (message.content === "$help") { // $help command
-		answer.answerContent = getGeneralHelpMessage(language);
+		answer.answerTextContent = getGeneralHelpMessage(language);
 	} else if (message.content === "$options") { // $options command
-		answer.answerContent = getOptionsHelpMessage(language);
+		answer.answerTextContent = getOptionsHelpMessage(language);
 	} else if (message.content === "$alglist") { // $alglist command
-		answer.answerContent = getAlgListHelpMessage(language);
+		answer.answerTextContent = getAlgListHelpMessage(language);
 	} else { // unrecognized command
-		answer.answerContent = getUnrecognizedCommandErrorMessage(message.content.split(" ")[0], language);
+		answer.answerTextContent = getUnrecognizedCommandErrorMessage(message.content.split(" ")[0], language);
 		answer.errorInCommand = true;
 	}
-	answer.addReactions &= !answer.errorInCommand; // don't react if there is an error in the command
 	return answer;
 };
 
@@ -64,8 +63,10 @@ const getResultOfAlgOrDoCommand = command => {
 				moveSequenceForAnswer = moveSequenceForAnswer.join(" ");
 			}
 			return {
-				messageContent: moveSequenceForAnswer + (parsedCommand.comments ? " //" + parsedCommand.comments : ""),
-				imageUrl: buildImageUrl(moveSequenceForVisualCubeNew, options, parsedCommand.algOrDo)
+				moveSequence: moveSequenceForAnswer,
+				imageUrl: buildImageUrl(moveSequenceForVisualCubeNew, options, parsedCommand.algOrDo),
+				puzzle: options.puzzle,
+				algOrDo: parsedCommand.algOrDo
 			};
 		}
 	}

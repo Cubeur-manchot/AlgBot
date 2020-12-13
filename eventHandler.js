@@ -1,7 +1,7 @@
 "use strict";
 
 const {getResultOfCommand} = require("./commandHandler.js");
-const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage} = require("./messageHandler.js");
+const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage, sendEmbedToChannel} = require("./messageHandler.js");
 
 const onReady = (AlgBot, language) => {
 	let activity = language === "french" ? "attendre d'afficher des algos" : "waiting for displaying algs";
@@ -13,9 +13,13 @@ const onReady = (AlgBot, language) => {
 const onMessage = (message, language) => {
 	if (messageIsAlgBotCommand(message)) {
 		let commandInfo = getResultOfCommand(message, language);
-		sendMessageToChannel(message.channel, commandInfo.answerContent, commandInfo.answerOptions, commandInfo.addReactions);
-		if (commandInfo.errorInCommand) {
-			deleteMessageAfterSomeSeconds(message);
+		if (commandInfo.isAlgOrDoCommandWithoutError) { // send embed
+			sendEmbedToChannel(message.channel, commandInfo.answerEmbed);
+		} else { // send informative message
+			sendMessageToChannel(message.channel, commandInfo.answerTextContent);
+			if (commandInfo.errorInCommand) {
+				deleteMessageAfterSomeSeconds(message);
+			}
 		}
 	} // else normal message, don't mind
 };

@@ -20,16 +20,18 @@ const findNextAlgBotCorrespondingMessage = (fromMessage, messageInfo) => {
 
 // message handling (send/delete/modify)
 
-const sendMessageToChannel = (channel, message, options, addReactions) => {
-	channel.send(message, options)
+const sendMessageToChannel = (channel, message) => {
+	channel.send(message).catch(console.error);
+};
+
+const sendEmbedToChannel = (channel, embedObject) => {
+	channel.send(new Discord.MessageEmbed(embedObject))
 		.catch(console.error)
 		.then(message => {
-			if (addReactions) {
-				message.react("❤").catch(console.error);
-				message.react("💩").catch(console.error);
-				message.react("🥇").catch(console.error);
-				message.react("👽").catch(console.error);
-			}
+			message.react("❤").catch(console.error);
+			message.react("💩").catch(console.error);
+			message.react("🥇").catch(console.error);
+			message.react("👽").catch(console.error);
 		});
 };
 
@@ -48,4 +50,21 @@ const deleteNextAlgBotCorrespondingMessage = (message, messageInfo) => {
 	deleteMessage(findNextAlgBotCorrespondingMessage(message, messageInfo));
 };
 
-module.exports = {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage};
+// embed building
+
+const buildEmbed = resultOfAlgOrDoCommand => {
+	return {
+		color: "#0099ff",
+		title: resultOfAlgOrDoCommand.moveSequence,
+		url: `https://alg.cubing.net/?alg=${resultOfAlgOrDoCommand.moveSequence}` // move sequence
+			+ (resultOfAlgOrDoCommand.algOrDo === "alg" ? `&setup=(${resultOfAlgOrDoCommand.moveSequence})-` : "") // inverse move sequence as setup
+			+ `&puzzle=${resultOfAlgOrDoCommand.puzzle}x${resultOfAlgOrDoCommand.puzzle}x${resultOfAlgOrDoCommand.puzzle}`, // puzzle
+		image: {
+			url: resultOfAlgOrDoCommand.imageUrl
+		}
+	};
+};
+
+module.exports = {messageIsAlgBotCommand,
+	sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage,
+	buildEmbed, sendEmbedToChannel};
