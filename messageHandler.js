@@ -12,14 +12,6 @@ const messageIsAlgBotMessage = message => {
 	return message.author.username === "AlgBot";
 };
 
-const findNextAlgBotCorrespondingMessage = (fromMessage, messageInfo) => {
-	return fromMessage.channel.messages.cache.array().find(message => {
-		return messageIsAlgBotMessage(message) // AlgBot's message
-			&& message.createdTimestamp > fromMessage.createdTimestamp // first corresponding after given message
-			&& message.content === messageInfo.answerContent; // message is exactly the answer of the given command
-	});
-};
-
 // message handling (send/delete/modify)
 
 const sendMessageToChannel = (channel, message) => {
@@ -48,8 +40,20 @@ const deleteMessageAfterSomeSeconds = message => {
 	setTimeout(() => deleteMessage(message), 10000);
 };
 
-const deleteNextAlgBotCorrespondingMessage = (message, messageInfo) => {
-	deleteMessage(findNextAlgBotCorrespondingMessage(message, messageInfo));
+const deleteNextAlgBotCorrespondingNormalMessage = (fromMessage, answerTextContent) => {
+	deleteMessage(fromMessage.channel.messages.cache.array().find(message => {
+		return messageIsAlgBotMessage(message) // AlgBot's message
+			&& message.createdTimestamp > fromMessage.createdTimestamp // first corresponding after given message
+			&& message.content === answerTextContent; // message is exactly the answer of the given command
+	}));
+};
+const deleteNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle) => {
+	deleteMessage(fromMessage.channel.messages.cache.array().find(message => {
+		return messageIsAlgBotMessage(message) // AlgBot's message
+			&& message.createdTimestamp > fromMessage.createdTimestamp // first corresponding after given message
+			&& message.embeds.length !== 0 // has at least one embed
+			&& message.embeds[0].title === answerEmbedTitle; // embed title corresponds to searched title
+	}));
 };
 
 // embed building
@@ -68,5 +72,5 @@ const buildEmbed = resultOfAlgOrDoCommand => {
 };
 
 module.exports = {messageIsAlgBotCommand,
-	sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage,
-	buildEmbed, sendEmbedToChannel};
+	sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingNormalMessage,
+	buildEmbed, sendEmbedToChannel, deleteNextAlgBotCorrespondingEmbeddedMessage};

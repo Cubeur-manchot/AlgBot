@@ -33,7 +33,12 @@ const onMessageUpdate = (oldMessage, newMessage, language) => {
 
 const onMessageDelete = (message, language) => {
 	if (messageIsAlgBotCommand(message)) {
-		deleteNextAlgBotCorrespondingMessage(message, getResultOfCommand(message, language));
+		let resultOfCommand = getResultOfCommand(message, language);
+		if (resultOfCommand.isAlgOrDoCommandWithoutError) {
+			deleteNextAlgBotCorrespondingEmbeddedMessage(message, resultOfCommand.answerEmbed.title);
+		} else {
+			deleteNextAlgBotCorrespondingNormalMessage(message, resultOfCommand.answerTextContent);
+		}
 	}
 };
 
