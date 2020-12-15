@@ -1,7 +1,8 @@
 "use strict";
 
 const {getResultOfCommand} = require("./commandHandler.js");
-const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingMessage, sendEmbedToChannel} = require("./messageHandler.js");
+const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingNormalMessage,
+	sendEmbedToChannel, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage} = require("./messageHandler.js");
 
 const onReady = (AlgBot, language) => {
 	let activity = language === "french" ? "attendre d'afficher des algos" : "waiting for displaying algs";
@@ -25,10 +26,28 @@ const onMessage = (message, language) => {
 };
 
 const onMessageUpdate = (oldMessage, newMessage, language) => {
-	if (messageIsAlgBotCommand(oldMessage)) { // if previous message was already a command, delete the previous answer
-		deleteNextAlgBotCorrespondingMessage(newMessage, getResultOfCommand(oldMessage, language));
+	if (messageIsAlgBotCommand(oldMessage)) {
+		if (messageIsAlgBotCommand(newMessage)) { // message was an AlgBot command, and has been edited to another AlgBot command
+			let oldCommandInfo = getResultOfCommand(oldMessage, language);
+			if (oldCommandInfo.isAlgOrDoCommandWithoutError) {
+				let newCommandInfo = getResultOfCommand(newMessage, language);
+				if (newCommandInfo.isAlgOrDoCommandWithoutError) { // both old and new answer are an embed
+					editNextAlgBotCorrespondingEmbeddedMessage(oldMessage, oldCommandInfo.answerEmbed.title, newCommandInfo.answerEmbed); // edit answer embed
+				} else { // old answer is an embed, but new answer is a simple message
+					deleteNextAlgBotCorrespondingEmbeddedMessage(oldMessage, oldCommandInfo.answerEmbed.title); // delete old answer
+					sendMessageToChannel(newMessage.channel, newCommandInfo.answerTextContent);
+				}
+				//sendEmbedToChannel(message.channel, commandInfo.answerEmbed);
+			} else { // old answer was a simple message
+				deleteNextAlgBotCorrespondingNormalMessage(oldMessage, oldCommandInfo.answerTextContent); // delete old answer
+				onMessage(newMessage, language); // treat edited message as if it was sent
+			}
+		} else { // message was an AlgBot command, but is not anymore
+			onMessageDelete(oldMessage, language); // behave as if the old command message was deleted
+		}
+	} else { // old message was not an AlgBot command
+		onMessage(newMessage, language); // treat the message as if it was send
 	}
-	onMessage(newMessage, language); // treat the message as if it was send
 };
 
 const onMessageDelete = (message, language) => {

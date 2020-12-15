@@ -22,10 +22,12 @@ const sendEmbedToChannel = (channel, embedObject) => {
 	channel.send(new Discord.MessageEmbed(embedObject))
 		.catch(console.error)
 		.then(message => {
-			message.react("❤").catch(console.error);
-			message.react("💩").catch(console.error);
-			message.react("🥇").catch(console.error);
-			message.react("👽").catch(console.error);
+			if (message) {
+				message.react("❤").catch(console.error);
+				message.react("💩").catch(console.error);
+				message.react("🥇").catch(console.error);
+				message.react("👽").catch(console.error);
+			}
 		});
 };
 
@@ -47,23 +49,35 @@ const deleteNextAlgBotCorrespondingNormalMessage = (fromMessage, answerTextConte
 			&& message.content === answerTextContent; // message is exactly the answer of the given command
 	}));
 };
-const deleteNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle) => {
-	deleteMessage(fromMessage.channel.messages.cache.array().find(message => {
+
+const findNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle) => {
+	return fromMessage.channel.messages.cache.array().find(message => {
 		return messageIsAlgBotMessage(message) // AlgBot's message
 			&& message.createdTimestamp > fromMessage.createdTimestamp // first corresponding after given message
 			&& message.embeds.length !== 0 // has at least one embed
 			&& message.embeds[0].title === answerEmbedTitle; // embed title corresponds to searched title
-	}));
+	});
+};
+
+const deleteNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle) => {
+	deleteMessage(findNextAlgBotCorrespondingEmbeddedMessage(fromMessage, answerEmbedTitle));
+};
+
+const editNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle, newEmbedObject) => {
+	findNextAlgBotCorrespondingEmbeddedMessage(fromMessage, answerEmbedTitle)
+		.edit(new Discord.MessageEmbed(newEmbedObject))
+		.catch(console.error);
 };
 
 // embed building
 
 const buildEmbed = resultOfAlgOrDoCommand => {
+	let moveSequenceForUrl = resultOfAlgOrDoCommand.moveSequence.replace(/ /g, "%20");
 	return {
 		color: "#0099ff",
 		title: resultOfAlgOrDoCommand.moveSequence,
-		url: `https://alg.cubing.net/?alg=${resultOfAlgOrDoCommand.moveSequence}` // move sequence
-			+ (resultOfAlgOrDoCommand.algOrDo === "alg" ? `&setup=(${resultOfAlgOrDoCommand.moveSequence})-` : "") // inverse move sequence as setup
+		url: `https://alg.cubing.net/?alg=${moveSequenceForUrl}` // move sequence
+			+ (resultOfAlgOrDoCommand.algOrDo === "alg" ? `&setup=(${moveSequenceForUrl})-` : "") // inverse move sequence as setup
 			+ `&puzzle=${resultOfAlgOrDoCommand.puzzle}x${resultOfAlgOrDoCommand.puzzle}x${resultOfAlgOrDoCommand.puzzle}`, // puzzle
 		image: {
 			url: resultOfAlgOrDoCommand.imageUrl
@@ -73,4 +87,4 @@ const buildEmbed = resultOfAlgOrDoCommand => {
 
 module.exports = {messageIsAlgBotCommand,
 	sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingNormalMessage,
-	buildEmbed, sendEmbedToChannel, deleteNextAlgBotCorrespondingEmbeddedMessage};
+	buildEmbed, sendEmbedToChannel, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage};
