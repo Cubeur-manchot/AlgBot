@@ -1,7 +1,7 @@
 "use strict";
 
 const {getResultOfCommand} = require("./commandHandler.js");
-const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingNormalMessage,
+const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSecondsIfNotModified, deleteNextAlgBotCorrespondingNormalMessage,
 	sendEmbedToChannel, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage} = require("./messageHandler.js");
 
 const onReady = (AlgBot, language) => {
@@ -19,7 +19,7 @@ const onMessage = (message, language) => {
 		} else { // send informative message
 			sendMessageToChannel(message.channel, commandInfo.answerTextContent);
 			if (commandInfo.errorInCommand) {
-				deleteMessageAfterSomeSeconds(message);
+				deleteMessageAfterSomeSecondsIfNotModified(message);
 			}
 		}
 	} // else normal message, don't mind
@@ -33,9 +33,12 @@ const onMessageUpdate = (oldMessage, newMessage, language) => {
 				let newCommandInfo = getResultOfCommand(newMessage, language);
 				if (newCommandInfo.isAlgOrDoCommandWithoutError) { // both old and new answer are an embed
 					editNextAlgBotCorrespondingEmbeddedMessage(oldMessage, oldCommandInfo.answerEmbed.title, newCommandInfo.answerEmbed); // edit answer embed
-				} else { // old answer is an embed, but new answer is a simple message
+				} else { // old answer was an embed, but new answer is a simple message
 					deleteNextAlgBotCorrespondingEmbeddedMessage(oldMessage, oldCommandInfo.answerEmbed.title); // delete old answer
 					sendMessageToChannel(newMessage.channel, newCommandInfo.answerTextContent);
+					if (newCommandInfo.errorInCommand) {
+						deleteMessageAfterSomeSecondsIfNotModified(newMessage);
+					}
 				}
 				//sendEmbedToChannel(message.channel, commandInfo.answerEmbed);
 			} else { // old answer was a simple message

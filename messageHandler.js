@@ -48,6 +48,15 @@ const deleteMessageAfterSomeSeconds = message => {
 	setTimeout(() => deleteMessage(message), 10000);
 };
 
+const deleteMessageAfterSomeSecondsIfNotModified = message => {
+	let lastUpdateTimeStamp = message.edits.length === 1 ? message.createdTimestamp : message.editedTimestamp;
+	setTimeout(() => {
+		if (message.editedTimestamp <= lastUpdateTimeStamp) { // message has not been modified since lastUpdateTimeStamp
+			deleteMessage(message);
+		}
+	}, 10000);
+};
+
 const deleteNextAlgBotCorrespondingNormalMessage = (fromMessage, answerTextContent) => {
 	deleteMessage(fromMessage.channel.messages.cache.array().find(message => {
 		return messageIsAlgBotMessage(message) // AlgBot's message
@@ -92,5 +101,5 @@ const buildEmbed = resultOfAlgOrDoCommand => {
 };
 
 module.exports = {messageIsAlgBotCommand,
-	sendMessageToChannel, deleteMessageAfterSomeSeconds, deleteNextAlgBotCorrespondingNormalMessage,
+	sendMessageToChannel, deleteMessageAfterSomeSecondsIfNotModified, deleteNextAlgBotCorrespondingNormalMessage,
 	buildEmbed, sendEmbedToChannel, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage};
