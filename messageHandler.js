@@ -32,7 +32,7 @@ const sendEmbedToChannel = (channel, embedObject) => {
 };
 
 const deleteMessage = message => {
-	if (message) {
+	if (message && !message.deleted) {
 		message.delete()
 			.catch(error => console.log(error));
 	}
