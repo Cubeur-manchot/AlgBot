@@ -24,8 +24,14 @@ const sendEmbedToChannel = (channel, embedObject) => {
 		.then(message => {
 			if (message) {
 				message.react("❤").catch(console.error);
+			}
+			if (message) {
 				message.react("💩").catch(console.error);
+			}
+			if (message) {
 				message.react("🥇").catch(console.error);
+			}
+			if (message) {
 				message.react("👽").catch(console.error);
 			}
 		});
