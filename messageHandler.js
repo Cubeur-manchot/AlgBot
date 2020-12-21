@@ -44,10 +44,6 @@ const deleteMessage = message => {
 	}
 };
 
-const deleteMessageAfterSomeSeconds = message => {
-	setTimeout(() => deleteMessage(message), 10000);
-};
-
 const deleteMessageAfterSomeSecondsIfNotModified = message => {
 	let lastUpdateTimeStamp = message.edits.length === 1 ? message.createdTimestamp : message.editedTimestamp;
 	setTimeout(() => {
