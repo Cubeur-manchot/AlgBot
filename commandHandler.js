@@ -11,8 +11,8 @@ const getResultOfCommand = (message, language) => {
 	let answer = {errorInCommand: false, isAlgOrDoCommandWithoutError: false};
 	if (/^\$(alg|do)(	| |$)/.test(message.content)) { // $alg or $do command
 		let resultOfAlgOrDoCommand = getResultOfAlgOrDoCommand(message.content);
-		if (resultOfAlgOrDoCommand.unrecognizedPuzzle) {
-			answer.answerTextContent = getUnsupportedPuzzleErrorMessage(resultOfAlgOrDoCommand.unrecognizedPuzzle, language);
+		if (resultOfAlgOrDoCommand.invalidPuzzle) {
+			answer.answerTextContent = getUnsupportedPuzzleErrorMessage(resultOfAlgOrDoCommand.invalidPuzzle, language);
 			answer.errorInCommand = true;
 		} else if (resultOfAlgOrDoCommand.unrecognizedOptions) {
 			answer.answerTextContent = getUnrecognizedOptionsErrorMessage(resultOfAlgOrDoCommand.unrecognizedOptions.join("\n"), language);
@@ -41,10 +41,13 @@ const getResultOfAlgOrDoCommand = command => {
 	command = command.replace(/’/g, "'"); // replace wrong apostrophe typography
 	let parsedCommand = splitCommand(command);
 	let options = parseOptions(parsedCommand.options); // parse options
-	if (options.unrecognizedOptions.length || !/^([1-9]|10)$/.test(options.puzzle)) { // problem in options
+	if (options.unrecognizedOptions.length) { // unrecognized option
 		return {
-			unrecognizedOptions: options.unrecognizedOptions,
-			unrecognizedPuzzle: options.puzzle
+			unrecognizedOptions: options.unrecognizedOptions
+		};
+	} else if (!/^([1-9]|10)$/.test(options.puzzle)) { // invalid puzzle
+		return {
+			invalidPuzzle: options.puzzle
 		};
 	} else { // everything is right, continue
 		let moveSequenceForAnswer = parseMoves(parsedCommand.moves);
