@@ -20,13 +20,25 @@ const sendMessageToChannel = (channel, message) => {
 
 const normalReactionList = ["❤", "💩", "🥇", "👽"];
 
-const rotationReactionList = [];
+const planViewRotationReactionList = ["⬆", "⬇", "↩", "↪", "➡", "⬅"];
+
+const isometricViewRotationReactionList = ["↗", "↙", "⬅", "➡", "↘", "↖"];
 
 const sendEmbedToChannel = (channel, embedObject, rotatable) => {
 	channel.send(new Discord.MessageEmbed(embedObject))
 		.catch(console.error)
 		.then(message => {
-			for (let reaction of normalReactionList) {
+			let reactionList;
+			if (rotatable) {
+				if (embedObject.image.url.includes("&view=plan")) {
+					reactionList = planViewRotationReactionList;
+				} else {
+					reactionList = isometricViewRotationReactionList;
+				}
+			} else {
+				reactionList = normalReactionList;
+			}
+			for (let reaction of reactionList) {
 				if (message) {
 					message.react(reaction).catch(console.error);
 				}
