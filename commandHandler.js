@@ -23,6 +23,7 @@ const getResultOfCommand = (message, language) => {
 		} else { // normal case, no error
 			answer.isAlgOrDoCommandWithoutError = true;
 			answer.answerEmbed = buildEmbed(resultOfAlgOrDoCommand);
+			answer.rotatable = resultOfAlgOrDoCommand.rotatable;
 		}
 	} else if (message.content === "$help") { // $help command
 		answer.answerTextContent = getGeneralHelpMessage(language);
@@ -69,7 +70,8 @@ const getResultOfAlgOrDoCommand = command => {
 				moveSequence: moveSequenceForAnswer,
 				imageUrl: buildImageUrl(moveSequenceForVisualCube, options, parsedCommand.algOrDo),
 				puzzle: options.puzzle,
-				algOrDo: parsedCommand.algOrDo
+				algOrDo: parsedCommand.algOrDo,
+				rotatable: options.rotatable
 			};
 		}
 	}

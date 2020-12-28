@@ -15,7 +15,7 @@ const onMessage = (message, language) => {
 	if (messageIsAlgBotCommand(message)) {
 		let commandInfo = getResultOfCommand(message, language);
 		if (commandInfo.isAlgOrDoCommandWithoutError) { // send embed
-			sendEmbedToChannel(message.channel, commandInfo.answerEmbed);
+			sendEmbedToChannel(message.channel, commandInfo.answerEmbed, commandInfo.rotatable);
 		} else { // send informative message
 			sendMessageToChannel(message.channel, commandInfo.answerTextContent);
 			if (commandInfo.errorInCommand) {

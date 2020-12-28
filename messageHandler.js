@@ -18,9 +18,11 @@ const sendMessageToChannel = (channel, message) => {
 	channel.send(message).catch(console.error);
 };
 
-const sendEmbedToChannel = (channel, embedObject) => {
 const normalReactionList = ["❤", "💩", "🥇", "👽"];
 
+const rotationReactionList = [];
+
+const sendEmbedToChannel = (channel, embedObject, rotatable) => {
 	channel.send(new Discord.MessageEmbed(embedObject))
 		.catch(console.error)
 		.then(message => {
