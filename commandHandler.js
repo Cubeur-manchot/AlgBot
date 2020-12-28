@@ -94,7 +94,7 @@ const splitCommand = commandString => {
 };
 
 const buildImageUrl = (moveSequence, options, algOrDo) => {
-	return "http://visualcube/visualcube.php?fmt=png&bg=t&size=150"
+	return "http://cube.rider.biz/visualcube.php?fmt=png&bg=t&size=150"
 		+ `${options.view === "normal" ? "" : "&view=" + options.view}`
 		+ `&pzl=${options.puzzle}`
 		+ `&sch=${options.colorScheme}`
