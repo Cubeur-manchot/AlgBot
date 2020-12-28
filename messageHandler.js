@@ -19,20 +19,15 @@ const sendMessageToChannel = (channel, message) => {
 };
 
 const sendEmbedToChannel = (channel, embedObject) => {
+const normalReactionList = ["❤", "💩", "🥇", "👽"];
+
 	channel.send(new Discord.MessageEmbed(embedObject))
 		.catch(console.error)
 		.then(message => {
-			if (message) {
-				message.react("❤").catch(console.error);
-			}
-			if (message) {
-				message.react("💩").catch(console.error);
-			}
-			if (message) {
-				message.react("🥇").catch(console.error);
-			}
-			if (message) {
-				message.react("👽").catch(console.error);
+			for (let reaction of normalReactionList) {
+				if (message) {
+					message.react(reaction).catch(console.error);
+				}
 			}
 		});
 };
