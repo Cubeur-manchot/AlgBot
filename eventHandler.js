@@ -64,4 +64,7 @@ const onMessageDelete = (message, language) => {
 	}
 };
 
-module.exports = {onReady, onMessage, onMessageUpdate, onMessageDelete};
+const onMessageReact = message => {
+};
+
+module.exports = {onReady, onMessage, onMessageUpdate, onMessageDelete, onMessageReact};
