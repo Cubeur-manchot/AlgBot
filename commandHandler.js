@@ -56,7 +56,7 @@ const getResultOfAlgOrDoCommand = command => {
 				badParsing: true
 			};
 		} else {
-			let moveSequenceForVisualCubeNew = buildMoveSequenceForVisualCube(moveSequenceForAnswer);
+			let moveSequenceForVisualCube = buildMoveSequenceForVisualCube(moveSequenceForAnswer);
 			if (options.shouldMergeMoves) {
 				moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +options.puzzle);
 			}
@@ -67,7 +67,7 @@ const getResultOfAlgOrDoCommand = command => {
 			}
 			return {
 				moveSequence: moveSequenceForAnswer,
-				imageUrl: buildImageUrl(moveSequenceForVisualCubeNew, options, parsedCommand.algOrDo),
+				imageUrl: buildImageUrl(moveSequenceForVisualCube, options, parsedCommand.algOrDo),
 				puzzle: options.puzzle,
 				algOrDo: parsedCommand.algOrDo
 			};
