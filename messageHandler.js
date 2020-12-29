@@ -27,7 +27,7 @@ const isometricViewRotationReactionList = ["↗", "↙", "⬅", "➡", "↘", "�
 const sendEmbedToChannel = (channel, embedObject, rotatable) => {
 	channel.send(new Discord.MessageEmbed(embedObject))
 		.catch(console.error)
-		.then(message => {
+		.then(async message => {
 			let reactionList;
 			if (rotatable) {
 				if (embedObject.image.url.includes("&view=plan")) {
@@ -40,7 +40,7 @@ const sendEmbedToChannel = (channel, embedObject, rotatable) => {
 			}
 			for (let reaction of reactionList) {
 				if (message) {
-					message.react(reaction).catch(console.error);
+					await message.react(reaction).catch(console.error);
 				}
 			}
 		});
