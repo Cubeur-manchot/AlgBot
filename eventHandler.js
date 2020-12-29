@@ -77,6 +77,7 @@ const onMessageReact = (reaction, user) => {
 			let indexOfEmoji = (embed.image.url.includes("&view=plan") ? planViewRotationReactionList : isometricViewRotationReactionList)
 				.indexOf(emojiName);
 			if (indexOfEmoji !== -1) {
+				reaction.users.remove(user).catch(console.error); // remove reaction, to be able to react many times
 				let rotationToAdd = rotationToAddList[indexOfEmoji];
 				if (embed.image.url.includes("case")) { // $alg command
 					rotationToAdd = rotationToAdd.includes("'") ? rotationToAdd[0] : rotationToAdd + "'"; // invert rotation
