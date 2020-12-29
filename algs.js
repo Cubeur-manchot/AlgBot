@@ -84,22 +84,22 @@ const parseSimpleSequence = movesString => {
 				moveSequenceForWordString = algCollection.parity4x4x4Collection[wordLowerWithoutSuffix];
 			} else if (wordLowerWithoutSuffix.includes("edge") || wordLowerWithoutSuffix.includes("sexy")) { // move is a trigger or composition
 				moveSequenceForWordString = algCollection.triggerCollection[wordLowerWithoutSuffix];
-			} // else ignore word
-			if (moveSequenceForWordString !== undefined) {
-				let moveSequenceForWordArray = moveSequenceForWordString.split(" ");
-				if (word.includes("'")) { // trigger has an apostrophe, it must be inverted
-					moveSequenceForWordArray = invertSequence(moveSequenceForWordArray);
-				}
-				if (/[0-9]+'?$/.test(word)) { // trigger has a number, it must be repeated
-					let factor = word.match(/[0-9]+(?='?)/)[0];
-					let factorizedMoveSequenceForWordArray = [];
-					for (let time = 0; time < factor; time++) {
-						factorizedMoveSequenceForWordArray.push(...moveSequenceForWordArray);
-					}
-					moveSequenceForWordArray = factorizedMoveSequenceForWordArray;
-				}
-				moveArray.push(...moveSequenceForWordArray);
+			} else { // ignore word
+				break;
 			}
+			let moveSequenceForWordArray = moveSequenceForWordString.split(" ");
+			if (word.includes("'")) { // trigger has an apostrophe, it must be inverted
+				moveSequenceForWordArray = invertSequence(moveSequenceForWordArray);
+			}
+			if (/[0-9]+'?$/.test(word)) { // trigger has a number, it must be repeated
+				let factor = word.match(/[0-9]+(?='?)/)[0];
+				let factorizedMoveSequenceForWordArray = [];
+				for (let time = 0; time < factor; time++) {
+					factorizedMoveSequenceForWordArray.push(...moveSequenceForWordArray);
+				}
+				moveSequenceForWordArray = factorizedMoveSequenceForWordArray;
+			}
+			moveArray.push(...moveSequenceForWordArray);
 		} else {
 			moveArray.push(...splitSequenceWithPatternList(word, [
 				/[MESxyz][0-9]?'?/g, // moves of the form M2, M or x2 or x
