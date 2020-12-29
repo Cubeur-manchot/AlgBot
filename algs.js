@@ -73,20 +73,32 @@ const parseSimpleSequence = movesString => {
 	let wordList = movesString.replace(/'/g, "' ").split(" ").filter(string => { return string !== ""; });
 	let moveArray = [];
 	for (let word of wordList) {
-		let wordLower = word.toLowerCase();
-		if (/(p|o|cm)ll_|sune|parity|niklas|sexy|edge/gi.test(word)) {
-			let moveSequenceForWord;
-			if (/(p|o|cm)ll_/.test(wordLower)) { // move is either a PLL, or an OLL, or a CMLL
-				moveSequenceForWord = algCollection[wordLower.match(/(p|o|cm)ll/)[0].toUpperCase() + "Collection"][wordLower];
-			} else if (wordLower.includes("sune") || wordLower.includes("niklas")) { // move is a basic alg
-				moveSequenceForWord = algCollection.basicAlgsCollection[wordLower];
-			} else if (wordLower.includes("parity")) { // move is a 4x4 parity
-				moveSequenceForWord = algCollection.parity4x4x4Collection[wordLower];
-			} else if (wordLower.includes("edge") || wordLower.includes("sexy")) { // move is a trigger or composition
-				moveSequenceForWord = algCollection.triggerCollection[wordLower];
-			} // else ignore move
-			if (moveSequenceForWord !== undefined) {
-				moveArray.push(...moveSequenceForWord.split(" "));
+		if (/(p|o|cm)ll_|sune|parity|niklas|(back|left)?(double|triple)?(anti)?sexy|(h|sl)edge/gi.test(word)) {
+			let wordLowerWithoutSuffix = word.toLowerCase().replace(/[0-9]*'?$/g,"");
+			let moveSequenceForWordString;
+			if (/(p|o|cm)ll_/.test(wordLowerWithoutSuffix)) { // move is either a PLL, or an OLL, or a CMLL
+				moveSequenceForWordString = algCollection[wordLowerWithoutSuffix.match(/(p|o|cm)ll/)[0].toUpperCase() + "Collection"][wordLowerWithoutSuffix];
+			} else if (wordLowerWithoutSuffix.includes("sune") || wordLowerWithoutSuffix.includes("niklas")) { // move is a basic alg
+				moveSequenceForWordString = algCollection.basicAlgsCollection[wordLowerWithoutSuffix];
+			} else if (wordLowerWithoutSuffix.includes("parity")) { // move is a 4x4 parity
+				moveSequenceForWordString = algCollection.parity4x4x4Collection[wordLowerWithoutSuffix];
+			} else if (wordLowerWithoutSuffix.includes("edge") || wordLowerWithoutSuffix.includes("sexy")) { // move is a trigger or composition
+				moveSequenceForWordString = algCollection.triggerCollection[wordLowerWithoutSuffix];
+			} // else ignore word
+			if (moveSequenceForWordString !== undefined) {
+				let moveSequenceForWordArray = moveSequenceForWordString.split(" ");
+				if (word.includes("'")) { // trigger has an apostrophe, it must be inverted
+					moveSequenceForWordArray = invertSequence(moveSequenceForWordArray);
+				}
+				if (/[0-9]+'?$/.test(word)) { // trigger has a number, it must be repeated
+					let factor = word.match(/[0-9]+(?='?)/)[0];
+					let factorizedMoveSequenceForWordArray = [];
+					for (let time = 0; time < factor; time++) {
+						factorizedMoveSequenceForWordArray.push(...moveSequenceForWordArray);
+					}
+					moveSequenceForWordArray = factorizedMoveSequenceForWordArray;
+				}
+				moveArray.push(...moveSequenceForWordArray);
 			}
 		} else {
 			moveArray.push(...splitSequenceWithPatternList(word, [
