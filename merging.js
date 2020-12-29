@@ -268,7 +268,7 @@ const computeFusionResult = (lastMove, nextMove) => {
 			};
 		}
 	} else { // other cases
-		if (lastMove.turnAngle === nextMove.turnAngle) { // same turn angle
+		if ((lastMove.turnAngle - nextMove.turnAngle) % 4 === 0) { // same turn angle
 			if (lastMove.maxSliceNumber + 1 === nextMove.minSliceNumber) { // moves of the form R M'
 				return {
 					minSliceNumber: lastMove.minSliceNumber,
