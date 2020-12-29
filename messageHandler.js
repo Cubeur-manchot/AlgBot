@@ -75,7 +75,8 @@ const findNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitl
 		return messageIsAlgBotMessage(message) // AlgBot's message
 			&& message.createdTimestamp > fromMessage.createdTimestamp // first corresponding after given message
 			&& message.embeds.length !== 0 // has at least one embed
-			&& message.embeds[0].title === answerEmbedTitle; // embed title corresponds to searched title
+			&& (message.embeds[0].title === answerEmbedTitle // embed title corresponds to searched title
+				|| (message.embeds[0].title === null && answerEmbedTitle === "")); // empty title is actually a null field
 	});
 };
 
