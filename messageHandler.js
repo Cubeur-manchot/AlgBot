@@ -108,6 +108,8 @@ const buildEmbed = resultOfAlgOrDoCommand => {
 	};
 };
 
-module.exports = {messageIsAlgBotCommand,
+module.exports = {messageIsAlgBotCommand, messageIsAlgBotMessage,
 	sendMessageToChannel, deleteMessageAfterSomeSecondsIfNotModified, deleteNextAlgBotCorrespondingNormalMessage,
-	buildEmbed, sendEmbedToChannel, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage};
+	buildEmbed, sendEmbedToChannel, editEmbeddedMessage, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage,
+	planViewRotationReactionList, isometricViewRotationReactionList
+};

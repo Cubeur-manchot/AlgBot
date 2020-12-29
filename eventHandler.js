@@ -1,8 +1,10 @@
 "use strict";
 
 const {getResultOfCommand} = require("./commandHandler.js");
-const {messageIsAlgBotCommand, sendMessageToChannel, deleteMessageAfterSomeSecondsIfNotModified, deleteNextAlgBotCorrespondingNormalMessage,
-	sendEmbedToChannel, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage} = require("./messageHandler.js");
+const {messageIsAlgBotCommand, messageIsAlgBotMessage, sendMessageToChannel,
+	deleteMessageAfterSomeSecondsIfNotModified, deleteNextAlgBotCorrespondingNormalMessage,
+	sendEmbedToChannel, editEmbeddedMessage, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage,
+	planViewRotationReactionList, isometricViewRotationReactionList} = require("./messageHandler.js");
 
 const onReady = (AlgBot, language) => {
 	let activity = language === "french" ? "attendre d'afficher des algos" : "waiting for displaying algs";
@@ -64,7 +66,28 @@ const onMessageDelete = (message, language) => {
 	}
 };
 
-const onMessageReact = message => {
+const rotationToAddList = ["x", "x'", "y", "y'", "z", "z'",];
+
+const onMessageReact = (reaction, user) => {
+	if (!user.bot) { // a normal person reacts
+		let message = reaction.message;
+		if (messageIsAlgBotMessage(message) && message.embeds.length) { // reacted to an AlgBot message containing an embed
+			let embed = message.embeds[0];
+			let emojiName = reaction._emoji.name;
+			let indexOfEmoji = (embed.image.url.includes("&view=plan") ? planViewRotationReactionList : isometricViewRotationReactionList)
+				.indexOf(emojiName);
+			if (indexOfEmoji !== -1) {
+				let rotationToAdd = rotationToAddList[indexOfEmoji];
+				if (embed.image.url.includes("case")) { // $alg command
+					rotationToAdd = rotationToAdd.includes("'") ? rotationToAdd[0] : rotationToAdd + "'"; // invert rotation
+					embed.image.url = embed.image.url.replace("&case=","&case=" + rotationToAdd); // insert rotation before the alg
+				} else { // $do command
+					embed.image.url += rotationToAdd; // simply add the rotation at the end
+				}
+				editEmbeddedMessage(message, embed); // replace old embed with new one
+			}
+		}
+	}
 };
 
 module.exports = {onReady, onMessage, onMessageUpdate, onMessageDelete, onMessageReact};
