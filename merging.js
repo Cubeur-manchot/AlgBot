@@ -230,24 +230,30 @@ const mergeMoves = (moveStringSequence, puzzle) => {
 const tryToMergeMovesInCommutingGroup = (commutingGroup, puzzle) => {
 	if (commutingGroup.length !== 1) { // if group is too small, no possible merge
 		parseMovesForMerging(commutingGroup, puzzle);
-		for (let lastMoveIndex = 0; lastMoveIndex < commutingGroup.length; lastMoveIndex++) {
-			let lastMove = commutingGroup[lastMoveIndex];
-			for (let nextMoveIndex = lastMoveIndex + 1; nextMoveIndex < commutingGroup.length; nextMoveIndex++) {
-				let nextMove = commutingGroup[nextMoveIndex];
-				let fusionResult = computeFusionResult(lastMove, nextMove);
-				if (fusionResult.hasCancelled) { // perfect cancellation
-					commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
-					commutingGroup.splice(lastMoveIndex, 1); // remove lastMove
-					lastMoveIndex--; // next lastMove will be at the same index as the current one
-					break; // stop trying to merge this move, because it has been cancelled, we can't do better
-				} else if (fusionResult.hasMerged) { // normal fusion
-					commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
-					nextMoveIndex--; // remove one rank to nextMoveIndex for recursivity
-					lastMove = fusionResult; // update lastMove
-					commutingGroup[lastMoveIndex] = lastMove; // update lastMove in array
-				} // else no merge, simply ignore
+		let somethingHasChanged;
+		do {
+			somethingHasChanged = false;
+			for (let lastMoveIndex = 0; lastMoveIndex < commutingGroup.length; lastMoveIndex++) {
+				let lastMove = commutingGroup[lastMoveIndex];
+				for (let nextMoveIndex = lastMoveIndex + 1; nextMoveIndex < commutingGroup.length; nextMoveIndex++) {
+					let nextMove = commutingGroup[nextMoveIndex];
+					let fusionResult = computeFusionResult(lastMove, nextMove);
+					if (fusionResult.hasCancelled) { // perfect cancellation
+						commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
+						commutingGroup.splice(lastMoveIndex, 1); // remove lastMove
+						lastMoveIndex--; // next lastMove will be at the same index as the current one
+						somethingHasChanged = true;
+						break; // stop trying to merge this move, because it has been cancelled, we can't do better
+					} else if (fusionResult.hasMerged) { // normal fusion
+						commutingGroup.splice(nextMoveIndex, 1); // remove nextMove
+						nextMoveIndex--; // remove one rank to nextMoveIndex for recursivity
+						lastMove = fusionResult; // update lastMove
+						commutingGroup[lastMoveIndex] = lastMove; // update lastMove in array
+						somethingHasChanged = true;
+					} // else no merge, simply ignore
+				}
 			}
-		}
+		} while (somethingHasChanged);
 	}
 };
 
