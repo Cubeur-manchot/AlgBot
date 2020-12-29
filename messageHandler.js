@@ -84,8 +84,10 @@ const deleteNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTi
 };
 
 const editEmbeddedMessage = (message, newEmbedObject) => {
-	message.edit(new Discord.MessageEmbed(newEmbedObject))
-		.catch(console.error);
+	if (message && !message.deleted) {
+		message.edit(new Discord.MessageEmbed(newEmbedObject))
+			.catch(console.error);
+	}
 };
 
 const editNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle, newEmbedObject) => {
