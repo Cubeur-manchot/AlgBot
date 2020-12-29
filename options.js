@@ -148,7 +148,9 @@ const getOptionsHelpMessage = language => {
 			+ "\n`-htm`, `-stm`, `-etm`, `-qtm` : compte les mouvements avec la métrique demandée (`-count` : compte avec toutes les métriques) :"
 			+ "```yaml\n$alg PLL_Y -count```"
 			+ "\n`-merge` : fusionne et annule les mouvements si possible"
-			+ "```yaml\n$alg OLL_33 OLL_37 -merge```\n";
+			+ "```yaml\n$alg OLL_33 OLL_37 -merge```"
+			+ "\n`-rotatable` : permet de faire tourner le cube en cliquant sur les réactions"
+			+ "```yaml\n$alg sune -rotatable```";
 	} else { // english
 		return "Here are the options I support :\n"
 			+ "\n`-puzzle` : allows to display the alg on a puzzle other than 3x3 :"
@@ -167,7 +169,9 @@ const getOptionsHelpMessage = language => {
 			+ "\n`-htm`, `-stm`, `-etm`, `-qtm` : count moves with specified metrics (`-count` : count with all metrics) :"
 			+ "```yaml\n$alg PLL_Y -count```"
 			+ "\n`-merge` : merge and cancel moves if possible"
-			+ "```yaml\n$alg OLL_33 OLL_37 -merge```\n";
+			+ "```yaml\n$alg OLL_33 OLL_37 -merge```"
+			+ "\n`-rotatable` : enables to rotate the cube by clicking on the reactions"
+			+ "```yaml\n$alg sune -rotatable```";
 	}
 };
 
