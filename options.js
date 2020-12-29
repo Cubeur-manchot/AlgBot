@@ -6,6 +6,7 @@ const parseOptions = optionsList => {
 		view: undefined,
 		puzzle: "3",
 		colorScheme: "wrgyob",
+		rotatable: false,
 		shouldCountMoves: {
 			htm: false,
 			stm: false,
@@ -41,6 +42,8 @@ const parseOptions = optionsList => {
 			}
 		} else if (option === "-merge") {
 			optionObject.shouldMergeMoves = true;
+		} else if (option === "-rotatable") {
+			optionObject.rotatable = true;
 		} else {
 			optionObject.unrecognizedOptions.push(option);
 		}

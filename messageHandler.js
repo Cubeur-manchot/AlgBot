@@ -18,21 +18,30 @@ const sendMessageToChannel = (channel, message) => {
 	channel.send(message).catch(console.error);
 };
 
-const sendEmbedToChannel = (channel, embedObject) => {
+const normalReactionList = ["❤", "💩", "🥇", "👽"];
+
+const planViewRotationReactionList = ["⬆", "⬇", "↩", "↪", "➡", "⬅"];
+
+const isometricViewRotationReactionList = ["↗", "↙", "⬅", "➡", "↘", "↖"];
+
+const sendEmbedToChannel = (channel, embedObject, rotatable) => {
 	channel.send(new Discord.MessageEmbed(embedObject))
 		.catch(console.error)
-		.then(message => {
-			if (message) {
-				message.react("❤").catch(console.error);
+		.then(async message => {
+			let reactionList;
+			if (rotatable) {
+				if (embedObject.image.url.includes("&view=plan")) {
+					reactionList = planViewRotationReactionList;
+				} else {
+					reactionList = isometricViewRotationReactionList;
+				}
+			} else {
+				reactionList = normalReactionList;
 			}
-			if (message) {
-				message.react("💩").catch(console.error);
-			}
-			if (message) {
-				message.react("🥇").catch(console.error);
-			}
-			if (message) {
-				message.react("👽").catch(console.error);
+			for (let reaction of reactionList) {
+				if (message) {
+					await message.react(reaction).catch(console.error);
+				}
 			}
 		});
 };
@@ -74,10 +83,13 @@ const deleteNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTi
 	deleteMessage(findNextAlgBotCorrespondingEmbeddedMessage(fromMessage, answerEmbedTitle));
 };
 
-const editNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle, newEmbedObject) => {
-	findNextAlgBotCorrespondingEmbeddedMessage(fromMessage, answerEmbedTitle)
-		.edit(new Discord.MessageEmbed(newEmbedObject))
+const editEmbeddedMessage = (message, newEmbedObject) => {
+	message.edit(new Discord.MessageEmbed(newEmbedObject))
 		.catch(console.error);
+};
+
+const editNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle, newEmbedObject) => {
+	editEmbeddedMessage(findNextAlgBotCorrespondingEmbeddedMessage(fromMessage, answerEmbedTitle), newEmbedObject);
 };
 
 // embed building
@@ -96,6 +108,8 @@ const buildEmbed = resultOfAlgOrDoCommand => {
 	};
 };
 
-module.exports = {messageIsAlgBotCommand,
+module.exports = {messageIsAlgBotCommand, messageIsAlgBotMessage,
 	sendMessageToChannel, deleteMessageAfterSomeSecondsIfNotModified, deleteNextAlgBotCorrespondingNormalMessage,
-	buildEmbed, sendEmbedToChannel, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage};
+	buildEmbed, sendEmbedToChannel, editEmbeddedMessage, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage,
+	planViewRotationReactionList, isometricViewRotationReactionList
+};
