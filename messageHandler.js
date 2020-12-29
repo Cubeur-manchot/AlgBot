@@ -83,10 +83,13 @@ const deleteNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTi
 	deleteMessage(findNextAlgBotCorrespondingEmbeddedMessage(fromMessage, answerEmbedTitle));
 };
 
-const editNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle, newEmbedObject) => {
-	findNextAlgBotCorrespondingEmbeddedMessage(fromMessage, answerEmbedTitle)
-		.edit(new Discord.MessageEmbed(newEmbedObject))
+const editEmbeddedMessage = (message, newEmbedObject) => {
+	message.edit(new Discord.MessageEmbed(newEmbedObject))
 		.catch(console.error);
+};
+
+const editNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitle, newEmbedObject) => {
+	editEmbeddedMessage(findNextAlgBotCorrespondingEmbeddedMessage(fromMessage, answerEmbedTitle), newEmbedObject);
 };
 
 // embed building
