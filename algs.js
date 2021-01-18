@@ -77,6 +77,9 @@ const parseSimpleSequence = movesString => {
 			let wordLowerWithoutSuffix = word.toLowerCase().replace(/[0-9]*'?$/g,"");
 			let moveSequenceForWordString;
 			if (/(p|o|cm)ll_/.test(wordLowerWithoutSuffix)) { // move is either a PLL, or an OLL, or a CMLL
+				if (wordLowerWithoutSuffix.includes("oll")) { // OLL is particular because it ends with a number
+					wordLowerWithoutSuffix = word.toLowerCase().replace(/'$/g,""); // only removes apostrophe at the end, keep digits
+				}
 				moveSequenceForWordString = algCollection[wordLowerWithoutSuffix.match(/(p|o|cm)ll/)[0].toUpperCase() + "Collection"][wordLowerWithoutSuffix];
 			} else if (wordLowerWithoutSuffix.includes("sune") || wordLowerWithoutSuffix.includes("niklas")) { // move is a basic alg
 				moveSequenceForWordString = algCollection.basicAlgsCollection[wordLowerWithoutSuffix];
