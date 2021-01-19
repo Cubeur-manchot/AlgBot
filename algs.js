@@ -94,7 +94,7 @@ const parseSimpleSequence = movesString => {
 			if (word.includes("'")) { // trigger has an apostrophe, it must be inverted
 				moveSequenceForWordArray = invertSequence(moveSequenceForWordArray);
 			}
-			if (/[0-9]+'?$/.test(word)) { // trigger has a number, it must be repeated
+			if (/[0-9]+'?$/.test(word) && !wordLowerWithoutSuffix.includes("oll")) { // trigger has a number, it must be repeated, except OLL which natively have this number
 				let factor = word.match(/[0-9]+(?='?)/)[0];
 				let factorizedMoveSequenceForWordArray = [];
 				for (let time = 0; time < factor; time++) {
