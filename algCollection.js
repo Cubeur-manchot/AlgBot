@@ -179,6 +179,7 @@ const algCollection = {
 		lefttriplehedge: "F' L F L' F' L F L' F' L F L'",
 		sexy: "R U R' U'",
 		antisexy: "U R U' R'",
+		unsexy: "U R U' R'",
 		backsexy: "R' U' R U",
 		backantisexy: "U' R' U R",
 		leftsexy: "L' U' L U",
