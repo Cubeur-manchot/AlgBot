@@ -5,7 +5,7 @@ const Discord = require("discord.js");
 // general information about message
 
 const messageIsAlgBotCommand = message => {
-	return message.content.match(/^\$[A-Za-z]/);
+	return message.content.match(/^\$[A-Za-z]/) && !message.content.endsWith("$");
 };
 
 const messageIsAlgBotMessage = message => {
