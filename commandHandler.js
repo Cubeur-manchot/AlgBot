@@ -79,9 +79,9 @@ const getResultOfAlgOrDoCommand = command => {
 
 const splitCommand = commandString => {
 	let commandObject = {};
-	let indexOfSpace = commandString.indexOf(" ");
-	commandObject.algOrDo = indexOfSpace === 4 ? "alg" : "do"; // get alg or do
-	commandString = commandString.substring(indexOfSpace); // remove first word
+	commandObject.algOrDo = commandString.startsWith("$alg") ? "alg" : "do"; // get alg or do
+	let regex = new RegExp("^\\$" + commandObject.algOrDo, "g");
+	commandString = commandString.replace(regex, ""); // remove first word
 	let indexOfComments = commandString.indexOf("//");
 	if (indexOfComments !== -1) {
 		commandObject.comments = commandString.slice(indexOfComments + 2); // get comments
