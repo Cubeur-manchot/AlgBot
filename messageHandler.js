@@ -98,7 +98,7 @@ const editNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitl
 // embed building
 
 const buildEmbed = resultOfAlgOrDoCommand => {
-	let moveSequenceForUrl = resultOfAlgOrDoCommand.moveSequence.replace(/ /g, "%20");
+	let moveSequenceForUrl = resultOfAlgOrDoCommand.moveSequence.replace(/ /g, "%20").replace(/-/g, "%26%2345%3B");
 	return {
 		color: "#0099ff",
 		title: resultOfAlgOrDoCommand.moveSequence,
