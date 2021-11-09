@@ -5,9 +5,3 @@ services:
     restart: always
     build: .
     env_file: .env
-  visualcube:
-    container_name: visualcube
-    restart: always
-    image: docker.pkg.github.com/nogesma/scrambler/visualcube:latest
-    ports:
-      - 80:80
