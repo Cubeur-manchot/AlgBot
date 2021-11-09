@@ -55,7 +55,7 @@ const algCollection = {
 		oll_27: "R U R' U R U2' R'",
 		oll_28: "r U R' U' M U R U' R'",
 		oll_29: "r2' D' r U r' D r2 U' r' U' r",
-		oll_30: "F U R U2' R' U' R U2 R' U' F'",
+		oll_30: "r' D' r U' r' D r2 U' r' U r U r'",
 		oll_31: "R' U' F U R U' R' F' R",
 		oll_32: "S R U R' U' R' F R f'",
 		oll_33: "R U R' U' R' F R F'",
