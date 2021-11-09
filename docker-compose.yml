@@ -3,5 +3,6 @@ services:
   algbot:
     container_name: algbot
     restart: always
-    build: .
+    #build: .
+    image: ghcr.io/cubeur-manchot/algbot:latest
     env_file: .env
