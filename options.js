@@ -19,7 +19,7 @@ const parseOptions = optionsList => {
 	for (let option of optionsList) {
 		option = option.toLowerCase();
 		if (isColorSchemeOption(option)) {
-			optionObject.colorScheme = colorSchemeFromColors[option.substring(1)];
+			optionObject.colorScheme = colorSchemeFromColors[option.substring(1).replace(/[^a-z]/g, "-")];
 		} else if (isPuzzleOption(option)) {
 			optionObject.puzzle = getPuzzleFromOption(option);
 		} else if (isViewOption(option)) {
@@ -65,11 +65,11 @@ const getUnrecognizedOptionsErrorMessage = (unrecognizedOptions, language) => {
 // orientation options
 
 const isColorSchemeOption = option => {
-	let colorList = ["white", "red", "green", "yellow", "orange", "blue"];
-	return (new RegExp(`^-(${colorList.join("|")})$`, "i")).test(option) // check format for single color
-		|| ((new RegExp(`^(-(${colorList.join("|")})){2}$`, "i")).test(option) // check format for two colors
-			&& !/^-(white-yellow|yellow-white|red-orange|orange-red|green-blue|blue-green)$/i.test(option) // check opposite colors
-			&& !/^-(white-white|yellow-yellow|red-red|orange-orange|green-green|blue-blue)$/i.test(option)); // check double color
+	let colorList = "(" + ["white", "red", "green", "yellow", "orange", "blue"].join("|") + ")";
+	return (new RegExp(`^-${colorList}$`, "i")).test(option) // check format for single color
+		|| ((new RegExp(`^(-${colorList}[^a-z]${colorList})$`, "i")).test(option) // check format for two colors
+			&& !/^-(white[^a-z]yellow|yellow[^a-z]white|red[^a-z]orange|orange[^a-z]red|green[^a-z]blue|blue[^a-z]green)$/i.test(option) // check opposite colors
+			&& !/^-(white[^a-z]white|yellow[^a-z]yellow|red[^a-z]red|orange[^a-z]orange|green[^a-z]green|blue[^a-z]blue)$/i.test(option)); // check double color
 };
 
 const colorSchemeFromColors = {
