@@ -1,0 +1,25 @@
+name: Build and publish docker image
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to GitHub Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Docker Build & Push Action
+        uses: mr-smithers-excellent/docker-build-push@v5.5
+        with:
+          # Name of the Docker image
+          image: algbot
+          # Target Docker registry
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          # Docker registry password
+          password: ${{ secrets.GITHUB_TOKEN }}
+          # Adds latest tag to auto-generated GitOps tag
+          addLatest: true
