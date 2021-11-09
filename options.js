@@ -18,8 +18,8 @@ const parseOptions = optionsList => {
 	}; // default parameters
 	for (let option of optionsList) {
 		option = option.toLowerCase();
-		if (option === "-yellow") {
-			optionObject.colorScheme = "yogwrb";
+		if (isColorSchemeOption(option)) {
+			optionObject.colorScheme = colorSchemeFromColors[option.substring(1)];
 		} else if (isPuzzleOption(option)) {
 			optionObject.puzzle = getPuzzleFromOption(option);
 		} else if (isViewOption(option)) {
@@ -60,6 +60,49 @@ const getUnrecognizedOptionsErrorMessage = (unrecognizedOptions, language) => {
 	} else { // english
 		return ":x: Unrecognized option(s) :\n" + unrecognizedOptions;
 	}
+};
+
+// orientation options
+
+const isColorSchemeOption = option => {
+	let colorList = ["white", "red", "green", "yellow", "orange", "blue"];
+	return (new RegExp(`^-(${colorList.join("|")})$`, "i")).test(option) // check format for single color
+		|| ((new RegExp(`^(-(${colorList.join("|")})){2}$`, "i")).test(option) // check format for two colors
+			&& !/^-(white-yellow|yellow-white|red-orange|orange-red|green-blue|blue-green)$/i.test(option) // check opposite colors
+			&& !/^-(white-white|yellow-yellow|red-red|orange-orange|green-green|blue-blue)$/i.test(option)); // check double color
+};
+
+const colorSchemeFromColors = {
+	"white": "wrgyob",
+	"yellow": "yogwrb",
+	"green": "grybow",
+	"blue": "brwgoy",
+	"red": "rygowb",
+	"orange": "owgryb",
+	"white-red": "wbrygo",
+	"white-green": "wrgyob",
+	"white-orange": "wgoybr",
+	"white-blue": "wobyrd",
+	"red-white": "rgwoby",
+	"red-green": "rygowb",
+	"red-yellow": "rbyogw",
+	"red-blue": "rwboyg",
+	"green-white": "gowbry",
+	"green-red": "gwrbyo",
+	"green-yellow": "grybow",
+	"green-orange": "gyobwr",
+	"yellow-red": "ygrwbo",
+	"yellow-green": "yogwrb",
+	"yellow-orange": "ybowgr",
+	"yellow-blue": "yrbwog",
+	"orange-white": "obwrgy",
+	"orange-green": "owgryb",
+	"orange-yellow": "ogyrbw",
+	"orange-blue": "oybrwg",
+	"blue-white": "brwgoy",
+	"blue-red": "byrgwo",
+	"blue-yellow": "boygrw",
+	"blue-orange": "bwogyr"
 };
 
 // view options
