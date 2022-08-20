@@ -51,24 +51,24 @@ const getResultOfAlgOrDoCommand = command => {
 			invalidPuzzle: options.puzzle
 		};
 	} else { // everything is right, continue
-		let moveSequenceForAnswer = parseMoves(parsedCommand.moves);
-		if (moveSequenceForAnswer === "Error : Bad parsing") {
+		let moveSequence = parseMoves(parsedCommand.moves);
+		if (moveSequence === "Error : Bad parsing") {
 			return {
 				badParsing: true
 			};
 		} else {
-			let moveSequenceForVisualCube = buildMoveSequenceForVisualCube(moveSequenceForAnswer);
 			if (options.shouldMergeMoves) {
-				moveSequenceForAnswer = mergeMoves(moveSequenceForAnswer, +options.puzzle);
+				moveSequence = mergeMoves(moveSequence, parseInt(options.puzzle));
 			}
+			let moveSequenceString = moveSequence.join(" ");
+			let moveSequenceStringWithCounts = moveSequenceString;
 			if (options.shouldCountMoves["htm"] || options.shouldCountMoves["stm"] || options.shouldCountMoves["etm"] || options.shouldCountMoves["qtm"]) {
-				moveSequenceForAnswer = moveSequenceForAnswer.join(" ") + countMoves(moveSequenceForAnswer, options.shouldCountMoves);
-			} else {
-				moveSequenceForAnswer = moveSequenceForAnswer.join(" ");
+				moveSequenceStringWithCounts += countMoves(moveSequence, options.shouldCountMoves);
 			}
 			return {
-				moveSequence: moveSequenceForAnswer,
-				imageUrl: buildImageUrl(moveSequenceForVisualCube, options, parsedCommand.algOrDo),
+				moveSequenceForLinkText: moveSequenceStringWithCounts,
+				moveSequenceForAlgCubingNet: moveSequenceString,
+				imageUrl: buildImageUrl(buildMoveSequenceForVisualCube(moveSequence), options, parsedCommand.algOrDo),
 				puzzle: options.puzzle,
 				algOrDo: parsedCommand.algOrDo,
 				rotatable: options.rotatable

@@ -98,10 +98,10 @@ const editNextAlgBotCorrespondingEmbeddedMessage = (fromMessage, answerEmbedTitl
 // embed building
 
 const buildEmbed = resultOfAlgOrDoCommand => {
-	let moveSequenceForUrl = resultOfAlgOrDoCommand.moveSequence.replace(/ /g, "%20").replace(/-/g, "%26%2345%3B");
+	let moveSequenceForUrl = resultOfAlgOrDoCommand.moveSequenceForAlgCubingNet.replace(/ /g, "%20").replace(/-/g, "%26%2345%3B");
 	return {
 		color: "#0099ff",
-		title: resultOfAlgOrDoCommand.moveSequence,
+		title: resultOfAlgOrDoCommand.moveSequenceForLinkText,
 		url: `https://alg.cubing.net/?alg=${moveSequenceForUrl}` // move sequence
 			+ (resultOfAlgOrDoCommand.algOrDo === "alg" ? `&setup=(${moveSequenceForUrl})-` : "") // inverse move sequence as setup
 			+ `&puzzle=${resultOfAlgOrDoCommand.puzzle}x${resultOfAlgOrDoCommand.puzzle}x${resultOfAlgOrDoCommand.puzzle}`, // puzzle
