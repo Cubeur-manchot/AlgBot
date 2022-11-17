@@ -19,7 +19,7 @@ const algCollection = {
 		pll_ra: "R U' R' U' R U R D R' U' R D' R' U2 R'",
 		pll_rb: "R' U2 R U2 R' F R U R' U' R' F' R2",
 		pll_t: "R U R' U' R' F R2 U' R' U' R U R' F'",
-		pll_ua: "R2 U' R' U' R U R U R U' R",
+		pll_ua: "R U R' U R' U' R2 U' R' U R' U R",
 		pll_ub: "R' U R' U' R' U' R' U R U R2",
 		pll_v: "R' U R' d' R' F' R2 U' R' U R' F R F",
 		pll_y: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
