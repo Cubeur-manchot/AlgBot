@@ -7,9 +7,15 @@ const {buildEmbed} = require("./messageHandler.js");
 const {getAlgListHelpMessage} = require("./algCollection.js");
 const {mergeMoves} = require("./merging.js");
 
+const prefix = "$";
+
+const messageIsAlgBotCommand = message => {
+	return new RegExp(`^\\${prefix}[A-Za-z]`).test(message.content) && !message.content.endsWith(prefix);
+};
+
 const getResultOfCommand = (message, language) => {
 	let answer = {errorInCommand: false, isAlgOrDoCommandWithoutError: false};
-	if (/^\$(alg|do)(	| |$)/.test(message.content)) { // $alg or $do command
+	if (new RegExp(`^\\${prefix}(alg|do)(	| |$)`).test(message.content)) { // alg or do command
 		let resultOfAlgOrDoCommand = getResultOfAlgOrDoCommand(message.content);
 		if (resultOfAlgOrDoCommand.invalidPuzzle) {
 			answer.answerTextContent = getUnsupportedPuzzleErrorMessage(resultOfAlgOrDoCommand.invalidPuzzle, language);
@@ -25,11 +31,11 @@ const getResultOfCommand = (message, language) => {
 			answer.answerEmbed = buildEmbed(resultOfAlgOrDoCommand);
 			answer.rotatable = resultOfAlgOrDoCommand.rotatable;
 		}
-	} else if (message.content === "$help") { // $help command
+	} else if (message.content === `${prefix}help`) { // help command
 		answer.answerTextContent = getGeneralHelpMessage(language);
-	} else if (message.content === "$options") { // $options command
+	} else if (message.content === `${prefix}options`) { // options command
 		answer.answerTextContent = getOptionsHelpMessage(language);
-	} else if (message.content === "$alglist") { // $alglist command
+	} else if (message.content === `${prefix}alglist`) { // alglist command
 		answer.answerTextContent = getAlgListHelpMessage(language);
 	} else { // unrecognized command
 		answer.answerTextContent = getUnrecognizedCommandErrorMessage(message.content.split(" ")[0], language);
@@ -40,7 +46,7 @@ const getResultOfCommand = (message, language) => {
 
 const getResultOfAlgOrDoCommand = command => {
 	command = command.replace(/’/g, "'"); // replace wrong apostrophe typography
-	let parsedCommand = splitCommand(command);
+	let parsedCommand = splitAlgOrDoCommand(command);
 	let options = parseOptions(parsedCommand.options); // parse options
 	if (options.unrecognizedOptions.length) { // unrecognized option
 		return {
@@ -77,11 +83,10 @@ const getResultOfAlgOrDoCommand = command => {
 	}
 };
 
-const splitCommand = commandString => {
+const splitAlgOrDoCommand = commandString => {
 	let commandObject = {};
-	commandObject.algOrDo = commandString.startsWith("$alg") ? "alg" : "do"; // get alg or do
-	let regex = new RegExp("^\\$" + commandObject.algOrDo, "g");
-	commandString = commandString.replace(regex, ""); // remove first word
+	commandObject.algOrDo = commandString.startsWith(`${prefix}alg`) ? "alg" : "do"; // get alg or do
+	commandString = commandString.replace(new RegExp(`\\${prefix}${commandObject.algOrDo}`), ""); // remove first word
 	let indexOfComments = commandString.indexOf("//");
 	if (indexOfComments !== -1) {
 		commandObject.comments = commandString.slice(indexOfComments + 2); // get comments
@@ -104,7 +109,7 @@ const buildImageUrl = (moveSequence, options, algOrDo) => {
 		+ `&pzl=${options.puzzle}`
 		+ `&sch=${options.colorScheme}`
 		+ (options.faceletDefinition ? `&fd=${options.faceletDefinition}` : `&stage=${options.stage}`)
-		+ `&${algOrDo === "alg" ? "case" : "alg"}=` // $alg/$do command in AlgBot is respectively case/alg in VisualCube
+		+ `&${algOrDo === "alg" ? "case" : "alg"}=` // alg/do command in AlgBot is respectively case/alg in VisualCube
 		+ `${moveSequence.join("%20").replace(/'/g, "%27")}`;
 };
 
@@ -116,4 +121,4 @@ const getUnrecognizedCommandErrorMessage = (command, language) => {
 	}
 };
 
-module.exports = {getResultOfCommand};
+module.exports = {messageIsAlgBotCommand, getResultOfCommand};

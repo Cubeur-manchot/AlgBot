@@ -1,7 +1,7 @@
 "use strict";
 
-const {getResultOfCommand} = require("./commandHandler.js");
-const {messageIsAlgBotCommand, messageIsAlgBotMessage, sendMessageToChannel,
+const {messageIsAlgBotCommand, getResultOfCommand} = require("./commandHandler.js");
+const {messageIsAlgBotMessage, sendMessageToChannel,
 	deleteMessageAfterSomeSecondsIfNotModified, deleteNextAlgBotCorrespondingNormalMessage,
 	sendEmbedToChannel, editEmbeddedMessage, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage,
 	planViewRotationReactionList, isometricViewRotationReactionList} = require("./messageHandler.js");

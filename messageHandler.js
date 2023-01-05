@@ -4,10 +4,6 @@ const Discord = require("discord.js");
 
 // general information about message
 
-const messageIsAlgBotCommand = message => {
-	return message.content.match(/^\$[A-Za-z]/) && !message.content.endsWith("$");
-};
-
 const messageIsAlgBotMessage = message => {
 	return message.author.username === "AlgBot";
 };
@@ -111,7 +107,7 @@ const buildEmbed = resultOfAlgOrDoCommand => {
 	};
 };
 
-module.exports = {messageIsAlgBotCommand, messageIsAlgBotMessage,
+module.exports = {messageIsAlgBotMessage,
 	sendMessageToChannel, deleteMessageAfterSomeSecondsIfNotModified, deleteNextAlgBotCorrespondingNormalMessage,
 	buildEmbed, sendEmbedToChannel, editEmbeddedMessage, editNextAlgBotCorrespondingEmbeddedMessage, deleteNextAlgBotCorrespondingEmbeddedMessage,
 	planViewRotationReactionList, isometricViewRotationReactionList
