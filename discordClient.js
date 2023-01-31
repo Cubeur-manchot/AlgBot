@@ -17,9 +17,11 @@ class DiscordClient extends Discord.Client {
 			message.delete()
 				.catch(error => this.algBot.logger.errorLog("Error when deleting message "
 					+ `(id = ${message.id}`
-					+ `, created at ${new AlgBotDate(message.createdTimestamp).getDateString()})`
+					+ `, created at "${new AlgBotDate(message.createdTimestamp).getDateString()}")`
 					+ `, content = "${message.content}"`
-					+ `, userId = ${message.author.id})`
+					+ `, userId = ${message.author.id}`
+					+ `, channelName = "${message.channel.name}"`
+					+ `, serverName = "${message.channel.guild.name}")`
 					+ ` : "${error}".`
 				));
 		}
