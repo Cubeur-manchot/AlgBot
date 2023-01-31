@@ -82,7 +82,7 @@ const colorSchemeFromColors = {
 	"white-red": "wbrygo",
 	"white-green": "wrgyob",
 	"white-orange": "wgoybr",
-	"white-blue": "wobyrd",
+	"white-blue": "wobyrg",
 	"red-white": "rgwoby",
 	"red-green": "rygowb",
 	"red-yellow": "rbyogw",
