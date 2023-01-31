@@ -7,4 +7,4 @@ class AlgManipulator {
 	};
 };
 
-module.exports = {AlgManipulator};
+export {AlgManipulator};

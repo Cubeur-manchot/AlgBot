@@ -7,4 +7,4 @@ class ImageBuilder {
 	};
 };
 
-module.exports = {ImageBuilder};
+export {ImageBuilder};

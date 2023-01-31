@@ -1,6 +1,6 @@
 "use strict";
 
-const Discord = require("discord.js");
+import Discord from "discord.js";
 
 class DiscordClient {
 	constructor(algBot) {
@@ -16,4 +16,4 @@ class DiscordClient {
 	};
 };
 
-module.exports = {DiscordClient};
+export {DiscordClient};

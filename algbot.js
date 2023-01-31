@@ -1,9 +1,9 @@
 "use strict";
 
-const {DiscordClient} = require("./discordClient.js");
-const {AlgManipulator} = require("./algManipulator.js");
-const {ImageBuilder} = require("./imageBuilder.js");
-const {MessageHandler} = require("./messageHandlerNew.js");
+import {DiscordClient} from "./discordClient.js";
+import {AlgManipulator} from "./algManipulator.js";
+import {ImageBuilder} from "./imageBuilder.js";
+import {MessageHandler} from "./messageHandlerNew.js";
 
 class AlgBot {
 	constructor(language, prefix) {
@@ -16,4 +16,4 @@ class AlgBot {
 	};
 };
 
-module.exports = {AlgBot};
+export {AlgBot};

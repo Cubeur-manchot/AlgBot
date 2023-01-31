@@ -1,6 +1,6 @@
 "use strict";
 
-const {AlgBot} = require("./algBot.js");
+import {AlgBot} from "./algBot.js"
 
 new AlgBot("french");
 new AlgBot("english");

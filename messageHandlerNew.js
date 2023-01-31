@@ -9,4 +9,4 @@ class MessageHandler {
 	};
 };
 
-module.exports = {MessageHandler};
+export {MessageHandler};

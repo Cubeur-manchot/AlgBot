@@ -4,6 +4,7 @@
   "description": "Discord bot to display rubik's cube images with a given sequence.",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "homepage": "https://github.com/Cubeur-manchot/AlgBot#readme",
   "repository": {
     "type": "git",
