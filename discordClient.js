@@ -10,7 +10,7 @@ class DiscordClient extends Discord.Client {
 		let language = this.algBot.language;
 		this.login(process.env[`TOKEN_${language.toUpperCase()}`])
 			.then(() => this.algBot.logger.infoLog(`AlgBot (${language}) is logged in !`))
-			.catch(() => this.algBot.logger.errorLog(`Login error with AlgBot (${language}).`));
+			.catch(() => this.algBot.logger.errorLog(`Fail to login for AlgBot (${language}).`));
 	};
 	deleteMessage = message => {
 		if (message && !message.deleted) {
