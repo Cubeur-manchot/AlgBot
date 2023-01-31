@@ -9,13 +9,13 @@ class DiscordClient extends Discord.Client {
 		this.on("message", this.algBot.messageHandler.onMessage);
 		let language = this.algBot.language;
 		this.login(process.env[`TOKEN_${language.toUpperCase()}`])
-			.then(() => console.log(`AlgBot (${language}) is logged in !`))
-			.catch(() => console.error(`Login error with AlgBot (${language}).`));
+			.then(() => this.algBot.logger.infoLog(`AlgBot (${language}) is logged in !`))
+			.catch(() => this.algBot.logger.errorLog(`Login error with AlgBot (${language}).`));
 	};
 	deleteMessage = message => {
 		if (message && !message.deleted) {
 			message.delete()
-				.catch(error => console.log(error));
+				.catch(error => this.algBot.logger.errorLog(error));
 		}
 	};
 	deleteMessageAfterSomeSecondsIfNotModified = message => {

@@ -6,6 +6,6 @@ COPY package.json .
 
 RUN npm install
 
-COPY indexNew.js algBot.js algManipulator.js discordClient.js imageBuilder.js messageHandlerNew.js /
+COPY indexNew.js algBot.js logger.js algManipulator.js discordClient.js imageBuilder.js messageHandler.js /
 
 CMD ["node", "indexNew.js"]
