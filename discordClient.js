@@ -15,7 +15,13 @@ class DiscordClient extends Discord.Client {
 	deleteMessage = message => {
 		if (message && !message.deleted) {
 			message.delete()
-				.catch(error => this.algBot.logger.errorLog(error));
+				.catch(error => this.algBot.logger.errorLog("Error when deleting message "
+					+ `(id = ${message.id}`
+					+ `, created at ${new AlgBotDate(message.createdTimestamp).getDateString()})`
+					+ `, content = "${message.content}"`
+					+ `, userId = ${message.author.id})`
+					+ ` : "${error}".`
+				));
 		}
 	};
 	deleteMessageAfterSomeSecondsIfNotModified = message => {
@@ -26,6 +32,22 @@ class DiscordClient extends Discord.Client {
 			}
 		}, 10000);
 	};
+};
+
+class AlgBotDate extends Date {
+	constructor(timestamp) {
+		super(timestamp);
+	};
+	getDateString = () =>
+		`${this.getYearString()}-${this.getMonthString()}-${this.getDayString()} `
+		+ `${this.getHoursString()}:${this.getMinutesString()}:${this.getSecondsString()}`;
+	getStringTwoDigits = value => `${value < 10 ? "0" : ""}${value}`;
+	getYearString = () => `${this.getFullYear()}`;
+	getMonthString = () => this.getStringTwoDigits(this.getMonth() + 1);
+	getDayString = () => this.getStringTwoDigits(this.getDate());
+	getHoursString = () => this.getStringTwoDigits(this.getHours());
+	getMinutesString = () => this.getStringTwoDigits(this.getMinutes());
+	getSecondsString = () => this.getStringTwoDigits(this.getSeconds());
 };
 
 export {DiscordClient};
