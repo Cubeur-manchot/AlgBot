@@ -12,13 +12,23 @@ class DiscordClient extends Discord.Client {
 			.then(() => this.algBot.logger.infoLog(`AlgBot (${language}) is logged in !`))
 			.catch(() => this.algBot.logger.errorLog(`Fail to login for AlgBot (${language}).`));
 	};
+	sendTextMessage = (textMessageContent, channel) => {
+		channel.send(textMessageContent)
+			.catch(error => this.algBot.logger.errorLog("Error when sending message "
+				+ `(content = "${textMessageContent}"`
+				+ `, at "${new AlgBotDate().getDateString()}"`
+				+ `, channelName = "${channel.name}"`
+				+ `, serverName = "${channel.guild.name}")`
+				+ ` : "${error}".`
+			));
+	};
 	deleteMessage = message => {
 		if (message && !message.deleted) {
 			message.delete()
 				.catch(error => this.algBot.logger.errorLog("Error when deleting message "
 					+ `(id = ${message.id}`
-					+ `, created at "${new AlgBotDate(message.createdTimestamp).getDateString()}")`
 					+ `, content = "${message.content}"`
+					+ `, created at "${new AlgBotDate(message.createdTimestamp).getDateString()}")`
 					+ `, userId = ${message.author.id}`
 					+ `, channelName = "${message.channel.name}"`
 					+ `, serverName = "${message.channel.guild.name}")`
