@@ -13,6 +13,7 @@ class DiscordClient extends Discord.Client {
 		]});
 		this.algBot = algBot;
 		this.on("message", this.algBot.messageHandler.onMessage);
+		this.on("ready", this.onReady);
 		let language = this.algBot.language;
 		this.login(process.env[`TOKEN_${language.toUpperCase()}`])
 			.then(() => this.algBot.logger.infoLog(`AlgBot (${language}) is logged in !`))
@@ -49,6 +50,19 @@ class DiscordClient extends Discord.Client {
 				this.deleteMessage(message);
 			}
 		}, 10000);
+	};
+	onReady = () => {
+		console.log("ready begin")
+		this.user.setPresence({
+			activities: [{ name: this.getActivity(), type: Discord.ActivityType.Playing}],
+			status: 'online',
+		});
+	};
+	getActivity = () => {
+		switch (this.algBot.language) {
+			case "french": return "apprendre de nouveaux algos";
+			case "english": return "learning new algs";
+		}
 	};
 };
 
