@@ -4,7 +4,13 @@ import Discord from "discord.js";
 
 class DiscordClient extends Discord.Client {
 	constructor(algBot) {
-		super();
+		super({intents: [
+			Discord.GatewayIntentBits.GuildMessages, // messages in servers
+			Discord.GatewayIntentBits.GuildMessageReactions, // reactions to messages in servers
+			Discord.GatewayIntentBits.DirectMessages, // direct messages
+			Discord.GatewayIntentBits.DirectMessageReactions, // reactions to direct messages
+			Discord.GatewayIntentBits.MessageContent // message content
+		]});
 		this.algBot = algBot;
 		this.on("message", this.algBot.messageHandler.onMessage);
 		let language = this.algBot.language;

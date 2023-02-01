@@ -14,7 +14,7 @@
     "url": "https://github.com/Cubeur-manchot/AlgBot/issues"
   },
   "dependencies": {
-    "discord.js": "^12.2.0"
+    "discord.js": "^14.7.1"
   },
   "license": "ISC"
 }
