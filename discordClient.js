@@ -14,10 +14,7 @@ class DiscordClient extends Discord.Client {
 		this.algBot = algBot;
 		this.on("message", this.algBot.messageHandler.onMessage);
 		this.on("ready", this.onReady);
-		let language = this.algBot.language;
-		this.login(process.env[`TOKEN_${language.toUpperCase()}`])
-			.then(() => this.algBot.logger.infoLog(`AlgBot (${language}) is logged in !`))
-			.catch(() => this.algBot.logger.errorLog(`Fail to login for AlgBot (${language}).`));
+		this.loginWithToken();
 	};
 	sendTextMessage = (textMessageContent, channel) => {
 		channel.send(textMessageContent)
@@ -50,6 +47,13 @@ class DiscordClient extends Discord.Client {
 				this.deleteMessage(message);
 			}
 		}, 10000);
+	};
+	loginWithToken = () => {
+		this.login(process.env[`TOKEN_${this.algBot.language.toUpperCase()}`])
+			.then(() => this.algBot.logger.infoLog(`AlgBot (${this.algBot.language}) is logged in !`))
+			.catch(loginError => this.algBot.logger.errorLog(
+				`Fail to login for AlgBot (${this.algBot.language}) : "${loginError}".`
+			));
 	};
 	onReady = () => {
 		console.log("ready begin")
