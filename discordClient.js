@@ -56,11 +56,12 @@ class DiscordClient extends Discord.Client {
 			));
 	};
 	onReady = () => {
-		console.log("ready begin")
+		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language}) is ready !`);
 		this.user.setPresence({
-			activities: [{ name: this.getActivity(), type: Discord.ActivityType.Playing}],
-			status: 'online',
+			activities: [{name: this.getActivity(), type: Discord.ActivityType.Playing}],
+			status: "online",
 		});
+		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language})'s presence has been set.`);
 	};
 	getActivity = () => {
 		switch (this.algBot.language) {
