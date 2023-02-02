@@ -43,6 +43,20 @@ class DiscordClient extends Discord.Client {
 				));
 		}
 	};
+	replyWithTextMessage = (textMessageContent, initialMessage) => {
+		if (initialMessage && !initialMessage.deleted) {
+			initialMessage.reply({content: textMessageContent})
+				.catch(messageReplyError => this.algBot.logger.errorLog(`Error when replying "${textMessageContent}" to initial message `
+					+ `(id = ${initialMessage.id}`
+					+ `, content = "${initialMessage.content}"`
+					+ `, created at "${new AlgBotDate(initialMessage.createdTimestamp).getDateString()}")`
+					+ `, userId = ${initialMessage.author.id}`
+					+ `, channelName = "${initialMessage.channel.name}"`
+					+ `, serverName = "${initialMessage.channel.guild.name}")`
+					+ ` : "${messageReplyError}".`
+				));
+		}
+	};
 	deleteMessageAfterSomeSecondsIfNotModified = message => {
 		let currentLastUpdateTimeStamp = message.edits.length === 1 ? message.createdTimestamp : message.editedTimestamp;
 		setTimeout(() => {
