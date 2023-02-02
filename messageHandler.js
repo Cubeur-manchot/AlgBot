@@ -9,6 +9,8 @@ class MessageHandler {
 	};
 	onMessageCreate = message => {
 	};
+	onMessageDelete = message => {
+	};
 };
 
 export {MessageHandler};

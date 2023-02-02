@@ -16,6 +16,7 @@ class DiscordClient extends Discord.Client {
 		this.algBot = algBot;
 		this.on("ready", this.onReady);
 		this.on("messageCreate", () => this.algBot.messageHandler.onMessageCreate);
+		this.on("messageDelete", () => this.algBot.messageHandler.onMessageDelete);
 		this.loginWithToken();
 	};
 	sendTextMessage = (textMessageContent, channel) => {
@@ -31,14 +32,14 @@ class DiscordClient extends Discord.Client {
 	deleteMessage = message => {
 		if (message && !message.deleted) {
 			message.delete()
-				.catch(error => this.algBot.logger.errorLog("Error when deleting message "
+				.catch(deleteMessageError => this.algBot.logger.errorLog("Error when deleting message "
 					+ `(id = ${message.id}`
 					+ `, content = "${message.content}"`
 					+ `, created at "${new AlgBotDate(message.createdTimestamp).getDateString()}")`
 					+ `, userId = ${message.author.id}`
 					+ `, channelName = "${message.channel.name}"`
 					+ `, serverName = "${message.channel.guild.name}")`
-					+ ` : "${error}".`
+					+ ` : "${deleteMessageError}".`
 				));
 		}
 	};
