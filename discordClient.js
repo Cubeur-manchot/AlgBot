@@ -20,7 +20,7 @@ class DiscordClient extends Discord.Client {
 		this.loginWithToken();
 	};
 	sendTextMessage = (textMessageContent, channel) => {
-		channel.send(textMessageContent)
+		channel.send({content: textMessageContent})
 			.catch(error => this.algBot.logger.errorLog("Error when sending message "
 				+ `(content = "${textMessageContent}"`
 				+ `, at "${new AlgBotDate().getDateString()}"`
