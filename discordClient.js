@@ -5,6 +5,8 @@ import Discord from "discord.js";
 class DiscordClient extends Discord.Client {
 	constructor(algBot) {
 		super({intents: [
+			Discord.GatewayIntentBits.Guilds,
+			Discord.GatewayIntentBits.GuildMembers,
 			Discord.GatewayIntentBits.GuildMessages, // messages in servers
 			Discord.GatewayIntentBits.GuildMessageReactions, // reactions to messages in servers
 			Discord.GatewayIntentBits.DirectMessages, // direct messages
@@ -12,8 +14,8 @@ class DiscordClient extends Discord.Client {
 			Discord.GatewayIntentBits.MessageContent // message content
 		]});
 		this.algBot = algBot;
-		this.on("message", this.algBot.messageHandler.onMessage);
 		this.on("ready", this.onReady);
+		this.on("messageCreate", () => this.algBot.messageHandler.onMessageCreate);
 		this.loginWithToken();
 	};
 	sendTextMessage = (textMessageContent, channel) => {

@@ -7,7 +7,7 @@ class MessageHandler {
 		this.algBot = algBot;
 		// todo
 	};
-	onMessage = message => {
+	onMessageCreate = message => {
 	};
 };
 
