@@ -15,8 +15,8 @@ class DiscordClient extends Discord.Client {
 		]});
 		this.algBot = algBot;
 		this.on("ready", this.onReady);
-		this.on("messageCreate", () => this.algBot.messageHandler.onMessageCreate);
-		this.on("messageDelete", () => this.algBot.messageHandler.onMessageDelete);
+		this.on("messageCreate", this.algBot.messageHandler.onMessageCreate);
+		this.on("messageDelete", this.algBot.messageHandler.onMessageDelete);
 		this.loginWithToken();
 	};
 	sendTextMessage = (textMessageContent, channel) => {
