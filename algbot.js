@@ -6,8 +6,10 @@ import {ImageBuilder} from "./imageBuilder.js";
 import {Logger} from "./logger.js";
 import {MessageHandler} from "./messageHandler.js";
 
+const prefix = "²";
+
 class AlgBot {
-	constructor(language, prefix) {
+	constructor(language) {
 		this.language = language;
 		this.prefix = prefix;
 		this.logger = new Logger(this);
