@@ -43,36 +43,19 @@ class DiscordClient extends Discord.Client {
 				));
 		}
 	};
-	replyWithTextMessage = (textMessageContent, initialMessage) => {
+	reply = (answer, initialMessage) => {
 		if (initialMessage && !initialMessage.deleted) {
 			initialMessage.reply({
-				content: textMessageContent,
+				content: answer.textContent,
+				embeds: answer.embed ? [answer.embed] : null,
 				allowedMentions: {
 					repliedUser: false
 				}
 			})
-			.catch(messageReplyError => this.algBot.logger.errorLog(`Error when replying "${textMessageContent}" to initial message `
-				+ `(id = ${initialMessage.id}`
-				+ `, content = "${initialMessage.content}"`
-				+ `, created at "${new AlgBotDate(initialMessage.createdTimestamp).getDateString()}")`
-				+ `, userId = ${initialMessage.author.id}`
-				+ `, channelName = "${initialMessage.channel.name}"`
-				+ `, serverName = "${initialMessage.channel.guild.name}")`
-				+ ` : "${messageReplyError}".`
-			));
-		}
-	};
-	replyWithEmbedMessage = (embedObject, initialMessage) => {
-		if (initialMessage && !initialMessage.deleted) {
-			initialMessage.reply({
-				embeds: [
-					embedObject
-				],
-				allowedMentions: {
-					repliedUser: false
-				}
-			})
-			.catch(messageReplyError => this.algBot.logger.errorLog("Error when replying with an embed to initial message "
+			.catch(messageReplyError => this.algBot.logger.errorLog("Error when replying "
+				+ (answer.textContent ? `"${answer.textContent}"` : "with an embed")
+				+ (answer.buttons ? " and interaction buttons" : "")
+				+ " to initial message "
 				+ `(id = ${initialMessage.id}`
 				+ `, content = "${initialMessage.content}"`
 				+ `, created at "${new AlgBotDate(initialMessage.createdTimestamp).getDateString()}")`
