@@ -7,11 +7,11 @@ class DiscordClient extends Discord.Client {
 		super({intents: [
 			Discord.GatewayIntentBits.Guilds,
 			Discord.GatewayIntentBits.GuildMembers,
-			Discord.GatewayIntentBits.GuildMessages, // messages in servers
-			Discord.GatewayIntentBits.GuildMessageReactions, // reactions to messages in servers
-			Discord.GatewayIntentBits.DirectMessages, // direct messages
-			Discord.GatewayIntentBits.DirectMessageReactions, // reactions to direct messages
-			Discord.GatewayIntentBits.MessageContent // message content
+			Discord.GatewayIntentBits.GuildMessages,
+			Discord.GatewayIntentBits.GuildMessageReactions,
+			Discord.GatewayIntentBits.DirectMessages,
+			Discord.GatewayIntentBits.DirectMessageReactions,
+			Discord.GatewayIntentBits.MessageContent
 		]});
 		this.algBot = algBot;
 		this.on("ready", this.onReady);
