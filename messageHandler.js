@@ -3,6 +3,9 @@
 class MessageHandler {
 	constructor(algBot) {
 		this.algBot = algBot;
+		this.commandHandler = new CommandHandler(this);
+		this.embedHandler = new MessageEmbedHandler(this);
+		this.componentsHandler = new MessageComponentsHandler(this);
 	};
 	onMessageCreate = message => {
 	};
