@@ -8,10 +8,30 @@ class MessageHandler {
 		this.componentsHandler = new MessageComponentsHandler(this);
 	};
 	onMessageCreate = message => {
+		if (this.messageIsAlgBotCommand(message)) {
+			let commandResult = this.commandHandler.getCommandResult(message);
+			this.algBot.discordClient.reply(commandResult.message, message, commandResult.error);
+		}
 	};
 	onMessageDelete = message => {
 		if (this.messageIsAlgBotCommand(message)) {
 			this.algBot.discordClient.deleteMessage(this.findAlgBotAnswer(message));
+		}
+	};
+	onMessageUpdate = (oldMessage, newMessage) => {
+		if (newMessage.author.id !== "217709941081767937") {
+			return;
+		}
+		if (this.messageIsAlgBotCommand(oldMessage)) {
+			let previousAnswer = this.findAlgBotAnswer(oldMessage);
+			if (this.messageIsAlgBotCommand(newMessage)) {
+				let commandResult = this.commandHandler.getCommandResult(newMessage);
+				this.algBot.discordClient.editMessage(previousAnswer, commandResult.message, commandResult.error, newMessage);
+			} else {
+				this.algBot.discordClient.deleteMessage(previousAnswer);
+			}
+		} else {
+			this.onMessageCreate(newMessage);
 		}
 	};
 	messageIsAlgBotCommand = message => {
@@ -29,16 +49,41 @@ class MessageHandler {
 };
 
 class CommandHandler {
+	static unrecognizedCommandLabel = {
+		english: "Unrecognized command",
+		french: "Commande non reconnue"
+	};
 	constructor(messageHandler) {
 		this.messageHandler = messageHandler;
+		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[messageHandler.algBot.language];
 	};
 	getCommandResult = message => {
 		let commandHeader = message.content.split(" ")[0];
 		switch (commandHeader.substring(1)) {
+			case "help":
+				return this.getHelpCommandResult();
+			default:
+				return this.getUnrecognizedCommandResult(commandHeader);
 		}
 	};
 	getErrorMessage = errorMessage => {
 		return `:x: ${errorMessage}.`;
+	};
+	getUnrecognizedCommandResult = commandHeader => {
+		return {
+			message: {
+				textContent: this.getErrorMessage(`${this.unrecognizedCommandLabel} : ${commandHeader}`)
+			},
+			error: true
+		};
+	};
+	getHelpCommandResult = () => {
+		return {
+			message: {
+				textContent: "the help message" // todo
+			},
+			error: false
+		};
 	};
 };
 
