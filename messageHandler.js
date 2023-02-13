@@ -23,6 +23,21 @@ class MessageHandler {
 			this.messageIsAlgBotMessage(channelMessage) && channelMessage.reference.messageId === message.id
 		);
 	};
+};
+
+class CommandHandler {
+	constructor(messageHandler) {
+		this.messageHandler = messageHandler;
+	};
+	getCommandResult = message => {
+		let commandHeader = message.content.split(" ")[0];
+		switch (commandHeader.substring(1)) {
+		}
+	};
+	getErrorMessage = errorMessage => {
+		return `:x: ${errorMessage}.`;
+	};
+};
 
 class MessageEmbedHandler {
 	constructor(messageHandler) {
