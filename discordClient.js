@@ -17,9 +17,11 @@ class DiscordClient extends Discord.Client {
 		this.on("ready", this.onReady);
 		this.on("messageCreate", this.algBot.messageHandler.onMessageCreate);
 		this.on("messageDelete", this.algBot.messageHandler.onMessageDelete);
+		this.on("messageUpdate", this.algBot.messageHandler.onMessageUpdate);
+		this.on("interactionCreate", this.algBot.messageHandler.onInteractionCreate);
 		this.loginWithToken();
 	};
-	sendTextMessage = (textMessageContent, channel) => {
+	/*sendTextMessage = (textMessageContent, channel) => {
 		channel.send({content: textMessageContent})
 			.catch(error => this.algBot.logger.errorLog("Error when sending message "
 				+ `(content = "${textMessageContent}"`
@@ -28,42 +30,85 @@ class DiscordClient extends Discord.Client {
 				+ `, serverName = "${channel.guild.name}")`
 				+ ` : "${error}".`
 			));
-	};
-	deleteMessage = message => {
-		if (message && !message.deleted) {
-			message.delete()
-				.catch(deleteMessageError => this.algBot.logger.errorLog("Error when deleting message "
-					+ `(id = ${message.id}`
-					+ `, content = "${message.content}"`
-					+ `, created at "${new AlgBotDate(message.createdTimestamp).getDateString()}")`
-					+ `, userId = ${message.author.id}`
-					+ `, channelName = "${message.channel.name}"`
-					+ `, serverName = "${message.channel.guild.name}")`
-					+ ` : "${deleteMessageError}".`
-				));
-		}
-	};
-	reply = (answer, initialMessage) => {
+	};*/
+	reply = (answer, initialMessage, deleteIfNotEdited) => {
 		if (initialMessage && !initialMessage.deleted) {
 			initialMessage.reply({
 				content: answer.textContent,
 				embeds: answer.embed ? [answer.embed] : null,
+				components: answer.components,
 				allowedMentions: {
 					repliedUser: false
 				}
 			})
+			.then(() => {
+				if (deleteIfNotEdited) {
+					this.deleteMessageAfterSomeSecondsIfNotModified(initialMessage);
+				}
+			})
 			.catch(messageReplyError => this.algBot.logger.errorLog("Error when replying "
-				+ (answer.textContent ? `"${answer.textContent}"` : "with an embed")
-				+ (answer.buttons ? " and interaction buttons" : "")
+				+ `"${answer.textContent ?? ""}" `
+				+ `(embeds : ${answer.embed ? "1" : "0"}`
+				+ `, components : ${answer.components?.length ?? 0})`
 				+ " to initial message "
-				+ `(id = ${initialMessage.id}`
-				+ `, content = "${initialMessage.content}"`
-				+ `, created at "${new AlgBotDate(initialMessage.createdTimestamp).getDateString()}")`
+				+ `(content = "${initialMessage.content}"`
+				+ `, embeds : ${initialMessage.embeds?.length ?? 0}`
+				+ `, components : ${initialMessage.components?.length ?? 0})`
+				+ `, created at "${new AlgBotDate(initialMessage.createdTimestamp).getDateString()}"`
 				+ `, userId = ${initialMessage.author.id}`
 				+ `, channelName = "${initialMessage.channel.name}"`
 				+ `, serverName = "${initialMessage.channel.guild.name}")`
 				+ ` : "${messageReplyError}".`
 			));
+		}
+	};
+	editMessage = (oldMessage, newMessage, deleteIfNotEdited, answeredMessageToDeleteIfNotEdited) => {
+		if (oldMessage && !oldMessage.deleted) {
+			oldMessage.edit({
+				content: newMessage.textContent,
+				embeds: newMessage.embed ? [newMessage.embed] : null,
+				components: newMessage.components,
+				allowedMentions: {
+					repliedUser: false
+				}
+			})
+			.then(() => {
+				if (deleteIfNotEdited) {
+					this.deleteMessageAfterSomeSecondsIfNotModified(answeredMessageToDeleteIfNotEdited);
+				}
+			})
+			.catch(messageReplyError => this.algBot.logger.errorLog("Error when editing message from "
+				+ `"${oldMessage.textContent ?? ""}" `
+				+ `(embeds : ${oldMessage.embeds??length ?? 0}`
+				+ `, components : ${oldMessage.components?.length ?? 0}`
+				+ `, created at "${new AlgBotDate(oldMessage.createdTimestamp).getDateString()}"`
+				+ `, userId = ${oldMessage.author.id}`
+				+ `, channelName = "${oldMessage.channel.name}"`
+				+ `, serverName = "${oldMessage.channel.guild.name}")`
+				+ " to "
+				+ `"${newMessage.textContent ?? ""}" `
+				+ `(embeds : ${newMessage.embed ? "1" : "0"}`
+				+ `, components : ${newMessage.components ? newMessage.components.length : "0"})`
+				+ ` : "${messageReplyError}".`
+			));
+		}
+	};
+	deleteMessage = message => {
+		if (message) {
+			message.delete()
+				.catch(deleteMessageError => {
+					if (deleteMessageError !== "DiscordAPIError[10008]: Unknown Message") { // when the message was not already deleted
+						this.algBot.logger.errorLog("Error when deleting message "
+							+ `(content = "${message.content}"`
+							+ `, embeds : ${message.embeds?.length ?? 0}`
+							+ `, components : ${message.components?.length ?? 0}`
+							+ `, created at "${new AlgBotDate(message.createdTimestamp).getDateString()}"`
+							+ `, userId = ${message.author.id}`
+							+ `, channelName = "${message.channel.name}"`
+							+ `, serverName = "${message.channel.guild.name}")`
+							+ ` : "${deleteMessageError}".`);
+					}
+				});
 		}
 	};
 	deleteMessageAfterSomeSecondsIfNotModified = message => {
