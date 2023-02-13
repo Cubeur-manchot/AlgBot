@@ -25,4 +25,40 @@ class MessageHandler {
 	};
 };
 
+class MessageComponentsHandler {
+	static componentTypes = {
+		row: 1,
+		button: 2,
+		select: 3
+	};
+	static buttonStyles = {
+		primary: 1,
+		link: 5
+	};
+	constructor(messageHandler) {
+		this.messageHandler = messageHandler;
+	};
+	createLinkButton = (label, url) => {
+		return {
+			type: MessageComponentsHandler.componentTypes.button,
+			style: MessageComponentsHandler.buttonStyles.link,
+			label: label,
+			url: url
+		};
+	};
+	createSelect = valueLabelPairs => {
+		return {
+			type: MessageComponentsHandler.componentTypes.select,
+			options: valueLabelPairs,
+			custom_id: "selectCustomId"
+		};
+	};
+	createRow = components => {
+		return {
+			type: MessageComponentsHandler.componentTypes.row,
+			components: components
+		};
+	};
+}
+
 export {MessageHandler};
