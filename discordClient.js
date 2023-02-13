@@ -67,7 +67,7 @@ class DiscordClient extends Discord.Client {
 		}
 	};
 	deleteMessageAfterSomeSecondsIfNotModified = message => {
-		let currentLastUpdateTimeStamp = message.edits.length === 1 ? message.createdTimestamp : message.editedTimestamp;
+		let currentLastUpdateTimeStamp = message.editedTimestamp ?? message.createdTimestamp;
 		setTimeout(() => {
 			if (message.editedTimestamp <= currentLastUpdateTimeStamp) {
 				this.deleteMessage(message);
