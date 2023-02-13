@@ -23,6 +23,11 @@ class MessageHandler {
 			this.messageIsAlgBotMessage(channelMessage) && channelMessage.reference.messageId === message.id
 		);
 	};
+
+class MessageEmbedHandler {
+	constructor(messageHandler) {
+		this.messageHandler = messageHandler;
+	};
 };
 
 class MessageComponentsHandler {
