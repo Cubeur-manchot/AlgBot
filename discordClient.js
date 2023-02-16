@@ -66,8 +66,8 @@ class DiscordClient extends Discord.Client {
 		if (oldMessage && !oldMessage.deleted) {
 			oldMessage.edit({
 				content: newMessage.textContent,
-				embeds: newMessage.embed ? [newMessage.embed] : null,
-				components: newMessage.components,
+				embeds: newMessage.embed ? [newMessage.embed] : [],
+				components: newMessage.components ?? [],
 				allowedMentions: {
 					repliedUser: false
 				}
