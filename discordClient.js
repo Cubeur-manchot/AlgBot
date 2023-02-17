@@ -77,7 +77,7 @@ class DiscordClient extends Discord.Client {
 					this.deleteMessageAfterSomeSecondsIfNotModified(answeredMessageToDeleteIfNotEdited);
 				}
 			})
-			.catch(messageReplyError => this.algBot.logger.errorLog("Error when editing message from "
+			.catch(messageEditError => this.algBot.logger.errorLog("Error when editing message from "
 				+ `"${oldMessage.textContent ?? ""}" `
 				+ `(embeds : ${oldMessage.embeds??length ?? 0}`
 				+ `, components : ${oldMessage.components?.length ?? 0}`
@@ -89,7 +89,7 @@ class DiscordClient extends Discord.Client {
 				+ `"${newMessage.textContent ?? ""}" `
 				+ `(embeds : ${newMessage.embed ? "1" : "0"}`
 				+ `, components : ${newMessage.components ? newMessage.components.length : "0"})`
-				+ ` : "${messageReplyError}".`
+				+ ` : "${messageEditError}".`
 			));
 		}
 	};
