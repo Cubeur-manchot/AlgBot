@@ -53,7 +53,7 @@ class DiscordClient extends Discord.Client {
 				+ " to initial message "
 				+ `(content = "${initialMessage.content}"`
 				+ `, embeds : ${initialMessage.embeds?.length ?? 0}`
-				+ `, components : ${initialMessage.components?.length ?? 0})`
+				+ `, components : ${initialMessage.components?.length ?? 0}`
 				+ `, created at "${new AlgBotDate(initialMessage.createdTimestamp).getDateString()}"`
 				+ `, userId = ${initialMessage.author.id}`
 				+ `, channelName = "${initialMessage.channel.name}"`
