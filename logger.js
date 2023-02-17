@@ -1,14 +1,19 @@
 "use strict";
 
+import {AlgBotDate} from "./date.js";
+
 class Logger {
 	constructor(algBot) {
 		this.algBot = algBot;
 	};
 	infoLog = infoMessage => {
-		console.log(`[Info] ${infoMessage}`);
+		console.log(`${this.getTimeStamp()}[Info] ${infoMessage}`);
 	};
 	errorLog = errorMessage => {
-		console.error(`[Error] ${errorMessage}`);
+		console.error(`${this.getTimeStamp()}[Error] ${errorMessage}`);
+	};
+	getTimeStamp = () => {
+		return `[${new AlgBotDate().getDateString()}]`;
 	};
 };
 
