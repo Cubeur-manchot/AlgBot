@@ -94,6 +94,7 @@ class CommandHandler {
 	getHelpCommandResult = () => {
 		return {
 			message: {
+				textContent: null,
 				embed: this.messageHandler.embedHandler.generalHelpEmbed,
 				components: this.messageHandler.componentsHandler.createHelpComponents("general")
 			},
