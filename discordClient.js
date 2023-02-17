@@ -1,6 +1,7 @@
 "use strict";
 
 import Discord from "discord.js";
+import {AlgBotDate} from "./date.js";
 
 class DiscordClient extends Discord.Client {
 	constructor(algBot) {
@@ -140,22 +141,6 @@ class DiscordClient extends Discord.Client {
 			case "english": return "learning new algs";
 		}
 	};
-};
-
-class AlgBotDate extends Date {
-	constructor(timestamp) {
-		super(timestamp);
-	};
-	getDateString = () =>
-		`${this.getYearString()}-${this.getMonthString()}-${this.getDayString()} `
-		+ `${this.getHoursString()}:${this.getMinutesString()}:${this.getSecondsString()}`;
-	getStringTwoDigits = value => `${value < 10 ? "0" : ""}${value}`;
-	getYearString = () => `${this.getFullYear()}`;
-	getMonthString = () => this.getStringTwoDigits(this.getMonth() + 1);
-	getDayString = () => this.getStringTwoDigits(this.getDate());
-	getHoursString = () => this.getStringTwoDigits(this.getHours());
-	getMinutesString = () => this.getStringTwoDigits(this.getMinutes());
-	getSecondsString = () => this.getStringTwoDigits(this.getSeconds());
 };
 
 export {DiscordClient};
