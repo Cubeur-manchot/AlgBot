@@ -1,5 +1,7 @@
 "use strict";
 
+import {OptionsHandler} from "./optionsHandler.js";
+
 class MessageHandler {
 	constructor(algBot) {
 		this.algBot = algBot;
@@ -67,15 +69,29 @@ class CommandHandler {
 		english: "Unrecognized command",
 		french: "Commande non reconnue"
 	};
+	static invalidOptionsLabel = {
+		english: "Invalid option(s)",
+		french: "Option(s) incorrecte(s)"
+	};
+	static invalidMoveSequence = {
+		english: "Invalid move sequence",
+		french: "Algorithme incorrect"
+	};
 	constructor(messageHandler) {
 		this.messageHandler = messageHandler;
+		this.optionsHandler = new OptionsHandler(this);
 		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[messageHandler.algBot.language];
+		this.invalidOptionsLabel = CommandHandler.invalidOptionsLabel[messageHandler.algBot.language];
+		this.invalidMoveSequence = CommandHandler.invalidMoveSequence[messageHandler.algBot.language];
 	};
 	getCommandResult = message => {
 		let commandHeader = message.content.split(" ")[0];
 		switch (commandHeader.substring(1)) {
 			case "help":
 				return this.getHelpCommandResult();
+			case "alg":
+			case "do":
+				return this.getAlgOrDoCommandResult(message.content);
 			default:
 				return this.getUnrecognizedCommandResult(commandHeader);
 		}
@@ -100,6 +116,21 @@ class CommandHandler {
 			},
 			error: false
 		};
+	};
+	getAlgOrDoCommandResult = command => {
+		let [commandHeader, moves, options, comment] = command
+			.replace(/(?<!\s.*)\s/, "  ")
+			.split(/(?<!\s.*)\s|(?<!\s-.*|\/\/.*)\s+(?=-|\/\/)|(?<!\/\/.*)\s*\/\/\s*/);
+		let parsedOptions = this.optionsHandler.parseOptions(options ?? "");
+		if (parsedOptions.errors.length) {
+			return {
+				message: {
+					textContent: this.getErrorMessage(`${this.invalidOptionsLabel} :\n`
+						+ parsedOptions.errors.map(error => `${error.message} : ${error.option}`).join(".\n"))
+				},
+				error: true
+			};
+		}
 	};
 };
 
