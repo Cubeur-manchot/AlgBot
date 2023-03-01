@@ -131,6 +131,16 @@ class CommandHandler {
 				error: true
 			};
 		}
+		let parsedMoveSequence = this.messageHandler.algBot.algManipulator.parseMoveSequence(moves ?? "");
+		if (parsedMoveSequence.errors.length) {
+			return {
+				message: {
+					textContent: this.getErrorMessage(`${this.invalidMoveSequence} :\n`
+						+ parsedMoveSequence.errors.map(error => `${error.message}${error.scope ? ` : ${error.scope}` : ""}`).join(".\n"))
+				},
+				error: true
+			};
+		}
 	};
 };
 
