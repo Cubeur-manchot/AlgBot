@@ -206,6 +206,30 @@ class AlgManipulator {
 	repeatSequence = (moveSequence, times) => {
 		return Array(times).fill(moveSequence).join(" ");
 	};
+	countMoves = moveSequence => {
+		let moveCounts = {
+			htm: 0,
+			stm: 0,
+			qtm: 0,
+			etm: 0
+		};
+		for (let move of moveSequence.split(" ")) {
+			if (/[xyz]/.test(move)) { // rotation moves : x
+				moveCounts.etm++;
+			} else if (/(?<!\d)[RUFLDB]|(?<!-.*)([RUFLDB]w|[rufldb])/.test(move)) { // outer block moves : R, Rw, r, 3Rw, 3r
+				moveCounts.htm++;
+				moveCounts.stm++;
+				moveCounts.qtm += parseInt((move.match(/(?<=[RUFLDBrufldb].*)\d+/) ?? ["1"])[0]);
+				moveCounts.etm++;
+			} else { // inner slice moves : M, 2R, 2-3Rw
+				moveCounts.htm += 2;
+				moveCounts.stm++;
+				moveCounts.qtm += parseInt((move.match(/(?<=[MESRUFLDBrufldb].*)\d+/) ?? ["1"])[0]);
+				moveCounts.etm++;
+			}
+		}
+		return moveCounts;
+	};
 };
 
 class AlgCollection {
