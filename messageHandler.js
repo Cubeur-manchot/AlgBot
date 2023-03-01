@@ -141,6 +141,10 @@ class CommandHandler {
 				error: true
 			};
 		}
+		if (Object.values(parsedOptions.countMoves).includes(true)) {
+			let moveCounts = this.messageHandler.algBot.algManipulator.countMoves(parsedMoveSequence.moveSequence);
+			parsedMoveSequence.moveCounts = moveCounts;
+		}
 	};
 };
 
