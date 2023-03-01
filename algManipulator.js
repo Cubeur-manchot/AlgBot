@@ -206,6 +206,24 @@ class AlgManipulator {
 	repeatSequence = (moveSequence, times) => {
 		return Array(times).fill(moveSequence).join(" ");
 	};
+	replaceMiddleSliceMoves = (moveSequence, cubeSize) => {
+		return moveSequence
+			.split(" ")
+			.map(move => {
+				if (/^\d+[MES]/.test(move)) {
+					let sliceCount = parseInt(move.match(/^\d+/)[0]);
+					let sliceLayer = move.match(/[MES]/)[0];
+					let outerSliceCount = (cubeSize - sliceCount) / 2;
+					let newMove = `${outerSliceCount + 1}-${cubeSize - outerSliceCount}`
+						+ (sliceLayer === "M" ? "R" : sliceLayer === "E" ? "U" : "F")
+						+ `w${move.replace(/^\d+[MES]/, "")}`;
+					return sliceLayer !== "S" ? this.invertMove(newMove) : newMove;
+				} else {
+					return move;
+				}
+			})
+			.join(" ");
+	};
 	countMoves = moveSequence => {
 		let moveCounts = {
 			htm: 0,

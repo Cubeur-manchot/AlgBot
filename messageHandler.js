@@ -141,16 +141,33 @@ class CommandHandler {
 				error: true
 			};
 		}
+		if (commandHeader.endsWith("do")) {
+			parsedOptions.isDo = true;
+		}
 		if (Object.values(parsedOptions.countMoves).includes(true)) {
 			let moveCounts = this.messageHandler.algBot.algManipulator.countMoves(parsedMoveSequence.moveSequence);
 			parsedMoveSequence.moveCounts = moveCounts;
 		}
+		parsedMoveSequence.comment = comment;
+		return {
+			message: {
+				textContent: null,
+				embed: this.messageHandler.embedHandler.createAlgEmbed(parsedMoveSequence, parsedOptions),
+				components: null // todo reactivate -rotatable with buttons
+			},
+			error: false
+		};
 	};
 };
 
 class MessageEmbedHandler {
 	static embedColors = {
-		help: 0xcccc00 // yellow
+		help: 0xcccc00, // yellow
+		alg: 0x0099ff // blue
+	};
+	static embedSizeLimits = {
+		title: 256,
+		description: 4096
 	};
 	static generalHelpEmbedTitle = {
 		english: "Help",
@@ -281,6 +298,36 @@ class MessageEmbedHandler {
 			title: MessageEmbedHandler.optionsHelpEmbedTitle[this.messageHandler.algBot.language],
 			description: MessageEmbedHandler.optionsHelpEmbedMessage[this.messageHandler.algBot.language]
 		};
+	};
+	createAlgEmbed = (moveSequenceObject, optionsObject) => {
+		let moveSequenceWithLimit = this.applyDiscordEmbedLimits(moveSequenceObject.moveSequence, MessageEmbedHandler.embedSizeLimits.title);
+		let cube = optionsObject.puzzle.replace("cube", "");
+		let commentWithLimit = moveSequenceObject.comment
+			? this.applyDiscordEmbedLimits(moveSequenceObject.comment, MessageEmbedHandler.embedSizeLimits.description)
+			: null;
+		let moveCounts = moveSequenceObject.moveCounts
+			? Object.keys(moveSequenceObject.moveCounts)
+				.filter(metric => optionsObject.countMoves[metric] === true)
+				.map(metric => `${moveSequenceObject.moveCounts[metric]} ${metric.toUpperCase()}`)
+			: null;
+		let moveSequenceForAlgCubingNet =
+			this.messageHandler.algBot.algManipulator.replaceMiddleSliceMoves(moveSequenceObject.moveSequence, parseInt(cube.match(/\d+/)[0]))
+			.replace(/\s/g, "%20") // replace spaces
+			.replace(/-/g, "%26%2345%3B"); // replace hyphen characters
+		let url = `https://alg.cubing.net/?alg=${moveSequenceForAlgCubingNet}`
+			+ (optionsObject.isDo ? "" : `&setup=(${moveSequenceForAlgCubingNet})-`)
+			+ `&puzzle=${cube}`;
+		return {
+			color: MessageEmbedHandler.embedColors.alg,
+			title: moveSequenceWithLimit,
+			url: url,
+			description: `${moveCounts ? `(${moveCounts.join(", ")})` : ""}${moveCounts || commentWithLimit ? "\n" : ""}${commentWithLimit ?? ""}`
+		};
+	};
+	applyDiscordEmbedLimits = (fieldValue, discordLimit) => {
+		return fieldValue.length <= discordLimit
+			? fieldValue
+			: `${fieldValue.substring(0, discordLimit - 3)}...`;
 	};
 };
 
