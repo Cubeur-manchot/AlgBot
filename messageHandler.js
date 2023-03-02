@@ -310,19 +310,45 @@ class MessageEmbedHandler {
 				.filter(metric => optionsObject.countMoves[metric] === true)
 				.map(metric => `${moveSequenceObject.moveCounts[metric]} ${metric.toUpperCase()}`)
 			: null;
+		let cubeSize = parseInt(cube.match(/\d+/)[0]);
 		let moveSequenceForAlgCubingNet =
-			this.messageHandler.algBot.algManipulator.replaceMiddleSliceMoves(moveSequenceObject.moveSequence, parseInt(cube.match(/\d+/)[0]))
+			this.messageHandler.algBot.algManipulator.replaceMiddleSliceMoves(moveSequenceObject.moveSequence, cubeSize)
 			.replace(/\s/g, "%20") // replace spaces
 			.replace(/-/g, "%26%2345%3B"); // replace hyphen characters
-		let url = `https://alg.cubing.net/?alg=${moveSequenceForAlgCubingNet}`
+		let visualCubeImageUrl = this.buildVisualCubeUrl(moveSequenceForAlgCubingNet, moveSequenceObject, optionsObject);
+		let algCubingNetUrl = `https://alg.cubing.net/?alg=${moveSequenceForAlgCubingNet}`
 			+ (optionsObject.isDo ? "" : `&setup=(${moveSequenceForAlgCubingNet})-`)
 			+ `&puzzle=${cube}`;
 		return {
 			color: MessageEmbedHandler.embedColors.alg,
 			title: moveSequenceWithLimit,
-			url: url,
-			description: `${moveCounts ? `(${moveCounts.join(", ")})` : ""}${moveCounts || commentWithLimit ? "\n" : ""}${commentWithLimit ?? ""}`
+			url: algCubingNetUrl,
+			description: `${moveCounts ? `(${moveCounts.join(", ")})` : ""}${moveCounts || commentWithLimit ? "\n" : ""}${commentWithLimit ?? ""}`,
+			image: {
+				url: visualCubeImageUrl
+			}
 		};
+	};
+	buildVisualCubeUrl = (moveSequence, moveSequenceObject, optionsObject) => {
+		let moveSequenceForVisualCube =
+			this.messageHandler.algBot.algManipulator.replaceInnerSliceMoves(moveSequence)
+			.replace(/\s/, "%20") // replace spaces
+			.replace(/'/, "%27"); // replace apostrophes
+		let caseOrAlg = moveSequenceObject.isDo ? "alg" : "case";
+		let stage = optionsObject.stage;
+		let view = optionsObject.view === OptionsHandler.planView ? "&view=plan" : "";
+		let puzzle = optionsObject.puzzle.match(/\d+/)[0];
+		let colorScheme = [
+			optionsObject.colorScheme.U,
+			optionsObject.colorScheme.R,
+			optionsObject.colorScheme.F,
+			optionsObject.colorScheme.D,
+			optionsObject.colorScheme.L,
+			optionsObject.colorScheme.B]
+			.map(color => color[0]) // keep first letter only
+			.join("");
+		let urlBegin = "http://cube.rider.biz/visualcube.php?fmt=png&bg=t&size=150";
+		return `${urlBegin}${view}&pzl=${puzzle}&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube}`;
 	};
 	applyDiscordEmbedLimits = (fieldValue, discordLimit) => {
 		return fieldValue.length <= discordLimit

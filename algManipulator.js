@@ -224,6 +224,24 @@ class AlgManipulator {
 			})
 			.join(" ");
 	};
+	replaceInnerSliceMoves = moveSequence => {
+		let simplifiedMoveSequence = [];
+		for (let move of moveSequence.split(" ")) {
+			if (/\d[RUFLDB](?!w)/.test(move)) { // moves of the form 3R
+				let [sliceNumber, face, restOfMove] = move.split(/([RUFLDB])/);
+				simplifiedMoveSequence.push(`${sliceNumber}${face}w${restOfMove}`);
+				simplifiedMoveSequence.push(this.invertMove(`${parseInt(sliceNumber) - 1}${face}w${restOfMove}`));
+			} else if (/\d+-\d[RUFLDB]/.test(move)) { // moves of the form 2-4Rw
+				let [, firstSliceNumber, , secondSliceNumber, ...restOfMove] = move.split(/(\d+)/);
+				restOfMove = restOfMove.join("");
+				simplifiedMoveSequence.push(`${firstSliceNumber}${face}w${restOfMove}`);
+				simplifiedMoveSequence.push(this.invertMove(`${parseInt(secondSliceNumber) - 1}${face}w${restOfMove}`));
+			} else {
+				simplifiedMoveSequence.push(move);
+			}
+		}
+		return simplifiedMoveSequence.join(" ");
+	};
 	countMoves = moveSequence => {
 		let moveCounts = {
 			htm: 0,
