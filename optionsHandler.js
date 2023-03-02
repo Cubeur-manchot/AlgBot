@@ -69,7 +69,7 @@ class OptionsHandler {
 		holoCube: false,
 		puzzle: "cube3x3x3",
 		stage: "pll",
-		view: "plan",
+		view: OptionsHandler.planView,
 		countMoves: {
 			htm: false,
 			stm: false,
@@ -108,6 +108,7 @@ class OptionsHandler {
 	};
 	parseOptions = options => {
 		let optionsResult = structuredClone(OptionsHandler.defaultOptions);
+		let forcedView = null;
 		for (let rawOption of options.split(" ").filter(option => option.length !== 0)) {
 			if (!rawOption.startsWith("-")) {
 				optionsResult.errors.push({
@@ -131,7 +132,7 @@ class OptionsHandler {
 				optionsResult.stage = option;
 				optionsResult.view = OptionsHandler.isometricView;
 			} else if (OptionsHandler.views.includes(option)) {
-				optionsResult.view = option;
+				forcedView = option;
 			} else if (OptionsHandler.metrics.includes(option)) {
 				optionsResult.countMoves[option] = true;
 			} else if (option === "count") { // shortcut for all metrics
@@ -148,6 +149,9 @@ class OptionsHandler {
 					message: this.unrecognizedOptionErrorMessage
 				})
 			}
+		}
+		if (forcedView) {
+			optionsResult.view = forcedView;
 		}
 		return optionsResult;
 	};
