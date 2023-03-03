@@ -42,7 +42,23 @@ class DiscordClient extends Discord.Client {
 					repliedUser: false
 				}
 			})
-			.then(() => {
+			.then(answerMessage => {
+				if (answer.reactions) {
+					for (let reaction of answer.reactions) {
+						answerMessage.react(reaction)
+							.catch(messageReactError => this.algBot.logger.errorLog(
+								`Error when reacting "${reaction}" to message `
+								+ `(content = "${answerMessage.content}"`
+								+ `, embeds : ${answerMessage.embeds?.length ?? 0}`
+								+ `, components : ${answerMessage.components?.length ?? 0}`
+								+ `, created at "${new AlgBotDate(answerMessage.createdTimestamp).getDateString()}"`
+								+ `, userId = ${answerMessage.author.id}`
+								+ `, channelName = "${answerMessage.channel.name}"`
+								+ `, serverName = "${answerMessage.channel.guild.name}")`
+								+ ` : "${messageReactError}".`
+							));
+					}
+				}
 				if (deleteIfNotEdited) {
 					this.deleteMessageAfterSomeSecondsIfNotModified(initialMessage);
 				}
@@ -73,7 +89,36 @@ class DiscordClient extends Discord.Client {
 					repliedUser: false
 				}
 			})
-			.then(() => {
+			.then(editedMessage => {
+				if (newMessage.reactions) {
+					for (let reaction of newMessage.reactions) {
+						editedMessage.react(reaction)
+							.catch(messageReactError => this.algBot.logger.errorLog(
+								`Error when reacting "${reaction}" to message `
+								+ `(content = "${editedMessage.content}"`
+								+ `, embeds : ${editedMessage.embeds?.length ?? 0}`
+								+ `, components : ${editedMessage.components?.length ?? 0}`
+								+ `, created at "${new AlgBotDate(editedMessage.createdTimestamp).getDateString()}"`
+								+ `, userId = ${editedMessage.author.id}`
+								+ `, channelName = "${editedMessage.channel.name}"`
+								+ `, serverName = "${editedMessage.channel.guild.name}")`
+								+ ` : "${messageReactError}".`
+							));
+					}
+				} else {
+					editedMessage.reactions.removeAll()
+						.catch(messageReactionRemoveError => this.algBot.logger.errorLog(
+							"Error when removing all reactions of message "
+							+ `(content = "${editedMessage.content}"`
+							+ `, embeds : ${editedMessage.embeds?.length ?? 0}`
+							+ `, components : ${editedMessage.components?.length ?? 0}`
+							+ `, created at "${new AlgBotDate(editedMessage.createdTimestamp).getDateString()}"`
+							+ `, userId = ${editedMessage.author.id}`
+							+ `, channelName = "${editedMessage.channel.name}"`
+							+ `, serverName = "${editedMessage.channel.guild.name}")`
+							+ ` : "${messageReactionRemoveError}".`
+						));
+				}
 				if (deleteIfNotEdited) {
 					this.deleteMessageAfterSomeSecondsIfNotModified(answeredMessageToDeleteIfNotEdited);
 				}

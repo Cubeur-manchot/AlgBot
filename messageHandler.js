@@ -153,7 +153,8 @@ class CommandHandler {
 			message: {
 				textContent: null,
 				embed: this.messageHandler.embedHandler.createAlgEmbed(parsedMoveSequence, parsedOptions),
-				components: null // todo reactivate -rotatable with buttons
+				components: null, // todo reactivate -rotatable with buttons
+				reactions: ["❤", "💩", "🥇", "👽"]
 			},
 			error: false
 		};
