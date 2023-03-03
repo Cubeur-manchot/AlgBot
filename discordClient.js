@@ -22,16 +22,6 @@ class DiscordClient extends Discord.Client {
 		this.on("interactionCreate", this.algBot.messageHandler.onInteractionCreate);
 		this.loginWithToken();
 	};
-	/*sendTextMessage = (textMessageContent, channel) => {
-		channel.send({content: textMessageContent})
-			.catch(error => this.algBot.logger.errorLog("Error when sending message "
-				+ `(content = "${textMessageContent}"`
-				+ `, at "${new AlgBotDate().getDateString()}"`
-				+ `, channelName = "${channel.name}"`
-				+ `, serverName = "${channel.guild.name}")`
-				+ ` : "${error}".`
-			));
-	};*/
 	reply = (answer, initialMessage, deleteIfNotEdited) => {
 		if (initialMessage && !initialMessage.deleted) {
 			initialMessage.reply({
