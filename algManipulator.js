@@ -56,7 +56,6 @@ class AlgManipulator {
 		this.unrecognizedMoveErrorMessage = AlgManipulator.unrecognizedMoveErrorMessage[this.algBot.language];
 	};
 	parseMoveSequence = moveSequenceString => {
-		// todo clean errors : structures detection
 		let errors = [];
 		let openingSeparators = ["[", "("];
 		let middleSeparators = [",", ":"];
@@ -100,19 +99,24 @@ class AlgManipulator {
 					partialMoveSequence: ""
 				});
 			} else if (middleSeparators.includes(moveSequenceChunk)) { // middle separator
-				let openingSeparator = stack[stack.length - 1].openingSeparator;
+				if (stack.length < 2) {
+					errors.push({
+						scope: moveSequenceChunk,
+						message: this.middleSeparatorOutOfBracketsErrorMessage
+					});
+					break;
+				}
+				let openingSeparator = stack[stack.length - 2].openingSeparator;
 				if (openingSeparator === "[") {
 					stack[stack.length - 2].middleSeparator = moveSequenceChunk;
 					stack[stack.length - 2].leftMember = stack[stack.length - 1].partialMoveSequence;
-					stack[length - 1] = {
+					stack[stack.length - 1] = {
 						partialMoveSequence: ""
 					};
 				} else {
 					errors.push({
 						scope: moveSequenceChunk,
-						message: openingSeparator === "("
-							? this.middleSeparatorInParenthesisErrorMessage
-							: this.middleSeparatorOutOfBracketsErrorMessage
+						message: this.middleSeparatorInParenthesisErrorMessage
 					});
 					break;
 				}
@@ -125,7 +129,9 @@ class AlgManipulator {
 					});
 					break;
 				}
-				if (closingSeparator !== stack[stack.length - 2].openingSeparator) {
+				let openingSeparator = stack[stack.length - 2].openingSeparator;
+				if ((openingSeparator === "(" && closingSeparator !== ")")
+					|| (openingSeparator === "[" && closingSeparator !== "]")) {
 					errors.push({
 						scope: closingSeparator,
 						message: this.wrongClosingCharacterErrorMessage
