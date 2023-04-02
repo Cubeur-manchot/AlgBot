@@ -229,13 +229,20 @@ class AlgManipulator {
 		for (let move of moveSequence.split(" ")) {
 			if (/\d[RUFLDB](?!w)/.test(move)) { // moves of the form 3R
 				let [sliceNumber, face, restOfMove] = move.split(/([RUFLDB])/);
-				simplifiedMoveSequence.push(`${sliceNumber}${face}w${restOfMove}`);
-				simplifiedMoveSequence.push(this.invertMove(`${parseInt(sliceNumber) - 1}${face}w${restOfMove}`));
+				simplifiedMoveSequence.push(`${sliceNumber}${face}${sliceNumber > 1 ? "w" : ""}${restOfMove}`);
+				simplifiedMoveSequence.push(this.invertMove(`${parseInt(sliceNumber) - 1}${face}${sliceNumber > 2 ? "w" : ""}${restOfMove}`));
 			} else if (/\d+-\d[RUFLDB]/.test(move)) { // moves of the form 2-4Rw
-				let [, firstSliceNumber, , secondSliceNumber, ...restOfMove] = move.split(/(\d+)/);
+				let [, firstSliceNumber, , secondSliceNumber, face, ...restOfMove] = move.split(/(\d+)/);
+				firstSliceNumber = parseInt(firstSliceNumber);
+				secondSliceNumber = parseInt(secondSliceNumber);
+				[firstSliceNumber, secondSliceNumber] = [
+					Math.min(firstSliceNumber, secondSliceNumber),
+					Math.max(firstSliceNumber, secondSliceNumber)
+				];
+				face = face.replace("w", "");
 				restOfMove = restOfMove.join("");
-				simplifiedMoveSequence.push(`${firstSliceNumber}${face}w${restOfMove}`);
-				simplifiedMoveSequence.push(this.invertMove(`${parseInt(secondSliceNumber) - 1}${face}w${restOfMove}`));
+				simplifiedMoveSequence.push(`${secondSliceNumber}${face}${secondSliceNumber > 1 ? "w" : ""}${restOfMove}`);
+				simplifiedMoveSequence.push(this.invertMove(`${firstSliceNumber - 1}${face}${firstSliceNumber > 2 ? "w" : ""}${restOfMove}`));
 			} else {
 				simplifiedMoveSequence.push(move);
 			}
