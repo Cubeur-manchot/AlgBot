@@ -46,7 +46,9 @@ class MessageHandler {
 				embeds: [this.embedHandler[`${interactionValue}HelpEmbed`]],
 				components: this.componentsHandler.createHelpComponents(interactionValue)
 			})
-			.catch(console.error);
+			.catch(interactionCreateError => this.algBot.logger.errorLog(
+				`Fail to create interaction on StringSelect component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
+			))
 		}
 		//else if (interaction.isButton()) { ... }
 	};
