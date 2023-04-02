@@ -41,8 +41,32 @@ class AlgManipulator {
 		english: "Unrecognized move",
 		french: "Mouvement non reconnu"
 	};
+	static xAxisCommutingGroup = "xRLrlM";
+	static yAxisCommutingGroup = "yUDudE";
+	static zAxisCommutingGroup = "zFBfbS";
+	static commutingGroupForMoveLetter = {
+		x: AlgManipulator.xAxisCommutingGroup,
+		R: AlgManipulator.xAxisCommutingGroup,
+		L: AlgManipulator.xAxisCommutingGroup,
+		r: AlgManipulator.xAxisCommutingGroup,
+		l: AlgManipulator.xAxisCommutingGroup,
+		M: AlgManipulator.xAxisCommutingGroup,
+		y: AlgManipulator.yAxisCommutingGroup,
+		U: AlgManipulator.yAxisCommutingGroup,
+		D: AlgManipulator.yAxisCommutingGroup,
+		u: AlgManipulator.yAxisCommutingGroup,
+		d: AlgManipulator.yAxisCommutingGroup,
+		E: AlgManipulator.yAxisCommutingGroup,
+		z: AlgManipulator.zAxisCommutingGroup,
+		F: AlgManipulator.zAxisCommutingGroup,
+		B: AlgManipulator.zAxisCommutingGroup,
+		f: AlgManipulator.zAxisCommutingGroup,
+		b: AlgManipulator.zAxisCommutingGroup,
+		S: AlgManipulator.zAxisCommutingGroup
+	};
 	constructor(algBot) {
 		this.algBot = algBot;
+		this.algMerger = new AlgMerger(this);
 		this.algCollection = new AlgCollection(this);
 		this.unclosedCommutatorErrorMessage = AlgManipulator.unclosedCommutatorErrorMessage[this.algBot.language];
 		this.unclosedConjugateErrorMessage = AlgManipulator.unclosedConjugateErrorMessage[this.algBot.language];
@@ -278,6 +302,234 @@ class AlgManipulator {
 			}
 		}
 		return moveCounts;
+	};
+};
+
+class AlgMerger {
+	constructor(algManipulator) {
+		this.algManipulator = algManipulator;
+	};
+	mergeMoves = (moveSequence, cubeSize) => {
+		let moveRegex = /([RUFLDBrufldbxyzMES])/;
+		let previousCommutingGroup = null;
+		let commutingGroups = [];
+		for (let move of moveSequence.split(" ")) {
+			let [prefix, moveLetter, suffix] = move.split(moveRegex);
+			let moveObject = {
+				moveString: move,
+				prefix: prefix,
+				moveLetter: moveLetter,
+				suffix: suffix
+			};
+			let commutingGroup = AlgManipulator.commutingGroupForMoveLetter[moveLetter];
+			if (commutingGroup === previousCommutingGroup) {
+				commutingGroups[commutingGroups.length - 1].moves.push(moveObject);
+			} else {
+				commutingGroups.push({
+					commutingGroup: commutingGroup,
+					moves: [moveObject],
+					merged: false
+				});
+				previousCommutingGroup = commutingGroup;
+			}
+		}
+		do {
+			commutingGroups = commutingGroups.filter(
+				commutingGroup => commutingGroup.length !== 0);
+			for (let commutingGroup of commutingGroups) {
+				if (commutingGroup.length === 1 || commutingGroup.merged) {
+					continue;
+				}
+				commutingGroup.moves.forEach((move, index) => {
+					this.parseForMerging(move, cubeSize); // extended parsing for merging
+					move.index = index;
+				});
+				commutingGroup.moves = this.simpleCancel(commutingGroup.moves); // cancel moves with same slice intervals
+				commutingGroup.moves = this.advancedCancel(commutingGroup.moves); // all other cancels
+				commutingGroup.merged = true;
+			}
+			let previousCommutingGroup = null;
+			let commutingGroupIndex = 0;
+			while (commutingGroupIndex < commutingGroups.length) {
+				let commutingGroup = commutingGroups[commutingGroupIndex];
+				if (commutingGroup.moves.length !== 0) { // commuting group has not completely cancelled
+					if (commutingGroup.commutingGroup === previousCommutingGroup) { // groups must be merged
+						commutingGroups[commutingGroupIndex - 1].moves.push(...commutingGroup.moves);
+						commutingGroups[commutingGroupIndex - 1].merged = false;
+						commutingGroups.splice(commutingGroupIndex, 1);
+					} else { // independant groups
+						commutingGroupIndex++;
+						previousCommutingGroup = commutingGroup.commutingGroup;
+					}
+				}
+			}
+		} while (commutingGroups.some(commutingGroup => !commutingGroup.merged));
+		return commutingGroups
+			.map(commutingGroup => commutingGroup.moves
+				.sort((firstMove, secondMove) => firstMove.index - secondMove.index))
+			.flat()
+			.map(move => move.moveString)
+			.join(" ");
+	};
+	parseForMerging = (move, cubeSize) => {
+		let sliceBegin;
+		let sliceEnd;
+		if (move.prefix === "") {
+			sliceBegin = 1;
+			sliceEnd = /[xyz]/.test(move.moveLetter)
+				? cubeSize
+				: /[rufldb]/.test(move.moveLetter) || move.suffix.includes("w")
+					? 2
+					: 1;
+			
+		} else if (move.prefix.includes("-")) {
+			[sliceBegin, sliceEnd] = move.prefix.match(/\d+/g)
+				.map(match => parseInt(match))
+				.sort();
+		} else {
+			sliceEnd = parseInt(move.prefix.match(/\d+/)[0]);
+			sliceBegin = /[rufldb]/.test(move.moveLetter) || move.suffix.includes("w")
+				? 1
+				: sliceEnd;
+		}
+		let isInverted = move.suffix.includes("'");
+		let rawTurnCount = parseInt((move.suffix.match(/\d+/) ?? ["1"])[0]);
+		let turnCount = isInverted
+			? [0, 3, 2, 1][rawTurnCount % 4]
+			: rawTurnCount % 4;
+		if (/[LlMDdEB]/.test(move.moveLetter)) { // opposite of reference axis, mirror everything
+			[sliceBegin, sliceEnd] = [cubeSize + 1 - sliceEnd, cubeSize + 1 - sliceBegin];
+			turnCount = [0, 3, 2, 1][turnCount];
+		}
+		move.sliceBegin = sliceBegin;
+		move.sliceEnd = sliceEnd;
+		move.turnCount = turnCount;
+		move.isInverted = isInverted;
+	};
+	simpleCancel = moves => {
+		let movesIntervalGroups = this.groupMovesBySliceInterval(moves);
+		let unCancelledMoves = [];
+		for (let movesIntervalGroup of movesIntervalGroups) {
+			if (movesIntervalGroup.length === 1) {
+				unCancelledMoves.push(movesIntervalGroup[0]);
+				continue;
+			}
+			movesIntervalGroup.sort((firstMove, secondMove) =>
+				Math.abs(2 - secondMove.turnCount) - Math.abs(2 - firstMove.turnCount) // dist(turnCount, 2) descending
+				+ (firstMove.index - secondMove.index) / 100 // then index ascending
+			);
+			let cumulativeTurnCount = 0;
+			let cumulativeTurnCounts = [0];
+			for (let moveIndex = 0; moveIndex < movesIntervalGroup.length; moveIndex++) {
+				let move = movesIntervalGroup[moveIndex];
+				cumulativeTurnCount = (cumulativeTurnCount + move.turnCount) % 4;
+				let matchingCumulativeTurnCountIndex = cumulativeTurnCounts.findIndex(
+					cumulativeTurnCountElement => cumulativeTurnCountElement === cumulativeTurnCount);
+				if (matchingCumulativeTurnCountIndex !== -1) {
+					movesIntervalGroup.splice(matchingCumulativeTurnCountIndex, moveIndex - matchingCumulativeTurnCountIndex + 1);
+					cumulativeTurnCounts.splice(matchingCumulativeTurnCountIndex + 1);
+					moveIndex = matchingCumulativeTurnCountIndex - 1;
+				} else {
+					cumulativeTurnCounts.push(cumulativeTurnCount);
+				}
+			}
+			unCancelledMoves.push(...movesIntervalGroup);
+		}
+		return unCancelledMoves;
+	};
+	groupMovesBySliceInterval = moves => {
+		let groups = [];
+		for (let move of moves) {
+			let intervalKey = `(${move.sliceBegin},${move.sliceEnd})`;
+			if (groups[intervalKey]) {
+				groups[intervalKey].push(move);
+			} else {
+				groups[intervalKey] = [move];
+			}
+		}
+		return Object.values(groups);
+	};
+	advancedCancel = moves => {
+		let unCancelledMoves = [];
+		let affectingMovesIndexes = this.findAffectingMovesIndexesPerSlice(moves);
+		this.removeAloneMoves(moves, affectingMovesIndexes, unCancelledMoves);
+		let groups = this.splitSliceIntervalsIntoGroups(moves, affectingMovesIndexes);
+		this.findCancellationsInGroups(groups, moves, unCancelledMoves);
+		return unCancelledMoves;
+	};
+	findAffectingMovesIndexesPerSlice = moves => {
+		let affectingMovesIndexes = [];
+		for (let move of moves) {
+			for (let sliceIndex = move.sliceBegin; sliceIndex <= move.sliceEnd; sliceIndex++) {
+				affectingMovesIndexes[sliceIndex] = [...affectingMovesIndexes[sliceIndex] ?? [], move.index];
+			}
+		}
+		return affectingMovesIndexes;
+	};
+	removeAloneMoves = (moves, affectingMovesIndexes, unCancelledMoves) => {
+		while (affectingMovesIndexes.some(moveIndexes => moveIndexes.length === 1)) {
+			let aloneMoveIndexes = affectingMovesIndexes
+				.filter(moveIndexes => moveIndexes.length === 1)
+				.map(aloneSlice => aloneSlice[0]);
+			unCancelledMoves.push(...moves.filter((move, moveIndex) => aloneMoveIndexes.includes(moveIndex)));
+			for (let sliceIndex in affectingMovesIndexes) {
+				affectingMovesIndexes[sliceIndex] = affectingMovesIndexes[sliceIndex]
+					.filter(moveIndex => !aloneMoveIndexes.includes(moveIndex));
+			}
+		}
+	};
+	splitSliceIntervalsIntoGroups = (moves, affectingMovesIndexes) => {
+		let groups = [];
+		let currentGroupMoves = [];
+		let maxAttainedSliceIndex = 0;
+		for (let sliceIndex in affectingMovesIndexes) {
+			let affectingMoves = affectingMovesIndexes[sliceIndex];
+			if (affectingMoves.length === 0) {
+				continue;
+			}
+			currentGroupMoves = [...new Set([...currentGroupMoves, ...affectingMoves])];
+			maxAttainedSliceIndex = Math.max(maxAttainedSliceIndex,
+				...moves
+					.filter((move, moveIndex) => affectingMoves.includes(moveIndex))
+					.map(move => move.sliceEnd));
+			if (maxAttainedSliceIndex === parseInt(sliceIndex)) {
+				groups.push(currentGroupMoves);
+				currentGroupMoves = [];
+			}
+		}
+		return groups;
+	};
+	findCancellationsInGroups = (groups, moves, unCancelledMoves) => {
+		for (let group of groups) {
+			let groupMoves = moves.filter((move, moveIndex) => group.includes(moveIndex));
+			if (this.checkTotalCancel(groupMoves)) {
+				continue;
+			}
+			// generate all subgroups
+			let subgroups = [[]];
+			for (let move of groupMoves) {
+				let newSubGroups = []
+				for (let subgroup of subgroups) {
+					newSubGroups.push([...subgroup, move]);
+				}
+				subgroups = [...subgroups, ...newSubGroups];
+			}
+			subgroups = subgroups
+				.filter(subgroup => subgroup.length >= 3)
+				.sort((firstSubgroup, secondSubgroup) => secondSubgroup.length - firstSubgroup.length);
+			// find cancellations in subgroups
+			let biggestFullyCancellingSubgroup = subgroups.find(subgroup => this.checkTotalCancel(subgroup)) ?? [];
+			unCancelledMoves.push(...groupMoves.filter(move => !biggestFullyCancellingSubgroup.includes(move)));
+		}
+	};
+	checkTotalCancel = moves => {
+		let turnCounts = [];
+		for (let move of moves) {
+			for (let sliceIndex = move.sliceBegin; sliceIndex <= move.sliceEnd; sliceIndex++) {
+				turnCounts[sliceIndex] = ((turnCounts[sliceIndex] ?? 0) + move.turnCount) % 4;
+			}
+		}
+		return !turnCounts.some(turnCount => turnCount !== 0);
 	};
 };
 

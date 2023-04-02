@@ -144,6 +144,10 @@ class CommandHandler {
 		if (commandHeader.endsWith("do")) {
 			parsedOptions.isDo = true;
 		}
+		if (parsedOptions.mergeMoves) {
+			let cubeSize = parseInt(parsedOptions.puzzle.match(/\d+/)[0]);
+			parsedMoveSequence.moveSequence = this.messageHandler.algBot.algManipulator.algMerger.mergeMoves(parsedMoveSequence.moveSequence, cubeSize);
+		}
 		if (Object.values(parsedOptions.countMoves).includes(true)) {
 			let moveCounts = this.messageHandler.algBot.algManipulator.countMoves(parsedMoveSequence.moveSequence);
 			parsedMoveSequence.moveCounts = moveCounts;
