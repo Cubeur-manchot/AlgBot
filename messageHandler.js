@@ -313,12 +313,13 @@ class MessageEmbedHandler {
 			: null;
 		let cubeSize = parseInt(cube.match(/\d+/)[0]);
 		let moveSequenceForAlgCubingNet =
-			this.messageHandler.algBot.algManipulator.replaceMiddleSliceMoves(moveSequenceObject.moveSequence, cubeSize)
-			.replace(/\s/g, "%20") // replace spaces
+			this.messageHandler.algBot.algManipulator.replaceMiddleSliceMoves(moveSequenceObject.moveSequence, cubeSize);
+		let moveSequenceForAlgCubingNetUrl = moveSequenceForAlgCubingNet
+			.replace(/\s/g, "_") // replace spaces
 			.replace(/-/g, "%26%2345%3B"); // replace hyphen characters
 		let visualCubeImageUrl = this.buildVisualCubeUrl(moveSequenceForAlgCubingNet, moveSequenceObject, optionsObject);
-		let algCubingNetUrl = `https://alg.cubing.net/?alg=${moveSequenceForAlgCubingNet}`
-			+ (optionsObject.isDo ? "" : `&setup=(${moveSequenceForAlgCubingNet})-`)
+		let algCubingNetUrl = `https://alg.cubing.net/?alg=${moveSequenceForAlgCubingNetUrl}`
+			+ (optionsObject.isDo ? "" : `&setup=(${moveSequenceForAlgCubingNetUrl})%27`)
 			+ `&puzzle=${cube}`;
 		return {
 			color: MessageEmbedHandler.embedColors.alg,
