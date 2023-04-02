@@ -334,8 +334,8 @@ class MessageEmbedHandler {
 	buildVisualCubeUrl = (moveSequence, moveSequenceObject, optionsObject) => {
 		let moveSequenceForVisualCube =
 			this.messageHandler.algBot.algManipulator.replaceInnerSliceMoves(moveSequence)
-			.replace(/\s/, "%20") // replace spaces
-			.replace(/'/, "%27"); // replace apostrophes
+			.replace(/\s/g, "%20") // replace spaces
+			.replace(/'/g, "%27"); // replace apostrophes
 		let caseOrAlg = moveSequenceObject.isDo ? "alg" : "case";
 		let stage = optionsObject.stage;
 		let view = optionsObject.view === OptionsHandler.planView ? "&view=plan" : "";
