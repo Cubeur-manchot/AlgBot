@@ -375,22 +375,32 @@ class AlgMerger {
 		let sliceBegin;
 		let sliceEnd;
 		if (move.prefix === "") {
-			sliceBegin = 1;
-			sliceEnd = /[xyz]/.test(move.moveLetter)
-				? cubeSize
-				: /[rufldb]/.test(move.moveLetter) || move.suffix.includes("w")
-					? 2
-					: 1;
-			
+			if (/[MES]/.test(move.moveLetter)) {
+				sliceBegin = (cubeSize + 1) / 2;
+				sliceEnd = sliceBegin;
+			} else {
+				sliceBegin = 1;
+				sliceEnd = /[xyz]/.test(move.moveLetter)
+					? cubeSize
+					: /[rufldb]/.test(move.moveLetter) || move.suffix.includes("w")
+						? 2
+						: 1;
+			}
 		} else if (move.prefix.includes("-")) {
 			[sliceBegin, sliceEnd] = move.prefix.match(/\d+/g)
 				.map(match => parseInt(match))
 				.sort();
 		} else {
-			sliceEnd = parseInt(move.prefix.match(/\d+/)[0]);
-			sliceBegin = /[rufldb]/.test(move.moveLetter) || move.suffix.includes("w")
-				? 1
-				: sliceEnd;
+			if (/[MES]/.test(move.moveLetter)) {
+				let outerSliceCount = (cubeSize - parseInt(move.prefix)) / 2;
+				sliceBegin = outerSliceCount + 1;
+				sliceEnd = cubeSize - outerSliceCount;
+			} else {
+				sliceEnd = parseInt(move.prefix.match(/\d+/)[0]);
+				sliceBegin = /[rufldb]/.test(move.moveLetter) || move.suffix.includes("w")
+					? 1
+					: sliceEnd;
+			}
 		}
 		let isInverted = move.suffix.includes("'");
 		let rawTurnCount = parseInt((move.suffix.match(/\d+/) ?? ["1"])[0]);
