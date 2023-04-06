@@ -346,6 +346,7 @@ class AlgMerger {
 				});
 				commutingGroup.moves = this.simpleCancel(commutingGroup.moves); // cancel moves with same slice intervals
 				commutingGroup.moves = this.advancedCancel(commutingGroup.moves); // all other cancels
+				commutingGroup.moves = this.mergeGroupMoves(commutingGroup.moves); // merges
 				commutingGroup.merged = true;
 			}
 			let previousCommutingGroup = null;
@@ -364,6 +365,7 @@ class AlgMerger {
 				}
 			}
 		} while (commutingGroups.some(commutingGroup => !commutingGroup.merged));
+		this.reconstructMoveStrings(commutingGroups, cubeSize);
 		return commutingGroups
 			.map(commutingGroup => commutingGroup.moves
 				.sort((firstMove, secondMove) => firstMove.index - secondMove.index))
@@ -541,6 +543,138 @@ class AlgMerger {
 			}
 		}
 		return !turnCounts.some(turnCount => turnCount !== 0);
+	};
+	mergeGroupMoves = moves => {
+		let someMovesWereMerged;
+		do {
+			someMovesWereMerged = false;
+			let unmergedMoves = [];
+			for (let moveToMerge of moves) {
+				// case 1 : same interval (R' R2)
+				let sameIntervalMove = unmergedMoves.find(unmergedMove =>
+					unmergedMove.sliceBegin === moveToMerge.sliceBegin
+					&& unmergedMove.sliceEnd === moveToMerge.sliceEnd);
+				if (sameIntervalMove) {
+					sameIntervalMove.shouldReconstructString = true;
+					sameIntervalMove.turnCount = (sameIntervalMove.turnCount + moveToMerge.turnCount) % 4;
+					sameIntervalMove.isInverted &= moveToMerge.isInverted;
+					someMovesWereMerged = true;
+					continue;
+				}
+				// case 2 : adjacent interval and same turn angle (M' R)
+				let adjacentSliceIntervalMove = unmergedMoves.find(unmergedMove =>
+					(unmergedMove.sliceEnd === moveToMerge.sliceBegin - 1 || unmergedMove.sliceBegin === moveToMerge.sliceEnd + 1)
+						&& unmergedMove.turnCount === moveToMerge.turnCount);
+				if (adjacentSliceIntervalMove) {
+					adjacentSliceIntervalMove.shouldReconstructString = true;
+					adjacentSliceIntervalMove.sliceBegin = Math.min(adjacentSliceIntervalMove.sliceBegin, moveToMerge.sliceBegin);
+					adjacentSliceIntervalMove.sliceEnd = Math.max(adjacentSliceIntervalMove.sliceEnd, moveToMerge.sliceEnd);
+					someMovesWereMerged = true;
+					continue;
+				}
+				// case 3 : one interval is at the extremity of the other one, and opposite turn count (Rw R')
+				let includedSliceIntervalMove = unmergedMoves.find(unmergedMove =>
+					(unmergedMove.sliceBegin === moveToMerge.sliceBegin || unmergedMove.sliceEnd === moveToMerge.sliceEnd)
+					&& (unmergedMove.turnCount + moveToMerge.turnCount) % 4 === 0);
+				if (includedSliceIntervalMove) {
+					includedSliceIntervalMove.shouldReconstructString = true;
+					if (includedSliceIntervalMove.sliceBegin === moveToMerge.sliceBegin) {
+						if (includedSliceIntervalMove.sliceEnd > moveToMerge.sliceEnd) {
+							includedSliceIntervalMove.sliceBegin = moveToMerge.sliceEnd + 1;
+						} else {
+							includedSliceIntervalMove.sliceBegin = includedSliceIntervalMove.sliceEnd + 1;
+							includedSliceIntervalMove.sliceEnd = moveToMerge.sliceEnd;
+							includedSliceIntervalMove.turnCount = moveToMerge.turnCount;
+							includedSliceIntervalMove.isInverted = moveToMerge.isInverted;
+						}
+					} else {
+						if (includedSliceIntervalMove.sliceBegin < moveToMerge.sliceBegin) {
+							includedSliceIntervalMove.sliceEnd = moveToMerge.sliceBegin - 1;
+						} else {
+							includedSliceIntervalMove.sliceEnd = includedSliceIntervalMove.sliceBegin - 1;
+							includedSliceIntervalMove.sliceBegin = moveToMerge.sliceBegin;
+							includedSliceIntervalMove.turnCount = moveToMerge.turnCount;
+							includedSliceIntervalMove.isInverted = moveToMerge.isInverted;
+						}
+					}
+					someMovesWereMerged = true;
+					continue;
+				}
+				unmergedMoves.push(moveToMerge); // move was not merged yet, but maybe later
+			}
+			moves = unmergedMoves;
+		} while (someMovesWereMerged && moves.length > 1);
+		return moves;
+	};
+	reconstructMoveStrings = (commutingGroups, cubeSize) => {
+		for (let commutingGroup of commutingGroups) {
+			for (let move of commutingGroup.moves) {
+				if (!move.shouldReconstructString) {
+					continue;
+				}
+				if (move.sliceBegin === 1) { // x, R, Rw, 3Rw
+					move.moveString =
+						(move.sliceEnd > 2 ? move.sliceEnd : "")
+						+ commutingGroup.commutingGroup[move.sliceEnd === cubeSize ? 0 : 1]
+						+ (move.sliceEnd > 1 && move.sliceEnd !== cubeSize ? "w" : "")
+						+ this.getSuffixFromTurnCount(move.turnCount, move.isInverted, false);
+				} else if (move.sliceEnd === cubeSize) { // L, Lw, 3Lw
+					move.moveString =
+						(move.sliceBegin < cubeSize - 1 ? cubeSize - move.sliceBegin + 1 : "")
+						+ commutingGroup.commutingGroup[2]
+						+ (move.sliceBegin < cubeSize ? "w" : "")
+						+ this.getSuffixFromTurnCount(move.turnCount, !move.isInverted, true);
+				} else if (move.sliceBegin === move.sliceEnd) {
+					let middleSlice = (cubeSize + 1) / 2;
+					if (move.sliceBegin === middleSlice) { // M
+						let invertedMiddleMove = commutingGroup.commutingGroup !== AlgManipulator.zAxisCommutingGroup;
+						move.moveString = commutingGroup.commutingGroup[5]
+							+ this.getSuffixFromTurnCount(move.turnCount, move.isInverted ^ invertedMiddleMove, invertedMiddleMove);
+					} else if (move.sliceBegin < middleSlice) { // 2R
+						move.moveString =
+							move.sliceBegin
+							+ commutingGroup.commutingGroup[1]
+							+ this.getSuffixFromTurnCount(move.turnCount, move.isInverted, false);
+					} else { // 2L
+						move.moveString =
+							(cubeSize - move.sliceEnd + 1)
+							+ commutingGroup.commutingGroup[2]
+							+ this.getSuffixFromTurnCount(move.turnCount, !move.isInverted, true);
+					}
+				} else {
+					if (move.sliceBegin + move.sliceEnd === cubeSize + 1) { // 3M
+						let invertedMiddleMove = commutingGroup.commutingGroup !== AlgManipulator.zAxisCommutingGroup;
+						move.moveString =
+							(move.sliceEnd - move.sliceBegin + 1)
+							+ commutingGroup.commutingGroup[5]
+							+ this.getSuffixFromTurnCount(move.turnCount, move.isInverted ^ invertedMiddleMove, invertedMiddleMove);
+					} else if (move.sliceBegin - 1 < cubeSize - move.sliceEnd) { // 2-3Rw on 5x5
+						move.moveString =
+							move.sliceBegin
+							+ "-"
+							+ move.sliceEnd
+							+ commutingGroup.commutingGroup[1]
+							+ "w"
+							+ this.getSuffixFromTurnCount(move.turnCount, move.isInverted, false);
+					} else { // 2-3Lw on 5x5
+						move.moveString =
+							(cubeSize - move.sliceEnd + 1)
+							+ "-"
+							+ (cubeSize - move.sliceBegin + 1)
+							+ commutingGroup.commutingGroup[2]
+							+ "w"
+							+ this.getSuffixFromTurnCount(move.turnCount, !move.isInverted, true);
+					}
+				}
+			}
+		}
+	};
+	getSuffixFromTurnCount = (turnCount, isInverted, letterIsInverted) => {
+		if (letterIsInverted) {
+			turnCount = 4 - turnCount;
+		}
+		let two = turnCount === 2;
+		return `${two ? "2" : ""}${turnCount === 3 || (two && isInverted) ? "'" : ""}`;
 	};
 };
 
