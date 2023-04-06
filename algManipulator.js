@@ -410,6 +410,7 @@ class AlgMerger {
 		if (/[LlMDdEB]/.test(move.moveLetter)) { // opposite of reference axis, mirror everything
 			[sliceBegin, sliceEnd] = [cubeSize + 1 - sliceEnd, cubeSize + 1 - sliceBegin];
 			turnCount = [0, 3, 2, 1][turnCount];
+			isInverted = !isInverted;
 		}
 		move.sliceBegin = sliceBegin;
 		move.sliceEnd = sliceEnd;
