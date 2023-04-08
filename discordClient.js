@@ -10,16 +10,20 @@ class DiscordClient extends Discord.Client {
 		french: "apprendre de nouveaux algos"
 	};
 	constructor(algBot) {
-		super({intents: [
-			Discord.GatewayIntentBits.Guilds,
-			Discord.GatewayIntentBits.GuildMembers,
-			Discord.GatewayIntentBits.GuildMessages,
-			Discord.GatewayIntentBits.GuildMessageReactions,
-			Discord.GatewayIntentBits.DirectMessages,
-			Discord.GatewayIntentBits.DirectMessageReactions,
-			Discord.GatewayIntentBits.MessageContent
-		]});
+		super({
+			intents: [
+				Discord.GatewayIntentBits.Guilds,
+				Discord.GatewayIntentBits.GuildMembers,
+				Discord.GatewayIntentBits.GuildMessages,
+				Discord.GatewayIntentBits.GuildMessageReactions,
+				Discord.GatewayIntentBits.DirectMessages,
+				Discord.GatewayIntentBits.DirectMessageReactions,
+				Discord.GatewayIntentBits.MessageContent
 			],
+			partials: [
+				Discord.Partials.Channel
+			]
+		});
 		this.algBot = algBot;
 		this.routineActivity = DiscordClient.routineActivity[this.algBot.language];
 		this.on("ready", this.onReady);
@@ -56,7 +60,7 @@ class DiscordClient extends Discord.Client {
 							));
 					}
 				}
-				if (deleteIfNotEdited) {
+				if (deleteIfNotEdited && !this.messageIsInDmChannel(initialMessage)) {
 					this.deleteMessageAfterSomeSecondsIfNotModified(initialMessage);
 				}
 			})
@@ -116,7 +120,7 @@ class DiscordClient extends Discord.Client {
 							+ ` : "${messageReactionRemoveError}".`
 						));
 				}
-				if (deleteIfNotEdited) {
+				if (deleteIfNotEdited && !this.messageIsInDmChannel(initialMessage)) {
 					this.deleteMessageAfterSomeSecondsIfNotModified(answeredMessageToDeleteIfNotEdited);
 				}
 			})
@@ -176,6 +180,9 @@ class DiscordClient extends Discord.Client {
 			status: "online",
 		});
 		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language})'s presence has been set.`);
+	};
+	messageIsInDmChannel = message => {
+		return message.channel.type === Discord.ChannelType.DM;
 	};
 };
 
