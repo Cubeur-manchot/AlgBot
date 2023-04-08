@@ -4,6 +4,7 @@ import Discord from "discord.js";
 import {AlgBotDate} from "./date.js";
 
 class DiscordClient extends Discord.Client {
+	static discordApiUnknownMessageError = "DiscordAPIError[10008]: Unknown Message";
 	constructor(algBot) {
 		super({intents: [
 			Discord.GatewayIntentBits.Guilds,
@@ -14,6 +15,7 @@ class DiscordClient extends Discord.Client {
 			Discord.GatewayIntentBits.DirectMessageReactions,
 			Discord.GatewayIntentBits.MessageContent
 		]});
+			],
 		this.algBot = algBot;
 		this.on("ready", this.onReady);
 		this.on("messageCreate", this.algBot.messageHandler.onMessageCreate);
@@ -133,7 +135,7 @@ class DiscordClient extends Discord.Client {
 		if (message) {
 			message.delete()
 				.catch(deleteMessageError => {
-					if (deleteMessageError !== "DiscordAPIError[10008]: Unknown Message") { // when the message was not already deleted
+					if (deleteMessageError !== DiscordClient.discordApiUnknownMessageError) {
 						this.algBot.logger.errorLog("Error when deleting message "
 							+ `(content = "${message.content}"`
 							+ `, embeds : ${message.embeds?.length ?? 0}`
