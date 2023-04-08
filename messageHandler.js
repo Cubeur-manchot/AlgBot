@@ -143,9 +143,7 @@ class CommandHandler {
 				error: true
 			};
 		}
-		if (commandHeader.endsWith("do")) {
-			parsedOptions.isDo = true;
-		}
+		parsedOptions.isDo = commandHeader.endsWith("do");
 		if (parsedOptions.mergeMoves) {
 			let cubeSize = parseInt(parsedOptions.puzzle.match(/\d+/)[0]);
 			parsedMoveSequence.moveSequence = this.messageHandler.algBot.algManipulator.algMerger.mergeMoves(parsedMoveSequence.moveSequence, cubeSize);
@@ -342,7 +340,7 @@ class MessageEmbedHandler {
 			this.messageHandler.algBot.algManipulator.replaceInnerSliceMoves(moveSequence)
 			.replace(/\s/g, "%20") // replace spaces
 			.replace(/'/g, "%27"); // replace apostrophes
-		let caseOrAlg = moveSequenceObject.isDo ? "alg" : "case";
+		let caseOrAlg = optionsObject.isDo ? "alg" : "case";
 		let stage = optionsObject.stage;
 		let view = optionsObject.view === OptionsHandler.planView ? "&view=plan" : "";
 		let puzzle = optionsObject.puzzle.match(/\d+/)[0];
