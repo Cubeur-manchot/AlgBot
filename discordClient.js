@@ -50,8 +50,8 @@ class DiscordClient extends Discord.Client {
 								+ `, components : ${answerMessage.components?.length ?? 0}`
 								+ `, created at "${new AlgBotDate(answerMessage.createdTimestamp).getDateString()}"`
 								+ `, userId = ${answerMessage.author.id}`
-								+ `, channelName = "${answerMessage.channel.name}"`
-								+ `, serverName = "${answerMessage.channel.guild.name}")`
+								+ `, channelName = ${answerMessage.channel.name ? `"${answerMessage.channel.name}"` : undefined}`
+								+ `, serverName = ${answerMessage.channel.guild ? `"${answerMessage.channel.guild.name}"` : undefined})`
 								+ ` : "${messageReactError}".`
 							));
 					}
@@ -70,8 +70,8 @@ class DiscordClient extends Discord.Client {
 				+ `, components : ${initialMessage.components?.length ?? 0}`
 				+ `, created at "${new AlgBotDate(initialMessage.createdTimestamp).getDateString()}"`
 				+ `, userId = ${initialMessage.author.id}`
-				+ `, channelName = "${initialMessage.channel.name}"`
-				+ `, serverName = "${initialMessage.channel.guild.name}")`
+				+ `, channelName = ${initialMessage.channel.name ? `"${initialMessage.channel.name}"` : undefined}`
+				+ `, serverName = ${initialMessage.channel.guild ? `"${initialMessage.channel.guild.name}"` : undefined})`
 				+ ` : "${messageReplyError}".`
 			));
 		}
@@ -97,8 +97,8 @@ class DiscordClient extends Discord.Client {
 								+ `, components : ${editedMessage.components?.length ?? 0}`
 								+ `, created at "${new AlgBotDate(editedMessage.createdTimestamp).getDateString()}"`
 								+ `, userId = ${editedMessage.author.id}`
-								+ `, channelName = "${editedMessage.channel.name}"`
-								+ `, serverName = "${editedMessage.channel.guild.name}")`
+								+ `, channelName = ${editedMessage.channel.name ? `"${editedMessage.channel.name}"` : undefined}`
+								+ `, serverName = ${editedMessage.channel.guild ? `"${editedMessage.channel.guild.name}"` : undefined})`
 								+ ` : "${messageReactError}".`
 							));
 					}
@@ -111,8 +111,8 @@ class DiscordClient extends Discord.Client {
 							+ `, components : ${editedMessage.components?.length ?? 0}`
 							+ `, created at "${new AlgBotDate(editedMessage.createdTimestamp).getDateString()}"`
 							+ `, userId = ${editedMessage.author.id}`
-							+ `, channelName = "${editedMessage.channel.name}"`
-							+ `, serverName = "${editedMessage.channel.guild.name}")`
+							+ `, channelName = ${editedMessage.channel.name ? `"${editedMessage.channel.name}"` : undefined}`
+							+ `, serverName = ${editedMessage.channel.guild ? `"${editedMessage.channel.guild.name}"` : undefined})`
 							+ ` : "${messageReactionRemoveError}".`
 						));
 				}
@@ -126,8 +126,8 @@ class DiscordClient extends Discord.Client {
 				+ `, components : ${oldMessage.components?.length ?? 0}`
 				+ `, created at "${new AlgBotDate(oldMessage.createdTimestamp).getDateString()}"`
 				+ `, userId = ${oldMessage.author.id}`
-				+ `, channelName = "${oldMessage.channel.name}"`
-				+ `, serverName = "${oldMessage.channel.guild.name}")`
+				+ `, channelName = ${oldMessage.channel.name ? `"${oldMessage.channel.name}"` : undefined}`
+				+ `, serverName = ${oldMessage.channel.guild ? `"${oldMessage.channel.guild.name}"` : undefined})`
 				+ " to "
 				+ `"${newMessage.textContent ?? ""}" `
 				+ `(embeds : ${newMessage.embed ? "1" : "0"}`
@@ -147,8 +147,8 @@ class DiscordClient extends Discord.Client {
 							+ `, components : ${message.components?.length ?? 0}`
 							+ `, created at "${new AlgBotDate(message.createdTimestamp).getDateString()}"`
 							+ `, userId = ${message.author.id}`
-							+ `, channelName = "${message.channel.name}"`
-							+ `, serverName = "${message.channel.guild.name}")`
+							+ `, channelName = ${message.channel.name ? `"${message.channel.name}"` : undefined}`
+							+ `, serverName = ${message.channel.guild ? `"${message.channel.guild.name}"` : undefined})`
 							+ ` : "${deleteMessageError}".`);
 					}
 				});
