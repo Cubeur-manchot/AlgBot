@@ -5,6 +5,10 @@ import {AlgBotDate} from "./date.js";
 
 class DiscordClient extends Discord.Client {
 	static discordApiUnknownMessageError = "DiscordAPIError[10008]: Unknown Message";
+	static routineActivity = {
+		english: "learning new algs",
+		french: "apprendre de nouveaux algos"
+	};
 	constructor(algBot) {
 		super({intents: [
 			Discord.GatewayIntentBits.Guilds,
@@ -17,6 +21,7 @@ class DiscordClient extends Discord.Client {
 		]});
 			],
 		this.algBot = algBot;
+		this.routineActivity = DiscordClient.routineActivity[this.algBot.language];
 		this.on("ready", this.onReady);
 		this.on("messageCreate", this.algBot.messageHandler.onMessageCreate);
 		this.on("messageDelete", this.algBot.messageHandler.onMessageDelete);
@@ -167,16 +172,10 @@ class DiscordClient extends Discord.Client {
 	onReady = () => {
 		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language}) is ready !`);
 		this.user.setPresence({
-			activities: [{name: this.getActivity(), type: Discord.ActivityType.Playing}],
+			activities: [{name: this.routineActivity, type: Discord.ActivityType.Playing}],
 			status: "online",
 		});
 		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language})'s presence has been set.`);
-	};
-	getActivity = () => {
-		switch (this.algBot.language) {
-			case "french": return "apprendre de nouveaux algos";
-			case "english": return "learning new algs";
-		}
 	};
 };
 
