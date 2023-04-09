@@ -60,7 +60,7 @@ class DiscordClient extends Discord.Client {
 							));
 					}
 				}
-				if (deleteIfNotEdited && !this.messageIsInDmChannel(initialMessage)) {
+				if (deleteIfNotEdited && !this.channelIsDm(initialMessage.channel)) {
 					this.deleteMessageAfterSomeSecondsIfNotModified(initialMessage);
 				}
 			})
@@ -120,7 +120,7 @@ class DiscordClient extends Discord.Client {
 							+ ` : "${messageReactionRemoveError}".`
 						));
 				}
-				if (deleteIfNotEdited && !this.messageIsInDmChannel(initialMessage)) {
+				if (deleteIfNotEdited && !this.channelIsDm(initialMessage.channel)) {
 					this.deleteMessageAfterSomeSecondsIfNotModified(answeredMessageToDeleteIfNotEdited);
 				}
 			})
@@ -181,8 +181,8 @@ class DiscordClient extends Discord.Client {
 		});
 		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language})'s presence has been set.`);
 	};
-	messageIsInDmChannel = message => {
-		return message.channel.type === Discord.ChannelType.DM;
+	channelIsDm = channel => {
+		return channel.type === Discord.ChannelType.DM;
 	};
 };
 
