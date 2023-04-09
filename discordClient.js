@@ -184,6 +184,9 @@ class DiscordClient extends Discord.Client {
 	channelIsDm = channel => {
 		return channel.type === Discord.ChannelType.DM;
 	};
+	channelIsThread = channel => {
+		return [Discord.ChannelType.PublicThread, Discord.ChannelType.PrivateThread].includes(channel.type);
+	};
 };
 
 export {DiscordClient};

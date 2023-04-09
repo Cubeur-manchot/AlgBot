@@ -10,7 +10,7 @@ class MessageHandler {
 		this.componentsHandler = new MessageComponentsHandler(this);
 	};
 	onMessageCreate = message => {
-		if (this.messageIsAlgBotCommand(message)) {
+		if (this.messageIsAlgBotCommand(message) && !this.messageIsInThreadWithoutAlgBot(message)) {
 			let commandResult = this.commandHandler.getCommandResult(message);
 			this.algBot.discordClient.reply(commandResult.message, message, commandResult.error);
 		}
@@ -63,6 +63,10 @@ class MessageHandler {
 		return [...message.channel.messages.cache.values()].find(channelMessage =>
 			this.messageIsAlgBotMessage(channelMessage) && channelMessage.reference.messageId === message.id
 		);
+	};
+	messageIsInThreadWithoutAlgBot = message => {
+		return this.algBot.discordClient.channelIsThread(message.channel)
+			&& message.channel.members.cache.get(message.client.user.id) === undefined;
 	};
 };
 
