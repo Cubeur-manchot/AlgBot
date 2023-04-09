@@ -120,7 +120,7 @@ class DiscordClient extends Discord.Client {
 							+ ` : "${messageReactionRemoveError}".`
 						));
 				}
-				if (deleteIfNotEdited && !this.channelIsDm(initialMessage.channel)) {
+				if (deleteIfNotEdited && !this.channelIsDm(oldMessage.channel)) {
 					this.deleteMessageAfterSomeSecondsIfNotModified(answeredMessageToDeleteIfNotEdited);
 				}
 			})
