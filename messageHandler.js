@@ -143,7 +143,7 @@ class AlgCommandHandler {
 		this.embedColor = embedColor;
 	};
 	getAlgOrDoCommandResult = (command, isDo) => {
-		let [commandHeader, moves, options, comment] = command // todo see if removing commandHeader still works
+		let [, moves, options, comment] = command
 			.replace(/(?<!\s.*)\s/, "  ")
 			.split(/(?<!\s.*)\s|(?<!\s-.*|\/\/.*)\s+(?=-|\/\/)|(?<!\/\/.*)\s*\/\/\s*/);
 		let parsedOptions = this.optionsHandler.parseOptions(options ?? "");
