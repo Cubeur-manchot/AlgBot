@@ -9,11 +9,11 @@ class MessageComponentHandler {
 			components: components
 		};
 	};
-	static createSelect = valueLabelPairs => {
+	static createSelect = (valueLabelPairs, customId) => {
 		return {
 			type: Discord.ComponentType.SelectMenu,
 			options: valueLabelPairs,
-			custom_id: "selectCustomId"
+			custom_id: customId
 		};
 	};
 	static createLinkButton = (label, url) => {
@@ -32,18 +32,13 @@ class MessageComponentHandler {
 			custom_id: "toto"
 		};
 	};
-	constructor(messageHandler) {
-		this.messageHandler = messageHandler;
+	constructor(commandHandler) {
+		this.commandHandler = commandHandler;
 	};
-	createHelpComponents = selectedOption => {
-		let selectOptions = [
-			{label: "General help", value: "general"},
-			{label: "Alg list", value: "algList"},
-			{label: "Options", value: "options"}
-		];
+	createRowWithSelectComponents = (selectOptions, selectedOption, customId) => {
 		selectOptions.forEach(selectOption => selectOption.default = selectOption.value === selectedOption);
 		return [MessageComponentHandler.createRow([
-			MessageComponentHandler.createSelect(selectOptions)
+			MessageComponentHandler.createSelect(selectOptions, customId)
 		])];
 	};
 };

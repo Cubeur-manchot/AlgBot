@@ -100,11 +100,12 @@ class OptionsHandler {
 		english: "Empty option",
 		french: "Option vide"
 	};
-	constructor(commandHandler) {
-		this.commandHandler = commandHandler;
-		this.unrecognizedOptionErrorMessage = OptionsHandler.unrecognizedOptionErrorMessage[this.commandHandler.messageHandler.algBot.language];
-		this.wrongOptionStartErrorMessage = OptionsHandler.wrongOptionStartErrorMessage[this.commandHandler.messageHandler.algBot.language];
-		this.emptyOptionErrorMessage = OptionsHandler.emptyOptionErrorMessage[this.commandHandler.messageHandler.algBot.language];
+	constructor(algCommandHandler) {
+		this.algCommandHandler = algCommandHandler;
+		let language = this.algCommandHandler.commandHandler.messageHandler.algBot.language;
+		this.unrecognizedOptionErrorMessage = OptionsHandler.unrecognizedOptionErrorMessage[language];
+		this.wrongOptionStartErrorMessage = OptionsHandler.wrongOptionStartErrorMessage[language];
+		this.emptyOptionErrorMessage = OptionsHandler.emptyOptionErrorMessage[language];
 	};
 	parseOptions = options => {
 		let optionsResult = structuredClone(OptionsHandler.defaultOptions);

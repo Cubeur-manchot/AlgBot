@@ -1,14 +1,13 @@
 "use strict";
 
 import {OptionsHandler} from "./optionsHandler.js";
+import {AlgManipulator} from "./algManipulator.js";
 import {MessageComponentHandler} from "./messageComponentHandler.js";
 
 class MessageHandler {
 	constructor(algBot) {
 		this.algBot = algBot;
 		this.commandHandler = new CommandHandler(this);
-		this.embedHandler = new MessageEmbedHandler(this);
-		this.componentsHandler = new MessageComponentHandler(this);
 	};
 	onMessageCreate = message => {
 		if (this.messageIsAlgBotCommand(message) && !this.messageIsInThreadWithoutAlgBot(message)) {
@@ -36,22 +35,6 @@ class MessageHandler {
 		} else {
 			this.onMessageCreate(newMessage);
 		}
-	};
-	onInteractionCreate = interaction => {
-		if (!this.messageIsAlgBotMessage(interaction.message)) {
-			return;
-		}
-		if (interaction.isStringSelectMenu()) { // string select with help command
-			let interactionValue = interaction.values[0];
-			interaction.update({
-				embeds: [this.embedHandler[`${interactionValue}HelpEmbed`]],
-				components: this.componentsHandler.createHelpComponents(interactionValue)
-			})
-			.catch(interactionCreateError => this.algBot.logger.errorLog(
-				`Fail to create interaction on StringSelect component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
-			))
-		}
-		//else if (interaction.isButton()) { ... }
 	};
 	messageIsAlgBotCommand = message => {
 		return message.content.startsWith(this.algBot.prefix)
@@ -86,19 +69,23 @@ class CommandHandler {
 	};
 	constructor(messageHandler) {
 		this.messageHandler = messageHandler;
-		this.optionsHandler = new OptionsHandler(this);
-		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[messageHandler.algBot.language];
-		this.invalidOptionsLabel = CommandHandler.invalidOptionsLabel[messageHandler.algBot.language];
-		this.invalidMoveSequence = CommandHandler.invalidMoveSequence[messageHandler.algBot.language];
+		this.helpCommandHandler = new HelpCommandHandler(this);
+		this.algCommandHandler = new AlgCommandHandler(this);
+		this.componentsHandler = new MessageComponentHandler(this);
+		let language = messageHandler.algBot.language;
+		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[language];
+		this.invalidOptionsLabel = CommandHandler.invalidOptionsLabel[language];
+		this.invalidMoveSequence = CommandHandler.invalidMoveSequence[language];
 	};
 	getCommandResult = message => {
 		let commandHeader = message.content.split(" ")[0];
 		switch (commandHeader.substring(1)) {
 			case "help":
-				return this.getHelpCommandResult();
+				return this.helpCommandHandler.getHelpCommandResult();
 			case "alg":
+				return this.algCommandHandler.getAlgOrDoCommandResult(message.content, false);
 			case "do":
-				return this.getAlgOrDoCommandResult(message.content);
+				return this.algCommandHandler.getAlgOrDoCommandResult(message.content, true);
 			default:
 				return this.getUnrecognizedCommandResult(commandHeader);
 		}
@@ -114,67 +101,24 @@ class CommandHandler {
 			error: true
 		};
 	};
-	getHelpCommandResult = () => {
 		return {
 			message: {
-				textContent: null,
-				embed: this.messageHandler.embedHandler.generalHelpEmbed,
-				components: this.messageHandler.componentsHandler.createHelpComponents("general")
 			},
 			error: false
 		};
 	};
-	getAlgOrDoCommandResult = command => {
-		let [commandHeader, moves, options, comment] = command
-			.replace(/(?<!\s.*)\s/, "  ")
-			.split(/(?<!\s.*)\s|(?<!\s-.*|\/\/.*)\s+(?=-|\/\/)|(?<!\/\/.*)\s*\/\/\s*/);
-		let parsedOptions = this.optionsHandler.parseOptions(options ?? "");
-		if (parsedOptions.errors.length) {
-			return {
-				message: {
-					textContent: this.getErrorMessage(`${this.invalidOptionsLabel} :\n`
-						+ parsedOptions.errors.map(error => `${error.message} : ${error.option}`).join(".\n"))
-				},
-				error: true
-			};
+	onInteractionCreate = interaction => {
+		if (!this.messageHandler.messageIsAlgBotMessage(interaction.message)) {
+			return;
 		}
-		let parsedMoveSequence = this.messageHandler.algBot.algManipulator.parseMoveSequence(moves ?? "");
-		if (parsedMoveSequence.errors.length) {
-			return {
-				message: {
-					textContent: this.getErrorMessage(`${this.invalidMoveSequence} :\n`
-						+ parsedMoveSequence.errors.map(error => `${error.message}${error.scope ? ` : ${error.scope}` : ""}`).join(".\n"))
-				},
-				error: true
-			};
+		if (interaction.customId === HelpCommandHandler.helpSelectOptionCustomId) {
+			this.helpCommandHandler.handleHelpStringSelectInteraction(interaction);
 		}
-		parsedOptions.isDo = commandHeader.endsWith("do");
-		if (parsedOptions.mergeMoves) {
-			let cubeSize = parseInt(parsedOptions.puzzle.match(/\d+/)[0]);
-			parsedMoveSequence.moveSequence = this.messageHandler.algBot.algManipulator.algMerger.mergeMoves(parsedMoveSequence.moveSequence, cubeSize);
 		}
-		if (Object.values(parsedOptions.countMoves).includes(true)) {
-			let moveCounts = this.messageHandler.algBot.algManipulator.countMoves(parsedMoveSequence.moveSequence);
-			parsedMoveSequence.moveCounts = moveCounts;
-		}
-		parsedMoveSequence.comment = comment;
-		return {
-			message: {
-				textContent: null,
-				embed: this.messageHandler.embedHandler.createAlgEmbed(parsedMoveSequence, parsedOptions),
-				components: null, // todo reactivate -rotatable with buttons
-				reactions: ["❤", "💩", "🥇", "👽"]
-			},
-			error: false
-		};
 	};
 };
 
-class MessageEmbedHandler {
-	static embedSizeLimits = {
-		title: 256,
-		description: 4096
-	};
+class HelpCommandHandler {
 	static generalHelpEmbedTitle = {
 		english: "Help",
 		french: "Aide"
@@ -287,29 +231,140 @@ class MessageEmbedHandler {
 			+ "\n`-rotatable` : permet de faire tourner le cube en cliquant sur les réactions"
 			+ "```yaml\n$alg sune -rotatable```"
 	};
-	constructor(messageHandler) {
-		this.messageHandler = messageHandler;
+	static generalHelpSelectOptionLabel = {
+		english: "General help",
+		french: "Aide générale"
+	};
+	static algListHelpSelectOptionLabel = {
+		english: "Alg list",
+		french: "Liste des algos"
+	};
+	static optionsHelpSelectOptionLabel = {
+		english: "Options",
+		french: "Options"
+	};
+	static helpSelectOptionCustomId = "helpSelectOption";
+	constructor(commandHandler) {
+		this.commandHandler = commandHandler;
+		let helpEmbedColor = CommandHandler.embedColors.help;
+		let language = this.commandHandler.messageHandler.algBot.language;
 		this.generalHelpEmbed = {
-			color: CommandHandler.embedColors.help,
-			title: MessageEmbedHandler.generalHelpEmbedTitle[this.messageHandler.algBot.language],
-			description: MessageEmbedHandler.generalHelpEmbedMessage[this.messageHandler.algBot.language]
+			color: helpEmbedColor,
+			title: HelpCommandHandler.generalHelpEmbedTitle[language],
+			description: HelpCommandHandler.generalHelpEmbedMessage[language]
 		};
 		this.algListHelpEmbed = {
-			color: CommandHandler.embedColors.help,
-			title: MessageEmbedHandler.algListHelpEmbedTitle[this.messageHandler.algBot.language],
-			description: MessageEmbedHandler.algListHelpEmbedMessage[this.messageHandler.algBot.language]
+			color: helpEmbedColor,
+			title: HelpCommandHandler.algListHelpEmbedTitle[language],
+			description: HelpCommandHandler.algListHelpEmbedMessage[language]
 		};
 		this.optionsHelpEmbed = {
-			color: CommandHandler.embedColors.help,
-			title: MessageEmbedHandler.optionsHelpEmbedTitle[this.messageHandler.algBot.language],
-			description: MessageEmbedHandler.optionsHelpEmbedMessage[this.messageHandler.algBot.language]
+			color: helpEmbedColor,
+			title: HelpCommandHandler.optionsHelpEmbedTitle[language],
+			description: HelpCommandHandler.optionsHelpEmbedMessage[language]
+		};
+		this.selectOptions = [
+			{label: HelpCommandHandler.generalHelpSelectOptionLabel[language], value: "general"},
+			{label: HelpCommandHandler.algListHelpSelectOptionLabel[language], value: "algList"},
+			{label: HelpCommandHandler.optionsHelpSelectOptionLabel[language], value: "options"}
+		];
+	};
+	getHelpCommandResult = () => {
+		return {
+			message: {
+				textContent: null,
+				embed: this.generalHelpEmbed,
+				components: this.commandHandler.componentsHandler.createRowWithSelectComponents(
+					this.selectOptions, this.selectOptions[0].value, HelpCommandHandler.helpSelectOptionCustomId)
+			},
+			error: false
 		};
 	};
+	handleHelpStringSelectInteraction = interaction => {
+		let interactionValue = interaction.values[0];
+		interaction.update({
+			embeds: [this[`${interactionValue}HelpEmbed`]],
+			components: this.commandHandler.componentsHandler.createRowWithSelectComponents(
+				this.selectOptions, interactionValue, HelpCommandHandler.helpSelectOptionCustomId)
+		})
+		.catch(interactionCreateError => this.algBot.logger.errorLog(
+			`Fail to create interaction on StringSelect component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
+		))
+	};
+};
+
+/*
+todo reactivate
+const rotationToAddList = ["x", "x'", "y", "y'", "z", "z'",];
+const planViewRotationReactionList = ["⬆", "⬇", "↩", "↪", "➡", "⬅"];
+const isometricViewRotationReactionList = ["↗", "↙", "⬅", "➡", "↘", "↖"];
+embed.image.url += rotationToAdd; // simply add the rotation at the end
+*/
+
+class AlgCommandHandler {
+	static embedSizeLimits = {
+		title: 256,
+		description: 4096
+	};
+	constructor(commandHandler) {
+		this.commandHandler = commandHandler;
+		this.optionsHandler = new OptionsHandler(this);
+		this.algManipulator = new AlgManipulator(this);
+	};
+	getAlgOrDoCommandResult = (command, isDo) => {
+		let [commandHeader, moves, options, comment] = command // todo see if removing commandHeader still works
+			.replace(/(?<!\s.*)\s/, "  ")
+			.split(/(?<!\s.*)\s|(?<!\s-.*|\/\/.*)\s+(?=-|\/\/)|(?<!\/\/.*)\s*\/\/\s*/);
+		let parsedOptions = this.optionsHandler.parseOptions(options ?? "");
+		if (parsedOptions.errors.length) {
+			return {
+				message: {
+					textContent: this.getErrorMessage(`${this.invalidOptionsLabel} :\n`
+						+ parsedOptions.errors.map(error => `${error.message} : ${error.option}`).join(".\n"))
+				},
+				error: true
+			};
+		}
+		let parsedMoveSequence = this.algManipulator.parseMoveSequence(moves ?? "");
+		if (parsedMoveSequence.errors.length) {
+			return {
+				message: {
+					textContent: this.getErrorMessage(`${this.invalidMoveSequence} :\n`
+						+ parsedMoveSequence.errors.map(error => `${error.message}${error.scope ? ` : ${error.scope}` : ""}`).join(".\n"))
+				},
+				error: true
+			};
+		}
+		parsedOptions.isDo = isDo;
+		if (parsedOptions.mergeMoves) {
+			let cubeSize = parseInt(parsedOptions.puzzle.match(/\d+/)[0]);
+			parsedMoveSequence.moveSequence = this.algManipulator.algMerger.mergeMoves(parsedMoveSequence.moveSequence, cubeSize);
+		}
+		if (Object.values(parsedOptions.countMoves).includes(true)) {
+			let moveCounts = this.algManipulator.countMoves(parsedMoveSequence.moveSequence);
+			parsedMoveSequence.moveCounts = moveCounts;
+		}
+		parsedMoveSequence.comment = comment;
+		return {
+			message: {
+				textContent: null,
+				embed: this.createAlgEmbed(parsedMoveSequence, parsedOptions),
+				components: null, // todo reactivate -rotatable with buttons
+				reactions: ["❤", "💩", "🥇", "👽"]
+			},
+			error: false
+		};
+	};
+	applyDiscordEmbedLimits = (fieldValue, discordLimit) => {
+		return fieldValue.length <= discordLimit
+			? fieldValue
+			: `${fieldValue.substring(0, discordLimit - 3)}...`;
+	};
 	createAlgEmbed = (moveSequenceObject, optionsObject) => {
-		let moveSequenceWithLimit = this.applyDiscordEmbedLimits(moveSequenceObject.moveSequence, MessageEmbedHandler.embedSizeLimits.title);
+		let moveSequenceWithLimit = this.applyDiscordEmbedLimits(moveSequenceObject.moveSequence, AlgCommandHandler.embedSizeLimits.title);
 		let cube = optionsObject.puzzle.replace("cube", "");
 		let commentWithLimit = moveSequenceObject.comment
-			? this.applyDiscordEmbedLimits(moveSequenceObject.comment, MessageEmbedHandler.embedSizeLimits.description)
+			? this.applyDiscordEmbedLimits(moveSequenceObject.comment, AlgCommandHandler.embedSizeLimits.description)
 			: null;
 		let moveCounts = moveSequenceObject.moveCounts
 			? Object.keys(moveSequenceObject.moveCounts)
@@ -318,7 +373,7 @@ class MessageEmbedHandler {
 			: null;
 		let cubeSize = parseInt(cube.match(/\d+/)[0]);
 		let moveSequenceForAlgCubingNet =
-			this.messageHandler.algBot.algManipulator.replaceMiddleSliceMoves(moveSequenceObject.moveSequence, cubeSize);
+			this.algManipulator.replaceMiddleSliceMoves(moveSequenceObject.moveSequence, cubeSize);
 		let moveSequenceForAlgCubingNetUrl = moveSequenceForAlgCubingNet
 			.replace(/\s/g, "_") // replace spaces
 			.replace(/-/g, "%26%2345%3B"); // replace hyphen characters
@@ -338,7 +393,7 @@ class MessageEmbedHandler {
 	};
 	buildVisualCubeUrl = (moveSequence, moveSequenceObject, optionsObject) => {
 		let moveSequenceForVisualCube =
-			this.messageHandler.algBot.algManipulator.replaceInnerSliceMoves(moveSequence)
+			this.algManipulator.replaceInnerSliceMoves(moveSequence)
 			.replace(/\s/g, "%20") // replace spaces
 			.replace(/'/g, "%27"); // replace apostrophes
 		let caseOrAlg = optionsObject.isDo ? "alg" : "case";
@@ -356,11 +411,6 @@ class MessageEmbedHandler {
 			.join("");
 		let urlBegin = "http://cube.rider.biz/visualcube.php?fmt=png&bg=t&size=150";
 		return `${urlBegin}${view}&pzl=${puzzle}&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube}`;
-	};
-	applyDiscordEmbedLimits = (fieldValue, discordLimit) => {
-		return fieldValue.length <= discordLimit
-			? fieldValue
-			: `${fieldValue.substring(0, discordLimit - 3)}...`;
 	};
 };
 

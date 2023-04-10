@@ -30,7 +30,7 @@ class DiscordClient extends Discord.Client {
 		this.on("messageCreate", this.algBot.messageHandler.onMessageCreate);
 		this.on("messageDelete", this.algBot.messageHandler.onMessageDelete);
 		this.on("messageUpdate", this.algBot.messageHandler.onMessageUpdate);
-		this.on("interactionCreate", this.algBot.messageHandler.onInteractionCreate);
+		this.on("interactionCreate", this.algBot.messageHandler.commandHandler.onInteractionCreate);
 		this.loginWithToken();
 	};
 	reply = (answer, initialMessage, deleteIfNotEdited) => {
