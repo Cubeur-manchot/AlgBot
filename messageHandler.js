@@ -171,10 +171,6 @@ class CommandHandler {
 };
 
 class MessageEmbedHandler {
-	static embedColors = {
-		help: 0xcccc00, // yellow
-		alg: 0x0099ff // blue
-	};
 	static embedSizeLimits = {
 		title: 256,
 		description: 4096
@@ -184,7 +180,7 @@ class MessageEmbedHandler {
 		french: "Aide"
 	};
 	static generalHelpEmbedMessage = {
-		english: 
+		english:
 			"I'm a :robot: that displays <:3x3solved:708049634349547531> images\n"
 			+ "\n`$alg` : displays the case that the alg solves```parser3\n$alg r U R' F' R U R' U' R' F R2 U' r'```"
 			+ "\n`$do` : applies the alg on a solved cube and displays the result```parser3\n$do r U R' F' R U R' U' R' F R2 U' r'```"
@@ -294,17 +290,17 @@ class MessageEmbedHandler {
 	constructor(messageHandler) {
 		this.messageHandler = messageHandler;
 		this.generalHelpEmbed = {
-			color: MessageEmbedHandler.embedColors.help,
+			color: CommandHandler.embedColors.help,
 			title: MessageEmbedHandler.generalHelpEmbedTitle[this.messageHandler.algBot.language],
 			description: MessageEmbedHandler.generalHelpEmbedMessage[this.messageHandler.algBot.language]
 		};
 		this.algListHelpEmbed = {
-			color: MessageEmbedHandler.embedColors.help,
+			color: CommandHandler.embedColors.help,
 			title: MessageEmbedHandler.algListHelpEmbedTitle[this.messageHandler.algBot.language],
 			description: MessageEmbedHandler.algListHelpEmbedMessage[this.messageHandler.algBot.language]
 		};
 		this.optionsHelpEmbed = {
-			color: MessageEmbedHandler.embedColors.help,
+			color: CommandHandler.embedColors.help,
 			title: MessageEmbedHandler.optionsHelpEmbedTitle[this.messageHandler.algBot.language],
 			description: MessageEmbedHandler.optionsHelpEmbedMessage[this.messageHandler.algBot.language]
 		};
@@ -331,7 +327,7 @@ class MessageEmbedHandler {
 			+ (optionsObject.isDo ? "" : `&setup=(${moveSequenceForAlgCubingNetUrl})%27`)
 			+ `&puzzle=${cube}`;
 		return {
-			color: MessageEmbedHandler.embedColors.alg,
+			color: CommandHandler.embedColors.alg,
 			title: moveSequenceWithLimit,
 			url: algCubingNetUrl,
 			description: `${moveCounts ? `(${moveCounts.join(", ")})` : ""}${moveCounts || commentWithLimit ? "\n" : ""}${commentWithLimit ?? ""}`,
