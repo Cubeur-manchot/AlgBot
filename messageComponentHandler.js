@@ -3,10 +3,6 @@
 import Discord from "discord.js";
 
 class MessageComponentHandler {
-	static buttonStyles = {
-		primary: 1,
-		link: 5
-	};
 	static createRow = components => {
 		return {
 			type: Discord.ComponentType.ActionRow,
@@ -22,16 +18,16 @@ class MessageComponentHandler {
 	};
 	static createLinkButton = (label, url) => {
 		return {
-			style: MessageComponentHandler.buttonStyles.link,
 			type: Discord.ComponentType.Button,
+			style: Discord.ButtonStyle.Link,
 			label: label,
 			url: url
 		};
 	};
 	static createTestButton = () => {
 		return {
-			style: 1, // primary
 			type: Discord.ComponentType.Button,
+			style: Discord.ButtonStyle.Primary,
 			label: "toto",
 			custom_id: "toto"
 		};
