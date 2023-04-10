@@ -1,13 +1,14 @@
 "use strict";
 
 import {OptionsHandler} from "./optionsHandler.js";
+import {MessageComponentHandler} from "./messageComponentHandler.js";
 
 class MessageHandler {
 	constructor(algBot) {
 		this.algBot = algBot;
 		this.commandHandler = new CommandHandler(this);
 		this.embedHandler = new MessageEmbedHandler(this);
-		this.componentsHandler = new MessageComponentsHandler(this);
+		this.componentsHandler = new MessageComponentHandler(this);
 	};
 	onMessageCreate = message => {
 		if (this.messageIsAlgBotCommand(message) && !this.messageIsInThreadWithoutAlgBot(message)) {
@@ -364,53 +365,6 @@ class MessageEmbedHandler {
 		return fieldValue.length <= discordLimit
 			? fieldValue
 			: `${fieldValue.substring(0, discordLimit - 3)}...`;
-	};
-};
-
-class MessageComponentsHandler {
-	static componentTypes = {
-		row: 1,
-		button: 2,
-		select: 3
-	};
-	static buttonStyles = {
-		primary: 1,
-		link: 5
-	};
-	static createRow = components => {
-		return {
-			type: MessageComponentsHandler.componentTypes.row,
-			components: components
-		};
-	};
-	static createSelect = valueLabelPairs => {
-		return {
-			type: MessageComponentsHandler.componentTypes.select,
-			options: valueLabelPairs,
-			custom_id: "selectCustomId"
-		};
-	};
-	static createLinkButton = (label, url) => {
-		return {
-			type: MessageComponentsHandler.componentTypes.button,
-			style: MessageComponentsHandler.buttonStyles.link,
-			label: label,
-			url: url
-		};
-	};
-	constructor(messageHandler) {
-		this.messageHandler = messageHandler;
-	};
-	createHelpComponents = selectedOption => {
-		let selectOptions = [
-			{label: "General help", value: "general"},
-			{label: "Alg list", value: "algList"},
-			{label: "Options", value: "options"}
-		];
-		selectOptions.forEach(selectOption => selectOption.default = selectOption.value === selectedOption);
-		return [MessageComponentsHandler.createRow([
-			MessageComponentsHandler.createSelect(selectOptions)
-		])];
 	};
 };
 
