@@ -1,41 +1,37 @@
 "use strict";
 
+import Discord from "discord.js";
+
 class MessageComponentHandler {
-	static componentTypes = {
-		row: 1,
-		button: 2,
-		select: 3,
-		textInput: 4
-	};
 	static buttonStyles = {
 		primary: 1,
 		link: 5
 	};
 	static createRow = components => {
 		return {
-			type: MessageComponentHandler.componentTypes.row,
+			type: Discord.ComponentType.ActionRow,
 			components: components
 		};
 	};
 	static createSelect = valueLabelPairs => {
 		return {
-			type: MessageComponentHandler.componentTypes.select,
+			type: Discord.ComponentType.SelectMenu,
 			options: valueLabelPairs,
 			custom_id: "selectCustomId"
 		};
 	};
 	static createLinkButton = (label, url) => {
 		return {
-			type: MessageComponentHandler.componentTypes.button,
 			style: MessageComponentHandler.buttonStyles.link,
+			type: Discord.ComponentType.Button,
 			label: label,
 			url: url
 		};
 	};
 	static createTestButton = () => {
 		return {
-			type: MessageComponentHandler.componentTypes.button,
 			style: 1, // primary
+			type: Discord.ComponentType.Button,
 			label: "toto",
 			custom_id: "toto"
 		};
