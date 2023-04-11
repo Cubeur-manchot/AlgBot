@@ -63,23 +63,12 @@ class CommandHandler {
 		english: "Unrecognized command",
 		french: "Commande non reconnue"
 	};
-	static invalidOptionsLabel = {
-		english: "Invalid option(s)",
-		french: "Option(s) incorrecte(s)"
-	};
-	static invalidMoveSequence = {
-		english: "Invalid move sequence",
-		french: "Algorithme incorrect"
-	};
 	constructor(messageHandler) {
 		this.messageHandler = messageHandler;
 		this.helpCommandHandler = new HelpCommandHandler(this, CommandHandler.embedColors.help);
 		this.algCommandHandler = new AlgCommandHandler(this, CommandHandler.embedColors.alg);
 		this.componentsHandler = new MessageComponentHandler(this);
-		let language = messageHandler.algBot.language;
-		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[language];
-		this.invalidOptionsLabel = CommandHandler.invalidOptionsLabel[language];
-		this.invalidMoveSequence = CommandHandler.invalidMoveSequence[language];
+		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[this.messageHandler.algBot.language];
 	};
 	getCommandResult = message => {
 		let commandHeader = message.content.split(" ")[0];

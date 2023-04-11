@@ -8,11 +8,22 @@ class AlgCommandHandler {
 		title: 256,
 		description: 4096
 	};
+	static invalidOptionsLabel = {
+		english: "Invalid option(s)",
+		french: "Option(s) incorrecte(s)"
+	};
+	static invalidMoveSequenceLabel = {
+		english: "Invalid move sequence",
+		french: "Algorithme incorrect"
+	};
 	constructor(commandHandler, embedColor) {
 		this.commandHandler = commandHandler;
 		this.optionsHandler = new OptionsHandler(this);
 		this.algManipulator = new AlgManipulator(this);
 		this.embedColor = embedColor;
+		let language = this.commandHandler.messageHandler.algBot.language;
+		this.invalidOptionsLabel = AlgCommandHandler.invalidOptionsLabel[language];
+		this.invalidMoveSequenceLabel = AlgCommandHandler.invalidMoveSequenceLabel[language];
 	};
 	getAlgOrDoCommandResult = (command, isDo) => {
 		let [, moves, options, comment] = command
@@ -22,7 +33,7 @@ class AlgCommandHandler {
 		if (parsedOptions.errors.length) {
 			return {
 				message: {
-					textContent: this.getErrorMessage(`${this.invalidOptionsLabel} :\n`
+					textContent: this.commandHandler.getErrorMessage(`${this.invalidOptionsLabel} :\n`
 						+ parsedOptions.errors.map(error => `${error.message} : ${error.option}`).join(".\n"))
 				},
 				error: true
@@ -32,7 +43,7 @@ class AlgCommandHandler {
 		if (parsedMoveSequence.errors.length) {
 			return {
 				message: {
-					textContent: this.getErrorMessage(`${this.invalidMoveSequence} :\n`
+					textContent: this.commandHandler.getErrorMessage(`${this.invalidMoveSequenceLabel} :\n`
 						+ parsedMoveSequence.errors.map(error => `${error.message}${error.scope ? ` : ${error.scope}` : ""}`).join(".\n"))
 				},
 				error: true

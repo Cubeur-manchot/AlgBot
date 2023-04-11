@@ -64,20 +64,21 @@ class AlgManipulator {
 		b: AlgManipulator.zAxisCommutingGroup,
 		S: AlgManipulator.zAxisCommutingGroup
 	};
-	constructor(algBot) {
-		this.algBot = algBot;
+	constructor(algCommandHandler) {
+		this.algCommandHandler = algCommandHandler;
 		this.algMerger = new AlgMerger(this);
 		this.algCollection = new AlgCollection(this);
-		this.unclosedCommutatorErrorMessage = AlgManipulator.unclosedCommutatorErrorMessage[this.algBot.language];
-		this.unclosedConjugateErrorMessage = AlgManipulator.unclosedConjugateErrorMessage[this.algBot.language];
-		this.unclosedParenthesisErrorMessage = AlgManipulator.unclosedParenthesisErrorMessage[this.algBot.language];
-		this.unclosedBracketStructureErrorMessage = AlgManipulator.unclosedBracketStructureErrorMessage[this.algBot.language];
-		this.middleSeparatorInParenthesisErrorMessage = AlgManipulator.middleSeparatorInParenthesisErrorMessage[this.algBot.language];
-		this.missingMiddleSeparatorInBracketsErrorMessage = AlgManipulator.missingMiddleSeparatorInBracketsErrorMessage[this.algBot.language];
-		this.middleSeparatorOutOfBracketsErrorMessage = AlgManipulator.middleSeparatorOutOfBracketsErrorMessage[this.algBot.language];
-		this.closingNonOpenStructureErrorMessage = AlgManipulator.closingNonOpenStructureErrorMessage[this.algBot.language];
-		this.wrongClosingCharacterErrorMessage = AlgManipulator.wrongClosingCharacterErrorMessage[this.algBot.language];
-		this.unrecognizedMoveErrorMessage = AlgManipulator.unrecognizedMoveErrorMessage[this.algBot.language];
+		let language = this.algCommandHandler.commandHandler.messageHandler.algBot.language;
+		this.unclosedCommutatorErrorMessage = AlgManipulator.unclosedCommutatorErrorMessage[language];
+		this.unclosedConjugateErrorMessage = AlgManipulator.unclosedConjugateErrorMessage[language];
+		this.unclosedParenthesisErrorMessage = AlgManipulator.unclosedParenthesisErrorMessage[language];
+		this.unclosedBracketStructureErrorMessage = AlgManipulator.unclosedBracketStructureErrorMessage[language];
+		this.middleSeparatorInParenthesisErrorMessage = AlgManipulator.middleSeparatorInParenthesisErrorMessage[language];
+		this.missingMiddleSeparatorInBracketsErrorMessage = AlgManipulator.missingMiddleSeparatorInBracketsErrorMessage[language];
+		this.middleSeparatorOutOfBracketsErrorMessage = AlgManipulator.middleSeparatorOutOfBracketsErrorMessage[language];
+		this.closingNonOpenStructureErrorMessage = AlgManipulator.closingNonOpenStructureErrorMessage[language];
+		this.wrongClosingCharacterErrorMessage = AlgManipulator.wrongClosingCharacterErrorMessage[language];
+		this.unrecognizedMoveErrorMessage = AlgManipulator.unrecognizedMoveErrorMessage[language];
 	};
 	parseMoveSequence = moveSequenceString => {
 		let errors = [];
