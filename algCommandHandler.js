@@ -91,7 +91,7 @@ class AlgCommandHandler {
 		let moveSequenceForAlgCubingNetUrl = moveSequenceForAlgCubingNet
 			.replace(/\s/g, "_") // replace spaces
 			.replace(/-/g, "%26%2345%3B"); // replace hyphen characters
-		let visualCubeImageUrl = this.buildVisualCubeUrl(moveSequenceForAlgCubingNet, moveSequenceObject, optionsObject);
+		let visualCubeImageUrl = this.buildVisualCubeUrl(moveSequenceForAlgCubingNet, optionsObject);
 		let algCubingNetUrl = `https://alg.cubing.net/?alg=${moveSequenceForAlgCubingNetUrl}`
 			+ (optionsObject.isDo ? "" : `&setup=(${moveSequenceForAlgCubingNetUrl})%27`)
 			+ `&puzzle=${cube}`;
@@ -105,7 +105,7 @@ class AlgCommandHandler {
 			}
 		};
 	};
-	buildVisualCubeUrl = (moveSequence, moveSequenceObject, optionsObject) => {
+	buildVisualCubeUrl = (moveSequence, optionsObject) => {
 		let moveSequenceForVisualCube =
 			this.algManipulator.replaceInnerSliceMoves(moveSequence)
 			.replace(/\s/g, "%20") // replace spaces
