@@ -147,9 +147,9 @@ class HelpCommandHandler {
 			description: HelpCommandHandler.optionsHelpEmbedMessage[language]
 		};
 		this.selectOptions = [
-			{label: HelpCommandHandler.generalHelpSelectOptionLabel[language], value: "general"},
-			{label: HelpCommandHandler.algListHelpSelectOptionLabel[language], value: "algList"},
-			{label: HelpCommandHandler.optionsHelpSelectOptionLabel[language], value: "options"}
+			{label: HelpCommandHandler.generalHelpSelectOptionLabel[language], emoji: "💡", value: "general"},
+			{label: HelpCommandHandler.algListHelpSelectOptionLabel[language], emoji: "📖", value: "algList"},
+			{label: HelpCommandHandler.optionsHelpSelectOptionLabel[language], emoji: "🔧", value: "options"}
 		];
 	};
 	getHelpCommandResult = () => {
