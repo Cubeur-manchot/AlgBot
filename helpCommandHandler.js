@@ -1,5 +1,7 @@
 "use strict";
 
+import { MessageComponentHandler } from "./messageComponentHandler.js";
+
 class HelpCommandHandler {
 	static generalHelpEmbedTitle = {
 		english: "Help",
@@ -155,7 +157,7 @@ class HelpCommandHandler {
 			message: {
 				textContent: null,
 				embed: this.generalHelpEmbed,
-				components: this.commandHandler.componentsHandler.createRowWithSelectComponents(
+				components: MessageComponentHandler.createRowWithSelectComponents(
 					this.selectOptions, this.selectOptions[0].value, HelpCommandHandler.helpSelectOptionCustomId)
 			},
 			error: false
@@ -165,7 +167,7 @@ class HelpCommandHandler {
 		let interactionValue = interaction.values[0];
 		interaction.update({
 			embeds: [this[`${interactionValue}HelpEmbed`]],
-			components: this.commandHandler.componentsHandler.createRowWithSelectComponents(
+			components: MessageComponentHandler.createRowWithSelectComponents(
 				this.selectOptions, interactionValue, HelpCommandHandler.helpSelectOptionCustomId)
 		})
 		.catch(interactionCreateError => this.algBot.logger.errorLog(

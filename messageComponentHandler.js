@@ -9,13 +9,6 @@ class MessageComponentHandler {
 			components: components
 		};
 	};
-	static createSelect = (valueLabelPairs, customId) => {
-		return {
-			type: Discord.ComponentType.SelectMenu,
-			options: valueLabelPairs,
-			custom_id: customId
-		};
-	};
 	static createLinkButton = (label, url) => {
 		return {
 			type: Discord.ComponentType.Button,
@@ -32,14 +25,14 @@ class MessageComponentHandler {
 			custom_id: "toto"
 		};
 	};
-	constructor(commandHandler) {
-		this.commandHandler = commandHandler;
-	};
-	createRowWithSelectComponents = (selectOptions, selectedOption, customId) => {
+	static createRowWithSelectComponents = (selectOptions, selectedOption, customId) => {
 		selectOptions.forEach(selectOption => selectOption.default = selectOption.value === selectedOption);
 		return [MessageComponentHandler.createRow([
-			MessageComponentHandler.createSelect(selectOptions, customId)
+			new Discord.StringSelectMenuBuilder({options: selectOptions, customId: customId})
 		])];
+	};
+	constructor(commandHandler) {
+		this.commandHandler = commandHandler;
 	};
 };
 
