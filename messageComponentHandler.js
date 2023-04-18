@@ -5,9 +5,13 @@ import Discord from "discord.js";
 class MessageComponentHandler {
 	static createRowWithSelectComponents = (selectOptions, selectedOption, customId) => {
 		selectOptions.forEach(selectOption => selectOption.default = selectOption.value === selectedOption);
-		return [MessageComponentHandler.createRow([
-			new Discord.StringSelectMenuBuilder({options: selectOptions, customId: customId})
-		])];
+		return [new Discord.ActionRowBuilder()
+			.setComponents([
+				new Discord.StringSelectMenuBuilder()
+					.setOptions(selectOptions)
+					.setCustomId(customId)
+			])
+		];
 	};
 	static createRowWithButtonsComponents = buttons => {
 		return [new Discord.ActionRowBuilder()
