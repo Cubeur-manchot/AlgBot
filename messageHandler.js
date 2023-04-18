@@ -2,6 +2,7 @@
 
 import {HelpCommandHandler} from "./helpCommandHandler.js";
 import {AlgCommandHandler} from "./algCommandHandler.js";
+import {FeedbackCommandHandler} from "./feedbackCommandHandler.js";
 import {MessageComponentHandler} from "./messageComponentHandler.js";
 
 class MessageHandler {
@@ -57,7 +58,8 @@ class MessageHandler {
 class CommandHandler {
 	static embedColors = {
 		help: 0xcccc00, // yellow
-		alg: 0x0099ff // blue
+		alg: 0x0099ff, // blue
+		feedback: 0xd67b07 // orange
 	};
 	static unrecognizedCommandLabel = {
 		english: "Unrecognized command",
@@ -67,6 +69,7 @@ class CommandHandler {
 		this.messageHandler = messageHandler;
 		this.helpCommandHandler = new HelpCommandHandler(this, CommandHandler.embedColors.help);
 		this.algCommandHandler = new AlgCommandHandler(this, CommandHandler.embedColors.alg);
+		this.feedbackCommandHandler = new FeedbackCommandHandler(this, CommandHandler.embedColors.feedback);
 		this.componentsHandler = new MessageComponentHandler(this);
 		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[this.messageHandler.algBot.language];
 	};
@@ -79,6 +82,8 @@ class CommandHandler {
 				return this.algCommandHandler.getAlgOrDoCommandResult(message.content, false);
 			case "do":
 				return this.algCommandHandler.getAlgOrDoCommandResult(message.content, true);
+			case "feedback":
+				return this.feedbackCommandHandler.getFeedbackCommandResult(message);
 			default:
 				return this.getUnrecognizedCommandResult(commandHeader);
 		}
@@ -94,19 +99,12 @@ class CommandHandler {
 			error: true
 		};
 	};
-		return {
-			message: {
-			},
-			error: false
-		};
-	};
 	onInteractionCreate = interaction => {
 		if (!this.messageHandler.messageIsAlgBotMessage(interaction.message)) {
 			return;
 		}
 		if (interaction.customId === HelpCommandHandler.helpSelectOptionCustomId) {
 			this.helpCommandHandler.handleHelpStringSelectInteraction(interaction);
-		}
 		}
 	};
 };
