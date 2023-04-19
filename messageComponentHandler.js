@@ -23,6 +23,23 @@ class MessageComponentHandler {
 			)
 		];
 	};
+	static createFormModal = (inputFields, title, customId) => {
+		return new Discord.ModalBuilder()
+			.setTitle(title)
+			.setComponents(inputFields.map(inputField =>
+				new Discord.ActionRowBuilder()
+					.setComponents([
+						new Discord.TextInputBuilder()
+							.setLabel(inputField.label)
+							.setStyle(inputField.isMultiLine ? Discord.TextInputStyle.Paragraph : Discord.TextInputStyle.Short)
+							.setRequired(inputField.isRequired ?? false)
+							.setValue(inputField.value)
+							.setPlaceholder(inputField.placeholder)
+							.setCustomId(inputField.customId)
+					])
+			))
+			.setCustomId(customId);
+	};
 	constructor(commandHandler) {
 		this.commandHandler = commandHandler;
 	};

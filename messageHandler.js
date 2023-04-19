@@ -86,7 +86,7 @@ class CommandHandler {
 				return this.feedbackCommandHandler.getFeedbackCommandResult(message);
 			default:
 				return this.getUnrecognizedCommandResult(commandHeader);
-		}
+		};
 	};
 	getErrorMessage = errorMessage => {
 		return `:x: ${errorMessage}.`;
@@ -103,9 +103,17 @@ class CommandHandler {
 		if (!this.messageHandler.messageIsAlgBotMessage(interaction.message)) {
 			return;
 		}
-		if (interaction.customId === HelpCommandHandler.helpSelectOptionCustomId) {
-			this.helpCommandHandler.handleHelpStringSelectInteraction(interaction);
-		}
+		switch (interaction.customId) {
+			case HelpCommandHandler.helpSelectOptionCustomId:
+				this.helpCommandHandler.handleHelpStringSelectInteraction(interaction);
+				break;
+			case FeedbackCommandHandler.commandErrorFeedbackButtonCustomId:
+				this.feedbackCommandHandler.handleCommandErrorFeedbackButtonInteraction(interaction);
+				break;
+			case FeedbackCommandHandler.otherFeedbackButtonCustomId:
+				this.feedbackCommandHandler.handleOtherFeedbackButtonInteraction(interaction);
+				break;
+		};
 	};
 };
 

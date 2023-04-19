@@ -17,6 +17,40 @@ class FeedbackCommandHandler {
 		french: "Autre"
 	};
 	static otherFeedbackButtonCustomId = "otherFeedbackButtonCustomId";
+	static commandErrorFeedbackModalTitle = {
+		english: "Report of an error",
+		french: "Rapport d'une erreur"
+	};
+	static commandErrorFeedbackModalCustomId = "commandErrorFeedbackModalCustomId";
+	static commandErrorFeedbackModalCommandInputLabel = {
+		english: "Example of command causing the error",
+		french: "Exemple de commande provoquant l'erreur"
+	};
+	static commandErrorFeedbackModalCommandInputCustomId = "commandErrorFeedbackModalCommandInputCustomId";
+	static commandErrorFeedbackModalShortDescriptionLabel = {
+		english: "Short description of the error",
+		french: "Description courte de l'erreur"
+	};
+	static commandErrorFeedbackModalShortDescriptionCustomId = "commandErrorFeedbackModalShortDescriptionCustomId";
+	static commandErrorFeedbackModalLongDescriptionLabel = {
+		english: "Detailed description of the error",
+		french: "Description détaillée de l'erreur"
+	};
+	static commandErrorFeedbackModalLongDescriptionCustomId = "commandErrorFeedbackModalLongDescriptionCustomId";
+	static otherFeedbackModalTitle = {
+		english: "Feedback",
+		french: "Feedback"
+	};
+	static otherFeedbackModalCustomId = "otherFeedbackModalCustomId";
+	static otherFeedbackModalDescriptionLabel = {
+		english: "Description",
+		french: "Description"
+	};
+	static otherFeedbackModalDescriptionPlaceholder = {
+		english: "Questions, new features suggestions, dissatisfactions, thanks, ...",
+		french: "Questions, propositions de nouvelles fonctionnalités, mécontentements, remerciements, ..."
+	};
+	static otherFeedbackModalDescriptionCustomId = "otherFeedbackModalDescriptionCustomId";
 	constructor(commandHandler, embedColor) {
 		this.commandHandler = commandHandler;
 		this.embedColor = embedColor;
@@ -40,7 +74,52 @@ class FeedbackCommandHandler {
 				emoji: "🗨️",
 				customId: FeedbackCommandHandler.otherFeedbackButtonCustomId
 			}
-		])
+		]);
+		this.commandErrorFeedbackModalTitle = FeedbackCommandHandler.commandErrorFeedbackModalTitle[language];
+		this.commandErrorFeedbackModalCommandInputLabel = FeedbackCommandHandler.commandErrorFeedbackModalCommandInputLabel[language];
+		this.commandErrorFeedbackModalShortDescriptionLabel = FeedbackCommandHandler.commandErrorFeedbackModalShortDescriptionLabel[language];
+		this.commandErrorFeedbackModalLongDescriptionLabel = FeedbackCommandHandler.commandErrorFeedbackModalLongDescriptionLabel[language];
+		this.commandErrorFeedbackModal = MessageComponentHandler.createFormModal(
+			[{
+				label: this.commandErrorFeedbackModalCommandInputLabel,
+				isMultiLine: false,
+				isRequired: false,
+				value: "",
+				placeholder: "",
+				customId: FeedbackCommandHandler.commandErrorFeedbackModalCommandInputCustomId
+			}, {
+				label: this.commandErrorFeedbackModalShortDescriptionLabel,
+				isMultiLine: false,
+				isRequired: true,
+				value: "",
+				placeholder: "",
+				customId: FeedbackCommandHandler.commandErrorFeedbackModalShortDescriptionCustomId
+			}, {
+				label: this.commandErrorFeedbackModalLongDescriptionLabel,
+				isMultiLine: true,
+				isRequired: false,
+				value: "",
+				placeholder: "",
+				customId: FeedbackCommandHandler.commandErrorFeedbackModalLongDescriptionCustomId
+			}],
+			this.commandErrorFeedbackModalTitle,
+			FeedbackCommandHandler.commandErrorFeedbackModalCustomId
+		);
+		this.otherFeedbackModalTitle = FeedbackCommandHandler.otherFeedbackModalTitle[language];
+		this.otherFeedbackModalDescriptionLabel = FeedbackCommandHandler.otherFeedbackModalDescriptionLabel[language];
+		this.otherFeedbackModalDescriptionPlaceholder = FeedbackCommandHandler.otherFeedbackModalDescriptionPlaceholder[language];
+		this.otherFeedbackModal = MessageComponentHandler.createFormModal(
+			[{
+				label: this.otherFeedbackModalDescriptionLabel,
+				isMultiLine: true,
+				isRequired: true,
+				value: "",
+				placeholder: this.otherFeedbackModalDescriptionPlaceholder,
+				customId: FeedbackCommandHandler.otherFeedbackModalDescriptionCustomId
+			}],
+			this.otherFeedbackModalTitle,
+			FeedbackCommandHandler.otherFeedbackModalCustomId
+		);
 	};
 	getFeedbackCommandResult = () => {
 		return {
@@ -51,6 +130,12 @@ class FeedbackCommandHandler {
 			},
 			error: false
 		};
+	};
+	handleCommandErrorFeedbackButtonInteraction = interaction => {
+		interaction.showModal(this.commandErrorFeedbackModal);
+	};
+	handleOtherFeedbackButtonInteraction = interaction => {
+		interaction.showModal(this.otherFeedbackModal);
 	};
 };
 
