@@ -33,6 +33,25 @@ class DiscordClient extends Discord.Client {
 		this.on("interactionCreate", this.algBot.messageHandler.commandHandler.onInteractionCreate);
 		this.loginWithToken();
 	};
+	sendMessageToChannel = (message, channel) => {
+		channel.send({
+			content: message.textContent,
+			embeds: message.embed ? [message.embed] : null,
+			components: message.components,
+			allowedMentions: {
+				repliedUser: false
+			}
+		})
+		.catch(messageSendError => this.algBot.logger.errorLog("Error when sending "
+			+ `"${message.textContent ?? ""}" `
+			+ `(embeds : ${message.embed ? 1 : 0}`
+			+ `, components : ${message.components?.length ?? 0})`
+			+ ` in channel "${channel.name}" `
+			+ `(channelId = ${channel.id}`
+			+ `, serverName = ${channel.guild.name})`
+			+ ` : "${messageSendError}".`
+		));
+	};
 	reply = (answer, initialMessage, deleteIfNotEdited) => {
 		if (initialMessage && !initialMessage.deleted) {
 			initialMessage.reply({
@@ -66,7 +85,7 @@ class DiscordClient extends Discord.Client {
 			})
 			.catch(messageReplyError => this.algBot.logger.errorLog("Error when replying "
 				+ `"${answer.textContent ?? ""}" `
-				+ `(embeds : ${answer.embed ? "1" : "0"}`
+				+ `(embeds : ${answer.embed ? 1 : 0}`
 				+ `, components : ${answer.components?.length ?? 0})`
 				+ " to initial message "
 				+ `(content = "${initialMessage.content}"`
