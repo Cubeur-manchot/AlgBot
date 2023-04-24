@@ -168,7 +168,10 @@ class DiscordClient extends Discord.Client {
 	};
 	loginWithToken = () => {
 		this.login(process.env[`TOKEN_${this.algBot.language.toUpperCase()}`])
-			.then(() => this.algBot.logger.infoLog(`AlgBot (${this.algBot.language}) is logged in !`))
+			.then(() => {
+				this.algBot.logger.infoLog(`AlgBot (${this.algBot.language}) is logged in !`);
+				this.fetchFeedbackChannel();
+			})
 			.catch(loginError => this.algBot.logger.errorLog(
 				`Fail to login for AlgBot (${this.algBot.language}) : "${loginError}".`
 			));
@@ -180,6 +183,18 @@ class DiscordClient extends Discord.Client {
 			status: "online",
 		});
 		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language})'s presence has been set.`);
+	};
+	fetchFeedbackChannel = () => {
+		this.channels.fetch(process.env[`FEEDBACKCHANNEL_${this.algBot.language.toUpperCase()}`])
+			.then(channel => {
+				this.algBot.messageHandler.commandHandler.feedbackCommandHandler.feedbackChannel = channel;
+				this.algBot.logger.infoLog(
+					`AlgBot (${this.algBot.language})'s feedback channel has been fetched !`
+				);
+			})
+			.catch(channelFetchError => this.algBot.logger.errorLog(
+				`Fail to fetch feedback channel for AlgBot (${this.algBot.language}) : "${channelFetchError}".`
+			));
 	};
 	channelIsDm = channel => {
 		return channel.type === Discord.ChannelType.DM;
