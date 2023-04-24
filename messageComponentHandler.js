@@ -32,6 +32,7 @@ class MessageComponentHandler {
 						new Discord.TextInputBuilder()
 							.setLabel(inputField.label)
 							.setStyle(inputField.isMultiLine ? Discord.TextInputStyle.Paragraph : Discord.TextInputStyle.Short)
+							.setMaxLength(inputField.maxLength)
 							.setRequired(inputField.isRequired ?? false)
 							.setValue(inputField.value)
 							.setPlaceholder(inputField.placeholder)

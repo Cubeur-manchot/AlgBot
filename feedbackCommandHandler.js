@@ -84,6 +84,7 @@ class FeedbackCommandHandler {
 				label: this.commandErrorFeedbackModalCommandInputLabel,
 				isMultiLine: false,
 				isRequired: false,
+				maxLength: 500,
 				value: "",
 				placeholder: "",
 				customId: FeedbackCommandHandler.commandErrorFeedbackModalCommandInputCustomId
@@ -91,6 +92,7 @@ class FeedbackCommandHandler {
 				label: this.commandErrorFeedbackModalShortDescriptionLabel,
 				isMultiLine: false,
 				isRequired: true,
+				maxLength: 120,
 				value: "",
 				placeholder: "",
 				customId: FeedbackCommandHandler.commandErrorFeedbackModalShortDescriptionCustomId
@@ -98,6 +100,7 @@ class FeedbackCommandHandler {
 				label: this.commandErrorFeedbackModalLongDescriptionLabel,
 				isMultiLine: true,
 				isRequired: false,
+				maxLength: 4000,
 				value: "",
 				placeholder: "",
 				customId: FeedbackCommandHandler.commandErrorFeedbackModalLongDescriptionCustomId
@@ -113,6 +116,7 @@ class FeedbackCommandHandler {
 				label: this.otherFeedbackModalDescriptionLabel,
 				isMultiLine: true,
 				isRequired: true,
+				maxLength: 4000,
 				value: "",
 				placeholder: this.otherFeedbackModalDescriptionPlaceholder,
 				customId: FeedbackCommandHandler.otherFeedbackModalDescriptionCustomId
