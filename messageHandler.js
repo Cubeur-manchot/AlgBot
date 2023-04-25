@@ -113,6 +113,12 @@ class CommandHandler {
 			case FeedbackCommandHandler.otherFeedbackButtonCustomId:
 				this.feedbackCommandHandler.handleOtherFeedbackButtonInteraction(interaction);
 				break;
+			case FeedbackCommandHandler.commandErrorFeedbackModalCustomId:
+				this.feedbackCommandHandler.handleCommandErrorFeedbackModalSubmit(interaction);
+				break;
+			case FeedbackCommandHandler.otherFeedbackModalCustomId:
+				this.feedbackCommandHandler.handleOtherFeedbackModalSubmit(interaction);
+				break;
 		};
 	};
 };

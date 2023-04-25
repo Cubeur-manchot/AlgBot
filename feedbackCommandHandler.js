@@ -1,5 +1,6 @@
 "use strict";
 
+import { AlgBotDate } from "./date.js";
 import { MessageComponentHandler } from "./messageComponentHandler.js";
 
 class FeedbackCommandHandler {
@@ -140,6 +141,58 @@ class FeedbackCommandHandler {
 	};
 	handleOtherFeedbackButtonInteraction = interaction => {
 		interaction.showModal(this.otherFeedbackModal);
+	};
+	handleCommandErrorFeedbackModalSubmit = interaction => {
+		let [command, shortDescription, longDescription] = interaction.components
+			.map(rowComponent => rowComponent.components[0].value);
+		let pseudo = this.getPseudoFromInteraction(interaction);
+		let date = new AlgBotDate().getDateString();
+		let answerMessage = {
+			textContent: null,
+			embed: {
+				color: this.embedColor,
+				title: `__Error report__\n"${shortDescription}"`,
+				thumbnail: {
+					url: interaction.user.avatarURL()
+				},
+				description: longDescription.length ? `> ${longDescription}` : null,
+				fields: command.length
+					? [{name: "Command", value: command}]
+					: null,
+				footer: {
+					text: `From ${pseudo}, at ${date}.`
+				}
+			},
+			components: null
+		};
+		this.commandHandler.messageHandler.algBot.discordClient.sendMessageToChannel(answerMessage, this.feedbackChannel);
+	};
+	handleOtherFeedbackModalSubmit = interaction => {
+		let description = interaction.components[0].components[0].value;
+		let pseudo = this.getPseudoFromInteraction(interaction);
+		let date = new AlgBotDate().getDateString();
+		let answerMessage = {
+			textContent: null,
+			embed: {
+				color: this.embedColor,
+				title: "__Feedback report__",
+				thumbnail: {
+					url: interaction.user.avatarURL()
+				},
+				description: `> ${description}`,
+				footer: {
+					text: `From ${pseudo}, at ${date}.`
+				}
+			},
+			components: null
+		};
+		this.commandHandler.messageHandler.algBot.discordClient.sendMessageToChannel(answerMessage, this.feedbackChannel);
+	};
+	getPseudoFromInteraction = interaction => {
+		let userWithDiscriminator = `${interaction.user.username}#${interaction.user.discriminator}`;
+		return interaction.member?.nickname
+			? `${interaction.member.nickname} (${userWithDiscriminator})`
+			: userWithDiscriminator;
 	};
 };
 
