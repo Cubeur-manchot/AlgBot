@@ -52,6 +52,10 @@ class FeedbackCommandHandler {
 		french: "Questions, propositions de nouvelles fonctionnalités, mécontentements, remerciements, ..."
 	};
 	static otherFeedbackModalDescriptionCustomId = "otherFeedbackModalDescriptionCustomId";
+	static feedbackThankYouLabel = {
+		english: "Thank you for your feedback !",
+		french: "Merci pour votre feedback !"
+	};
 	constructor(commandHandler, embedColor) {
 		this.commandHandler = commandHandler;
 		this.embedColor = embedColor;
@@ -125,6 +129,7 @@ class FeedbackCommandHandler {
 			this.otherFeedbackModalTitle,
 			FeedbackCommandHandler.otherFeedbackModalCustomId
 		);
+		this.feedbackThankYouLabel = FeedbackCommandHandler.feedbackThankYouLabel[language];
 	};
 	getFeedbackCommandResult = () => {
 		return {
@@ -166,6 +171,7 @@ class FeedbackCommandHandler {
 			components: null
 		};
 		this.commandHandler.messageHandler.algBot.discordClient.sendMessageToChannel(answerMessage, this.feedbackChannel);
+		this.replyFeedbackModalSubmitInteraction(interaction);
 	};
 	handleOtherFeedbackModalSubmit = interaction => {
 		let description = interaction.components[0].components[0].value;
@@ -187,12 +193,21 @@ class FeedbackCommandHandler {
 			components: null
 		};
 		this.commandHandler.messageHandler.algBot.discordClient.sendMessageToChannel(answerMessage, this.feedbackChannel);
+		this.replyFeedbackModalSubmitInteraction(interaction);
 	};
 	getPseudoFromInteraction = interaction => {
 		let userWithDiscriminator = `${interaction.user.username}#${interaction.user.discriminator}`;
 		return interaction.member?.nickname
 			? `${interaction.member.nickname} (${userWithDiscriminator})`
 			: userWithDiscriminator;
+	};
+	replyFeedbackModalSubmitInteraction = interaction => {
+		this.commandHandler.messageHandler.algBot.discordClient.replyInteraction({
+			textContent: this.feedbackThankYouLabel,
+			embed: null,
+			components: null,
+			ephemeral: true
+		}, interaction);
 	};
 };
 

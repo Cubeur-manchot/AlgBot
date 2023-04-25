@@ -99,6 +99,29 @@ class DiscordClient extends Discord.Client {
 			));
 		}
 	};
+	replyInteraction = (answer, interaction) => {
+		interaction.reply({
+			contents: answer.textContent,
+			embeds: answer.embed ? [answer.embed] : null,
+			components: answer.components,
+			allowedMentions: {
+				repliedUser: false
+			},
+			ephemeral: answer.ephemeral
+		})
+		.catch(interactionReplyError => this.algBot.logger.errorLog("Error when replying "
+			+ `"${answer.textContent ?? ""}" `
+			+ `(embeds : ${answer.embed ? 1 : 0}`
+			+ `, components : ${answer.components?.length ?? 0})`
+			+ " to interaction "
+			+ `(type = "${Discord.InteractionType[interaction.type]}"`
+			+ `, created at "${new AlgBotDate(interaction.createdTimestamp).getDateString()}"`
+			+ `, userId = ${interaction.user.id}`
+			+ `, channelName = ${interaction.channel.name ? `"${interaction.channel.name}"` : undefined}`
+			+ `, serverName = ${interaction.channel.guild ? `"${interaction.channel.guild.name}"` : undefined})`
+			+ ` : "${interactionReplyError}".`
+		));
+	};
 	editMessage = (oldMessage, newMessage, deleteIfNotEdited, answeredMessageToDeleteIfNotEdited) => {
 		if (oldMessage && !oldMessage.deleted) {
 			oldMessage.edit({
