@@ -13,7 +13,7 @@ class MessageHandler {
 	onMessageCreate = message => {
 		if (this.messageIsAlgBotCommand(message) && !this.messageIsInThreadWithoutAlgBot(message)) {
 			let commandResult = this.commandHandler.getCommandResult(message);
-			this.algBot.discordClient.reply(commandResult.message, message, commandResult.error);
+			this.algBot.discordClient.replyMessage(commandResult.message, message, commandResult.error);
 		}
 	};
 	onMessageDelete = message => {

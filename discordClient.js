@@ -52,7 +52,7 @@ class DiscordClient extends Discord.Client {
 			+ ` : "${messageSendError}".`
 		));
 	};
-	reply = (answer, initialMessage, deleteIfNotEdited) => {
+	replyMessage = (answer, initialMessage, deleteIfNotEdited) => {
 		if (initialMessage && !initialMessage.deleted) {
 			initialMessage.reply({
 				content: answer.textContent,
