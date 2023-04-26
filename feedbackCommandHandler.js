@@ -1,7 +1,7 @@
 "use strict";
 
-import { AlgBotDate } from "./date.js";
-import { MessageComponentHandler } from "./messageComponentHandler.js";
+import {AlgBotDate} from "./date.js";
+import {MessageComponentHandler} from "./messageComponentHandler.js";
 
 class FeedbackCommandHandler {
 	static selectFeedbackTypeQuestionLabel = {

@@ -1,6 +1,6 @@
 "use strict";
 
-import { MessageComponentHandler } from "./messageComponentHandler.js";
+import {MessageComponentHandler} from "./messageComponentHandler.js";
 
 class HelpCommandHandler {
 	static generalHelpEmbedTitle = {

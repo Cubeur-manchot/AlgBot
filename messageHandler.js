@@ -78,12 +78,12 @@ class CommandHandler {
 		switch (commandHeader.substring(1)) {
 			case "help":
 				return this.helpCommandHandler.getHelpCommandResult();
+			case "feedback":
+				return this.feedbackCommandHandler.getFeedbackCommandResult();
 			case "alg":
 				return this.algCommandHandler.getAlgOrDoCommandResult(message.content, false);
 			case "do":
 				return this.algCommandHandler.getAlgOrDoCommandResult(message.content, true);
-			case "feedback":
-				return this.feedbackCommandHandler.getFeedbackCommandResult(message);
 			default:
 				return this.getUnrecognizedCommandResult(commandHeader);
 		};
