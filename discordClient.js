@@ -101,7 +101,7 @@ class DiscordClient extends Discord.Client {
 	};
 	replyInteraction = (answer, interaction) => {
 		interaction.reply({
-			contents: answer.textContent,
+			content: answer.textContent,
 			embeds: answer.embed ? [answer.embed] : null,
 			components: answer.components,
 			allowedMentions: {
