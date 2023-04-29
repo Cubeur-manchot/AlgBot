@@ -220,11 +220,7 @@ class DiscordClient extends Discord.Client {
 	};
 	onReady = () => {
 		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language}) is ready !`);
-		this.user.setPresence({
-			activities: [{name: this.routineActivity, type: Discord.ActivityType.Playing}],
-			status: "online",
-		});
-		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language})'s presence has been set.`);
+		this.setRoutinePresence();
 	};
 	fetchFeedbackChannel = () => {
 		this.channels.fetch(process.env[`FEEDBACKCHANNEL_${this.algBot.language.toUpperCase()}`])
@@ -237,6 +233,13 @@ class DiscordClient extends Discord.Client {
 			.catch(channelFetchError => this.algBot.logger.errorLog(
 				`Fail to fetch feedback channel for AlgBot (${this.algBot.language}) : "${channelFetchError}".`
 			));
+	};
+	setRoutinePresence = () => {
+		this.user.setPresence({
+			activities: [{name: this.routineActivity, type: Discord.ActivityType.Playing}],
+			status: "online",
+		});
+		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language})'s routine presence has been set.`);
 	};
 	channelIsDm = channel => {
 		return channel.type === Discord.ChannelType.DM;
