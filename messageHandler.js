@@ -4,6 +4,7 @@ import {HelpCommandHandler} from "./helpCommandHandler.js";
 import {AlgCommandHandler} from "./algCommandHandler.js";
 import {FeedbackCommandHandler} from "./feedbackCommandHandler.js";
 import {MessageComponentHandler} from "./messageComponentHandler.js";
+import {ServersCommandHandler} from "./serversCommandHandler.js";
 
 class MessageHandler {
 	constructor(algBot) {
@@ -59,7 +60,8 @@ class CommandHandler {
 	static embedColors = {
 		help: 0xcccc00, // yellow
 		alg: 0x0099ff, // blue
-		feedback: 0xd67b07 // orange
+		feedback: 0xd67b07, // orange
+		servers: 0x771bc2 // purple
 	};
 	static unrecognizedCommandLabel = {
 		english: "Unrecognized command",
@@ -70,6 +72,7 @@ class CommandHandler {
 		this.helpCommandHandler = new HelpCommandHandler(this, CommandHandler.embedColors.help);
 		this.algCommandHandler = new AlgCommandHandler(this, CommandHandler.embedColors.alg);
 		this.feedbackCommandHandler = new FeedbackCommandHandler(this, CommandHandler.embedColors.feedback);
+		this.serversCommandHandler = new ServersCommandHandler(this, CommandHandler.embedColors.servers);
 		this.componentsHandler = new MessageComponentHandler(this);
 		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[this.messageHandler.algBot.language];
 	};
@@ -80,6 +83,8 @@ class CommandHandler {
 				return this.helpCommandHandler.getHelpCommandResult();
 			case "feedback":
 				return this.feedbackCommandHandler.getFeedbackCommandResult();
+			case "servers":
+				return this.serversCommandHandler.getServersCommandResult();
 			case "alg":
 				return this.algCommandHandler.getAlgOrDoCommandResult(message.content, false);
 			case "do":

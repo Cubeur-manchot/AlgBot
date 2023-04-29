@@ -14,6 +14,7 @@ class HelpCommandHandler {
 			+ "\n`$do` : applies the alg on a solved cube and displays the result```parser3\n$do r U R' F' R U R' U' R' F R2 U' r'```"
 			+ "\n`$help` : displays this help, the recognized algs and the supported options```parser3\n$help```"
 			+ "\n`$feedback` : allows to give feedback, for example to report a bug```parser3\n$feedback```"
+			+ "\n`$servers`: lists all servers I am on```parser3\n$servers```"
 			+ "\nIf the command is edited/deleted, I'll automatically adapt my answer.\n"
 			+ "\nIf a command is incorrect, I'll send an error message,"
 			+ " and I'll delete the command after 10 seconds to clean the channel.",
@@ -23,6 +24,7 @@ class HelpCommandHandler {
 			+ "\n`$do` : applique l'algo sur un cube résolu et affiche le résultat```parser3\n$do r U R' F' R U R' U' R' F R2 U' r'```"
 			+ "\n`$help` : affiche cette aide, les algos reconnus et les options supportées```parser3\n$help```"
 			+ "\n`$feedback` : permet de donner un feedback, par exemple pour rapporter un bug```parser3\n$feedback```"
+			+ "\n`$servers`: liste tous les serveurs sur lesquels je suis```parser3\n$servers```"
 			+ "\nSi la commande est modifiée ou supprimée, j'adapte automatiquement ma réponse.\n"
 			+ "\nSi une commande est incorrecte, j'envoie un message d'erreur,"
 			+ " et je supprime la commande au bout de 10 secondes pour faire le ménage."
