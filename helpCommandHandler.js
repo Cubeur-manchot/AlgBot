@@ -95,7 +95,7 @@ class HelpCommandHandler {
 			+ "```yaml\n$alg PLL_Y -count```"
 			+ "\n`-merge` : merge and cancel moves if possible"
 			+ "```yaml\n$alg OLL_33 OLL_37 -merge```"
-			+ "\n`-rotatable` : enables to rotate the cube by clicking on the reactions"
+			+ "\n`-rotatable` : enables to rotate the cube by clicking on the reactions (temporarily disabled)"
 			+ "```yaml\n$alg sune -rotatable```",
 		french:
 			"Voici les options que je prends en charge :\n"
@@ -116,7 +116,7 @@ class HelpCommandHandler {
 			+ "```yaml\n$alg PLL_Y -count```"
 			+ "\n`-merge` : fusionne et annule les mouvements si possible"
 			+ "```yaml\n$alg OLL_33 OLL_37 -merge```"
-			+ "\n`-rotatable` : permet de faire tourner le cube en cliquant sur les réactions"
+			+ "\n`-rotatable` : permet de faire tourner le cube en cliquant sur les réactions (temporairement désactivé)"
 			+ "```yaml\n$alg sune -rotatable```"
 	};
 	static generalHelpSelectOptionLabel = {
