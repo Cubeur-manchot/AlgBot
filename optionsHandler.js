@@ -141,7 +141,7 @@ class OptionsHandler {
 			} else if (option === "merge") {
 				optionsResult.mergeMoves = true;
 			} else if (OptionsHandler.colorSchemes[option]) {
-				optionsResult.colorScheme = colorSchemeFromOption[option];
+				optionsResult.colorScheme = OptionsHandler.colorSchemes[option];
 			} else if (option === "rotatable") {
 				optionsResult.rotatable = true;
 			} else {
