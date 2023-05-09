@@ -24,9 +24,6 @@ class MessageHandler {
 		}
 	};
 	onMessageUpdate = (oldMessage, newMessage) => {
-		if (newMessage.author.id !== "217709941081767937") {
-			return;
-		}
 		if (this.messageIsAlgBotCommand(oldMessage)) {
 			let previousAnswer = this.findAlgBotAnswer(oldMessage);
 			if (this.messageIsAlgBotCommand(newMessage)) {
