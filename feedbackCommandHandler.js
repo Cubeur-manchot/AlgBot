@@ -1,7 +1,7 @@
 "use strict";
 
 import {AlgBotDate} from "./date.js";
-import {MessageComponentHandler} from "./messageComponentHandler.js";
+import {DiscordMessageComponentBuilder} from "./discordUtils/discordMessageComponentBuilder.js";
 
 class FeedbackCommandHandler {
 	static selectFeedbackTypeQuestionLabel = {
@@ -68,7 +68,7 @@ class FeedbackCommandHandler {
 			title: "Feedback",
 			description: this.selectFeedbackTypeQuestionLabel
 		};
-		this.feedbackButtonsComponents = MessageComponentHandler.createRowWithButtonsComponents([
+		this.feedbackButtonsComponents = DiscordMessageComponentBuilder.createRowWithButtonsComponents([
 			{
 				label: this.commandErrorFeedbackButtonLabel,
 				emoji: "🤒",
@@ -84,7 +84,7 @@ class FeedbackCommandHandler {
 		this.commandErrorFeedbackModalCommandInputLabel = FeedbackCommandHandler.commandErrorFeedbackModalCommandInputLabel[language];
 		this.commandErrorFeedbackModalShortDescriptionLabel = FeedbackCommandHandler.commandErrorFeedbackModalShortDescriptionLabel[language];
 		this.commandErrorFeedbackModalLongDescriptionLabel = FeedbackCommandHandler.commandErrorFeedbackModalLongDescriptionLabel[language];
-		this.commandErrorFeedbackModal = MessageComponentHandler.createFormModal(
+		this.commandErrorFeedbackModal = DiscordMessageComponentBuilder.createFormModal(
 			[{
 				label: this.commandErrorFeedbackModalCommandInputLabel,
 				isMultiLine: false,
@@ -116,7 +116,7 @@ class FeedbackCommandHandler {
 		this.otherFeedbackModalTitle = FeedbackCommandHandler.otherFeedbackModalTitle[language];
 		this.otherFeedbackModalDescriptionLabel = FeedbackCommandHandler.otherFeedbackModalDescriptionLabel[language];
 		this.otherFeedbackModalDescriptionPlaceholder = FeedbackCommandHandler.otherFeedbackModalDescriptionPlaceholder[language];
-		this.otherFeedbackModal = MessageComponentHandler.createFormModal(
+		this.otherFeedbackModal = DiscordMessageComponentBuilder.createFormModal(
 			[{
 				label: this.otherFeedbackModalDescriptionLabel,
 				isMultiLine: true,

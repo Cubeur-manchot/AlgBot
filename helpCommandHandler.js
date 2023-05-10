@@ -1,6 +1,6 @@
 "use strict";
 
-import {MessageComponentHandler} from "./messageComponentHandler.js";
+import {DiscordMessageComponentBuilder} from "./discordUtils/discordMessageComponentBuilder.js";
 
 class HelpCommandHandler {
 	static generalHelpEmbedTitle = {
@@ -161,7 +161,7 @@ class HelpCommandHandler {
 			message: {
 				textContent: null,
 				embed: this.generalHelpEmbed,
-				components: MessageComponentHandler.createRowWithSelectComponents(
+				components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
 					this.selectOptions, this.selectOptions[0].value, HelpCommandHandler.helpSelectOptionCustomId)
 			},
 			error: false
@@ -171,7 +171,7 @@ class HelpCommandHandler {
 		let interactionValue = interaction.values[0];
 		interaction.update({
 			embeds: [this[`${interactionValue}HelpEmbed`]],
-			components: MessageComponentHandler.createRowWithSelectComponents(
+			components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
 				this.selectOptions, interactionValue, HelpCommandHandler.helpSelectOptionCustomId)
 		})
 		.catch(interactionCreateError => this.algBot.logger.errorLog(

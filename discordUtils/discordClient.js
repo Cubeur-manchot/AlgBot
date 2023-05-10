@@ -1,7 +1,7 @@
 "use strict";
 
 import Discord from "discord.js";
-import {AlgBotDate} from "./date.js";
+import {AlgBotDate} from "../date.js";
 
 class DiscordClient extends Discord.Client {
 	static discordApiUnknownMessageError = "DiscordAPIError[10008]: Unknown Message";

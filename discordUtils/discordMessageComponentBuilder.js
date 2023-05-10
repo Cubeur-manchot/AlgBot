@@ -2,7 +2,7 @@
 
 import Discord from "discord.js";
 
-class MessageComponentHandler {
+class DiscordMessageComponentBuilder {
 	static createRowWithSelectComponents = (selectOptions, selectedOption, customId) => {
 		selectOptions.forEach(selectOption => selectOption.default = selectOption.value === selectedOption);
 		return [new Discord.ActionRowBuilder()
@@ -41,9 +41,6 @@ class MessageComponentHandler {
 			))
 			.setCustomId(customId);
 	};
-	constructor(commandHandler) {
-		this.commandHandler = commandHandler;
-	};
 };
 
-export {MessageComponentHandler};
+export {DiscordMessageComponentBuilder};

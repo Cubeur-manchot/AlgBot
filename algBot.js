@@ -1,6 +1,6 @@
 "use strict";
 
-import {DiscordClient} from "./discordClient.js";
+import {DiscordClient} from "./discordUtils/discordClient.js";
 import {ImageBuilder} from "./imageBuilder.js";
 import {Logger} from "./logger.js";
 import {MessageHandler} from "./messageHandler.js";
