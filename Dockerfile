@@ -6,7 +6,7 @@ COPY package.json .
 
 RUN npm install
 
-COPY index.js algBot.js date.js logger.js discordClient.js messageHandler.js messageComponentHandler.js /
+COPY index.js algBot.js date.js logger.js discordUtils/discordClient.js messageHandler.js messageComponentHandler.js /
 COPY algCommandHandler.js algManipulator.js optionsHandler.js imageBuilder.js /
 COPY helpCommandHandler.js feedbackCommandHandler.js serversCommandHandler.js inviteCommandHandler.js /
 
