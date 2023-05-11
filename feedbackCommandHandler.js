@@ -2,6 +2,7 @@
 
 import {AlgBotDate} from "./date.js";
 import {DiscordMessageComponentBuilder} from "./discordUtils/discordMessageComponentBuilder.js";
+import {DiscordMessageEmbedBuilder} from "./discordUtils/discordMessageEmbedBuilder.js";
 
 class FeedbackCommandHandler {
 	static selectFeedbackTypeQuestionLabel = {
@@ -60,12 +61,11 @@ class FeedbackCommandHandler {
 		this.commandHandler = commandHandler;
 		this.embedColor = embedColor;
 		let language = this.commandHandler.messageHandler.algBot.language;
-		this.selectFeedbackTypeQuestionLabel = FeedbackCommandHandler.selectFeedbackTypeQuestionLabel[language];
-		this.feedbackCommandEmbed = {
-			color: this.embedColor,
-			title: "Feedback",
-			description: this.selectFeedbackTypeQuestionLabel
-		};
+		this.feedbackCommandEmbed = DiscordMessageEmbedBuilder.createSimpleEmbed(
+			this.embedColor,
+			"Feedback",
+			FeedbackCommandHandler.selectFeedbackTypeQuestionLabel[language]
+		);
 		this.feedbackButtonsComponents = DiscordMessageComponentBuilder.createRowWithButtonsComponents([
 			{
 				label: FeedbackCommandHandler.commandErrorFeedbackButtonLabel[language],
