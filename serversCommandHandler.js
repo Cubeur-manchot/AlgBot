@@ -1,5 +1,7 @@
 "use strict";
 
+import {DiscordMessageEmbedBuilder} from "./discordUtils/discordMessageEmbedBuilder.js";
+
 class ServersCommandHandler {
 	static serversCommandEmbedTitle = {
 		english: "Servers",
@@ -37,11 +39,11 @@ class ServersCommandHandler {
 			.sort((firstGuild, secondGuild) => secondGuild.memberCount - firstGuild.memberCount)
 			.map(guild => `${guild.name} (${guild.memberCount} ${this.membersWord})`)
 			.join("\n");
-		return {
-			color: this.embedColor,
-			title: this.serversCommandEmbedTitle,
-			description: `${this.serversCommandEmbedDescription} :\n\n${guildsList}`
-		};
+		return DiscordMessageEmbedBuilder.createSimpleEmbed(
+			this.embedColor,
+			this.serversCommandEmbedTitle,
+			`${this.serversCommandEmbedDescription} :\n\n${guildsList}`
+		);
 	};
 };
 
