@@ -1,6 +1,7 @@
 "use strict";
 
 import {DiscordMessageComponentBuilder} from "./discordUtils/discordMessageComponentBuilder.js";
+import {DiscordMessageEmbedBuilder} from "./discordUtils/discordMessageEmbedBuilder.js";
 
 class HelpCommandHandler {
 	static generalHelpEmbedTitle = {
@@ -135,21 +136,21 @@ class HelpCommandHandler {
 	constructor(commandHandler, embedColor) {
 		this.commandHandler = commandHandler;
 		let language = this.commandHandler.messageHandler.algBot.language;
-		this.generalHelpEmbed = {
-			color: embedColor,
-			title: HelpCommandHandler.generalHelpEmbedTitle[language],
-			description: HelpCommandHandler.generalHelpEmbedMessage[language]
-		};
-		this.algListHelpEmbed = {
-			color: embedColor,
-			title: HelpCommandHandler.algListHelpEmbedTitle[language],
-			description: HelpCommandHandler.algListHelpEmbedMessage[language]
-		};
-		this.optionsHelpEmbed = {
-			color: embedColor,
-			title: HelpCommandHandler.optionsHelpEmbedTitle[language],
-			description: HelpCommandHandler.optionsHelpEmbedMessage[language]
-		};
+		this.generalHelpEmbed = DiscordMessageEmbedBuilder.createSimpleEmbed(
+			embedColor,
+			HelpCommandHandler.generalHelpEmbedTitle[language],
+			HelpCommandHandler.generalHelpEmbedMessage[language]
+		);
+		this.algListHelpEmbed = DiscordMessageEmbedBuilder.createSimpleEmbed(
+			embedColor,
+			HelpCommandHandler.algListHelpEmbedTitle[language],
+			HelpCommandHandler.algListHelpEmbedMessage[language]
+		);
+		this.optionsHelpEmbed = DiscordMessageEmbedBuilder.createSimpleEmbed(
+			embedColor,
+			HelpCommandHandler.optionsHelpEmbedTitle[language],
+			HelpCommandHandler.optionsHelpEmbedMessage[language]
+		);
 		this.selectOptions = [
 			{label: HelpCommandHandler.generalHelpSelectOptionLabel[language], emoji: "💡", value: "general"},
 			{label: HelpCommandHandler.algListHelpSelectOptionLabel[language], emoji: "📖", value: "algList"},
