@@ -3,11 +3,28 @@
 import Discord from "discord.js";
 
 class DiscordMessageEmbedBuilder {
+	static embedSizeLimits = {
+		title: 256,
+		description: 4096
+	};
 	static createSimpleEmbed = (color, title, description) => {
 		return new Discord.EmbedBuilder()
 			.setColor(color)
-			.setTitle(title)
-			.setDescription(description);
+			.setTitle(DiscordMessageEmbedBuilder.applyTitleSizeLimit(title))
+			.setDescription(DiscordMessageEmbedBuilder.applyDescriptionSizeLimit(description));
+	};
+	applyTitleSizeLimit = title => {
+		return DiscordMessageEmbedBuilder.applyEmbedSizeLimit(
+			title, DiscordMessageEmbedBuilder.embedSizeLimits.title);
+	};
+	applyDescriptionSizeLimit = description => {
+		return DiscordMessageEmbedBuilder.applyEmbedSizeLimit(
+			description, DiscordMessageEmbedBuilder.embedSizeLimits.description);
+	};
+	applyEmbedSizeLimit = (fieldValue, discordLimit) => {
+		return fieldValue.length <= discordLimit
+			? fieldValue
+			: `${fieldValue.substring(0, discordLimit - 3)}...`;
 	};
 };
 
