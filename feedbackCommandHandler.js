@@ -61,8 +61,6 @@ class FeedbackCommandHandler {
 		this.embedColor = embedColor;
 		let language = this.commandHandler.messageHandler.algBot.language;
 		this.selectFeedbackTypeQuestionLabel = FeedbackCommandHandler.selectFeedbackTypeQuestionLabel[language];
-		this.commandErrorFeedbackButtonLabel = FeedbackCommandHandler.commandErrorFeedbackButtonLabel[language];
-		this.otherFeedbackButtonLabel = FeedbackCommandHandler.otherFeedbackButtonLabel[language];
 		this.feedbackCommandEmbed = {
 			color: this.embedColor,
 			title: "Feedback",
@@ -70,23 +68,19 @@ class FeedbackCommandHandler {
 		};
 		this.feedbackButtonsComponents = DiscordMessageComponentBuilder.createRowWithButtonsComponents([
 			{
-				label: this.commandErrorFeedbackButtonLabel,
+				label: FeedbackCommandHandler.commandErrorFeedbackButtonLabel[language],
 				emoji: "🤒",
 				customId: FeedbackCommandHandler.commandErrorFeedbackButtonCustomId
 			},
 			{
-				label: this.otherFeedbackButtonLabel,
+				label: FeedbackCommandHandler.otherFeedbackButtonLabel[language],
 				emoji: "🗨️",
 				customId: FeedbackCommandHandler.otherFeedbackButtonCustomId
 			}
 		]);
-		this.commandErrorFeedbackModalTitle = FeedbackCommandHandler.commandErrorFeedbackModalTitle[language];
-		this.commandErrorFeedbackModalCommandInputLabel = FeedbackCommandHandler.commandErrorFeedbackModalCommandInputLabel[language];
-		this.commandErrorFeedbackModalShortDescriptionLabel = FeedbackCommandHandler.commandErrorFeedbackModalShortDescriptionLabel[language];
-		this.commandErrorFeedbackModalLongDescriptionLabel = FeedbackCommandHandler.commandErrorFeedbackModalLongDescriptionLabel[language];
 		this.commandErrorFeedbackModal = DiscordMessageComponentBuilder.createFormModal(
 			[{
-				label: this.commandErrorFeedbackModalCommandInputLabel,
+				label: FeedbackCommandHandler.commandErrorFeedbackModalCommandInputLabel[language],
 				isMultiLine: false,
 				isRequired: false,
 				maxLength: 500,
@@ -94,7 +88,7 @@ class FeedbackCommandHandler {
 				placeholder: "",
 				customId: FeedbackCommandHandler.commandErrorFeedbackModalCommandInputCustomId
 			}, {
-				label: this.commandErrorFeedbackModalShortDescriptionLabel,
+				label: FeedbackCommandHandler.commandErrorFeedbackModalShortDescriptionLabel[language],
 				isMultiLine: false,
 				isRequired: true,
 				maxLength: 120,
@@ -102,7 +96,7 @@ class FeedbackCommandHandler {
 				placeholder: "",
 				customId: FeedbackCommandHandler.commandErrorFeedbackModalShortDescriptionCustomId
 			}, {
-				label: this.commandErrorFeedbackModalLongDescriptionLabel,
+				label: FeedbackCommandHandler.commandErrorFeedbackModalLongDescriptionLabel[language],
 				isMultiLine: true,
 				isRequired: false,
 				maxLength: 4000,
@@ -110,23 +104,20 @@ class FeedbackCommandHandler {
 				placeholder: "",
 				customId: FeedbackCommandHandler.commandErrorFeedbackModalLongDescriptionCustomId
 			}],
-			this.commandErrorFeedbackModalTitle,
+			FeedbackCommandHandler.commandErrorFeedbackModalTitle[language],
 			FeedbackCommandHandler.commandErrorFeedbackModalCustomId
 		);
-		this.otherFeedbackModalTitle = FeedbackCommandHandler.otherFeedbackModalTitle[language];
-		this.otherFeedbackModalDescriptionLabel = FeedbackCommandHandler.otherFeedbackModalDescriptionLabel[language];
-		this.otherFeedbackModalDescriptionPlaceholder = FeedbackCommandHandler.otherFeedbackModalDescriptionPlaceholder[language];
 		this.otherFeedbackModal = DiscordMessageComponentBuilder.createFormModal(
 			[{
-				label: this.otherFeedbackModalDescriptionLabel,
+				label: FeedbackCommandHandler.otherFeedbackModalDescriptionLabel[language],
 				isMultiLine: true,
 				isRequired: true,
 				maxLength: 4000,
 				value: "",
-				placeholder: this.otherFeedbackModalDescriptionPlaceholder,
+				placeholder: FeedbackCommandHandler.otherFeedbackModalDescriptionPlaceholder[language],
 				customId: FeedbackCommandHandler.otherFeedbackModalDescriptionCustomId
 			}],
-			this.otherFeedbackModalTitle,
+			FeedbackCommandHandler.otherFeedbackModalTitle[language],
 			FeedbackCommandHandler.otherFeedbackModalCustomId
 		);
 		this.feedbackThankYouLabel = FeedbackCommandHandler.feedbackThankYouLabel[language];
