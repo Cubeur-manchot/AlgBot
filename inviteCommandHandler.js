@@ -1,5 +1,7 @@
 "use strict";
 
+import {DiscordMessageEmbedBuilder} from "./discordUtils/discordMessageEmbedBuilder.js";
+
 class InviteCommandHandler {
 	static inviteCommandEmbedTitle = {
 		english: "Invite AlgBot to a server",
@@ -37,11 +39,11 @@ class InviteCommandHandler {
 				Math.abs(firstAlgBotUser.id - currentAlgBotUserId) - Math.abs(secondAlgBotUser.id - currentAlgBotUserId)) // current version will appear first
 			.map(this.buildInviteLink)
 			.join("\n\n");
-		return {
-			color: this.embedColor,
-			title: this.inviteCommandEmbedTitle,
-			description: `${this.inviteCommandEmbedDescription}\n\n${inviteLinks}`
-		};
+		return DiscordMessageEmbedBuilder.createSimpleEmbed(
+			this.embedColor,
+			this.inviteCommandEmbedTitle,
+			`${this.inviteCommandEmbedDescription}\n\n${inviteLinks}`
+		);
 	};
 	buildInviteLink = algBotUser => {
 		return ":flag_" + algBotUser.languageIsoCode + ": - "
