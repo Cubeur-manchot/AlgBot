@@ -2,6 +2,7 @@
 
 import {OptionsHandler} from "./optionsHandler.js";
 import {AlgManipulator} from "./algManipulator.js";
+import { DiscordMessageEmbedBuilder } from "./discordUtils/discordMessageEmbedBuilder.js";
 
 class AlgCommandHandler {
 	static embedSizeLimits = {
@@ -95,15 +96,14 @@ class AlgCommandHandler {
 		let algCubingNetUrl = `https://alg.cubing.net/?alg=${moveSequenceForAlgCubingNetUrl}`
 			+ (optionsObject.isDo ? "" : `&setup=(${moveSequenceForAlgCubingNetUrl})%27`)
 			+ `&puzzle=${cube}`;
-		return {
-			color: this.embedColor,
-			title: moveSequenceWithLimit,
-			url: algCubingNetUrl,
-			description: `${moveCounts ? `(${moveCounts.join(", ")})` : ""}${moveCounts || commentWithLimit ? "\n" : ""}${commentWithLimit ?? ""}`,
-			image: {
-				url: visualCubeImageUrl
-			}
-		};
+		let description = `${moveCounts ? `(${moveCounts.join(", ")})` : ""}${moveCounts || commentWithLimit ? "\n" : ""}${commentWithLimit ?? ""}`;
+		return DiscordMessageEmbedBuilder.createEmbedWithImageAndLink(
+			this.embedColor,
+			moveSequenceWithLimit,
+			algCubingNetUrl,
+			description,
+			visualCubeImageUrl
+		);
 	};
 	buildVisualCubeUrl = (moveSequence, optionsObject) => {
 		let moveSequenceForVisualCube =

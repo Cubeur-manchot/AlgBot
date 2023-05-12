@@ -13,6 +13,11 @@ class DiscordMessageEmbedBuilder {
 			.setTitle(DiscordMessageEmbedBuilder.applyTitleSizeLimit(title))
 			.setDescription(DiscordMessageEmbedBuilder.applyDescriptionSizeLimit(description));
 	};
+	static createEmbedWithImageAndLink = (color, title, url, description, imageUrl) => {
+		return DiscordMessageEmbedBuilder.createSimpleEmbed(color, title, description)
+			.setURL(url)
+			.setImage(imageUrl);
+	};
 	static applyTitleSizeLimit = title => {
 		return DiscordMessageEmbedBuilder.applyEmbedSizeLimit(
 			title, DiscordMessageEmbedBuilder.embedSizeLimits.title);
