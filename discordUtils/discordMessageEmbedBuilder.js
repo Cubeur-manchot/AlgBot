@@ -13,15 +13,15 @@ class DiscordMessageEmbedBuilder {
 			.setTitle(DiscordMessageEmbedBuilder.applyTitleSizeLimit(title))
 			.setDescription(DiscordMessageEmbedBuilder.applyDescriptionSizeLimit(description));
 	};
-	applyTitleSizeLimit = title => {
+	static applyTitleSizeLimit = title => {
 		return DiscordMessageEmbedBuilder.applyEmbedSizeLimit(
 			title, DiscordMessageEmbedBuilder.embedSizeLimits.title);
 	};
-	applyDescriptionSizeLimit = description => {
+	static applyDescriptionSizeLimit = description => {
 		return DiscordMessageEmbedBuilder.applyEmbedSizeLimit(
 			description, DiscordMessageEmbedBuilder.embedSizeLimits.description);
 	};
-	applyEmbedSizeLimit = (fieldValue, discordLimit) => {
+	static applyEmbedSizeLimit = (fieldValue, discordLimit) => {
 		return fieldValue.length <= discordLimit
 			? fieldValue
 			: `${fieldValue.substring(0, discordLimit - 3)}...`;
