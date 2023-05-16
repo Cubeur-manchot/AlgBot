@@ -3,6 +3,12 @@
 import Discord from "discord.js";
 
 class DiscordMessageEmbedBuilder {
+	static noTitleUrl = null;
+	static noDescription = null;
+	static noFields = null;
+	static noThumbnailUrl = null;
+	static noImageUrl = null;
+	static noFooterTextContent = null;
 	static embedSizeLimits = {
 		title: 256,
 		description: 4096
@@ -22,24 +28,24 @@ class DiscordMessageEmbedBuilder {
 			.setColor(color)
 			.setTitle(DiscordMessageEmbedBuilder.applyTitleSizeLimit(title));
 		// optional fields
-		if (titleUrl) {
+		if (titleUrl !== DiscordMessageEmbedBuilder.noTitleUrl) {
 			embed.setURL(titleUrl);
 		}
-		if (description) {
+		if (description !== DiscordMessageEmbedBuilder.noDescription) {
 			embed.setDescription(DiscordMessageEmbedBuilder.applyDescriptionSizeLimit(description));
 		}
-		if (fields) {
+		if (fields !== DiscordMessageEmbedBuilder.noFields) {
 			for (let field of fields) {
 				embed.addFields(field);
 			}
 		}
-		if (thumbnailImageUrl) {
+		if (thumbnailImageUrl !== DiscordMessageEmbedBuilder.noThumbnailUrl) {
 			embed.setThumbnail(thumbnailImageUrl);
 		}
-		if (imageUrl) {
+		if (imageUrl !== DiscordMessageEmbedBuilder.noImageUrl) {
 			embed.setImage(imageUrl);
 		}
-		if (footerTextContent) {
+		if (footerTextContent !== DiscordMessageEmbedBuilder.noFooterTextContent) {
 			embed.setFooter({text: footerTextContent});
 		}
 		return embed;
