@@ -13,15 +13,6 @@ class DiscordMessageEmbedBuilder {
 		title: 256,
 		description: 4096
 	};
-	static createBaseEmbed = (color, title) => {
-		return new Discord.EmbedBuilder()
-		.setColor(color)
-		.setTitle(DiscordMessageEmbedBuilder.applyTitleSizeLimit(title))
-	};
-	static createSimpleEmbed = (color, title, description) => {
-		return DiscordMessageEmbedBuilder.createBaseEmbed(color, title)
-			.setDescription(DiscordMessageEmbedBuilder.applyDescriptionSizeLimit(description));
-	};
 	static createEmbed = (color, title, titleUrl, description, fields, thumbnailImageUrl, imageUrl, footerTextContent) => {
 		// mandatory fields
 		let embed = new Discord.EmbedBuilder()
