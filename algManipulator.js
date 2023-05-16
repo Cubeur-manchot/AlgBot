@@ -904,9 +904,9 @@ class AlgCollection {
 		niklasleft: "L' U R U' L U R'",
 
 		// parities
-		"4x4ollparity": "r U2 x r U2 r U2' r' U2 l U2 r' U2' r U2 r' U2' r'",
-		"4x4pllparity": "Rw2 R2 U2 Rw2 R2 Uw2 Rw2 R2 Uw2",
-		"4x4pllparitybigcubes": "Rw2' F2 U2 Rw2 R2' U2 F2 Rw2"
+		"4x4ollparity": "Rw U2 x Rw U2 Rw U2' Rw' U2 Lw U2 Rw' U2' Rw U2 Rw' U2' Rw'",
+		"4x4pllparity": "2R2 U2 2R2 Uw2 2R2 Uw2",
+		"4x4pllparitybigcubes": "Rw2' F2 U2' Rw2 R2' U2' F2 Rw2"
 	};
 	constructor(algManipulator) {
 		this.algManipulator = algManipulator;
