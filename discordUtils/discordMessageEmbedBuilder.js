@@ -50,11 +50,6 @@ class DiscordMessageEmbedBuilder {
 		}
 		return embed;
 	};
-	static createEmbedWithThumbnail = (color, title, description, thumbnailImageUrl, footerTextContent) => {
-		return DiscordMessageEmbedBuilder.createSimpleEmbed(color, title, description)
-			.setThumbnail(thumbnailImageUrl)
-			.setFooter({text: footerTextContent});
-	};
 	static createEmbedWithImageAndLink = (color, title, url, imageUrl) => {
 		return DiscordMessageEmbedBuilder.createBaseEmbed(color, title)
 			.setURL(url)
