@@ -141,24 +141,18 @@ class FeedbackCommandHandler {
 	handleCommandErrorFeedbackModalSubmit = interaction => {
 		let [command, shortDescription, longDescription] = interaction.components
 			.map(rowComponent => rowComponent.components[0].value);
-		let pseudo = this.getPseudoFromInteraction(interaction);
-		let date = new AlgBotDate().getDateString();
+		let embed = DiscordMessageEmbedBuilder.createEmbed(this.embedColor,
+			`__Error report__\n"${shortDescription}"`,
+			null,
+			longDescription.length ? `> ${longDescription}` : null,
+			command.length ? [{name: "Command", value: command}] : null,
+			interaction.user.avatarURL(),
+			null,
+			`From ${this.getPseudoFromInteraction(interaction)}, at ${new AlgBotDate().getDateString()}.`
+		);
 		let answerMessage = {
 			textContent: null,
-			embed: {
-				color: this.embedColor,
-				title: `__Error report__\n"${shortDescription}"`,
-				thumbnail: {
-					url: interaction.user.avatarURL()
-				},
-				description: longDescription.length ? `> ${longDescription}` : null,
-				fields: command.length
-					? [{name: "Command", value: command}]
-					: null,
-				footer: {
-					text: `From ${pseudo}, at ${date}.`
-				}
-			},
+			embed: embed,
 			components: null
 		};
 		this.commandHandler.messageHandler.algBot.discordClient.sendMessageToChannel(answerMessage, this.feedbackChannel);
