@@ -159,11 +159,14 @@ class FeedbackCommandHandler {
 		this.replyFeedbackModalSubmitInteraction(interaction);
 	};
 	handleOtherFeedbackModalSubmit = interaction => {
-		let embed = DiscordMessageEmbedBuilder.createEmbedWithThumbnail(
+		let embed = DiscordMessageEmbedBuilder.createEmbed(
 			this.embedColor,
 			"__Feedback report__",
+			DiscordMessageEmbedBuilder.noTitleUrl,
 			`> ${interaction.components[0].components[0].value}`,
+			DiscordMessageEmbedBuilder.noFields,
 			interaction.user.avatarURL(),
+			DiscordMessageEmbedBuilder.noImageUrl,
 			`From ${this.getPseudoFromInteraction(interaction)}, at ${new AlgBotDate().getDateString()}.`
 		);
 		let answerMessage = {
