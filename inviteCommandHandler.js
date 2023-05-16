@@ -39,10 +39,15 @@ class InviteCommandHandler {
 				Math.abs(firstAlgBotUser.id - currentAlgBotUserId) - Math.abs(secondAlgBotUser.id - currentAlgBotUserId)) // current version will appear first
 			.map(this.buildInviteLink)
 			.join("\n\n");
-		return DiscordMessageEmbedBuilder.createSimpleEmbed(
+		return DiscordMessageEmbedBuilder.createEmbed(
 			this.embedColor,
 			this.inviteCommandEmbedTitle,
-			`${this.inviteCommandEmbedDescription}\n\n${inviteLinks}`
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			`${this.inviteCommandEmbedDescription}\n\n${inviteLinks}`,
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			DiscordMessageEmbedBuilder.noImageUrl,
+			DiscordMessageEmbedBuilder.noFooterTextContent
 		);
 	};
 	buildInviteLink = algBotUser => {
