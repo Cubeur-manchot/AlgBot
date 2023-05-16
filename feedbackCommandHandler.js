@@ -165,22 +165,16 @@ class FeedbackCommandHandler {
 		this.replyFeedbackModalSubmitInteraction(interaction);
 	};
 	handleOtherFeedbackModalSubmit = interaction => {
-		let description = interaction.components[0].components[0].value;
-		let pseudo = this.getPseudoFromInteraction(interaction);
-		let date = new AlgBotDate().getDateString();
+		let embed = DiscordMessageEmbedBuilder.createEmbedWithThumbnail(
+			this.embedColor,
+			"__Feedback report__",
+			`> ${interaction.components[0].components[0].value}`,
+			interaction.user.avatarURL(),
+			`From ${this.getPseudoFromInteraction(interaction)}, at ${new AlgBotDate().getDateString()}.`
+		);
 		let answerMessage = {
 			textContent: null,
-			embed: {
-				color: this.embedColor,
-				title: "__Feedback report__",
-				thumbnail: {
-					url: interaction.user.avatarURL()
-				},
-				description: `> ${description}`,
-				footer: {
-					text: `From ${pseudo}, at ${date}.`
-				}
-			},
+			embed: embed,
 			components: null
 		};
 		this.commandHandler.messageHandler.algBot.discordClient.sendMessageToChannel(answerMessage, this.feedbackChannel);
