@@ -136,20 +136,35 @@ class HelpCommandHandler {
 	constructor(commandHandler, embedColor) {
 		this.commandHandler = commandHandler;
 		let language = this.commandHandler.messageHandler.algBot.language;
-		this.generalHelpEmbed = DiscordMessageEmbedBuilder.createSimpleEmbed(
+		this.generalHelpEmbed = DiscordMessageEmbedBuilder.createEmbed(
 			embedColor,
 			HelpCommandHandler.generalHelpEmbedTitle[language],
-			HelpCommandHandler.generalHelpEmbedMessage[language]
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			HelpCommandHandler.generalHelpEmbedMessage[language],
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			DiscordMessageEmbedBuilder.noImageUrl,
+			DiscordMessageEmbedBuilder.noFooterTextContent
 		);
-		this.algListHelpEmbed = DiscordMessageEmbedBuilder.createSimpleEmbed(
+		this.algListHelpEmbed = DiscordMessageEmbedBuilder.createEmbed(
 			embedColor,
 			HelpCommandHandler.algListHelpEmbedTitle[language],
-			HelpCommandHandler.algListHelpEmbedMessage[language]
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			HelpCommandHandler.algListHelpEmbedMessage[language],
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			DiscordMessageEmbedBuilder.noImageUrl,
+			DiscordMessageEmbedBuilder.noFooterTextContent
 		);
-		this.optionsHelpEmbed = DiscordMessageEmbedBuilder.createSimpleEmbed(
+		this.optionsHelpEmbed = DiscordMessageEmbedBuilder.createEmbed(
 			embedColor,
 			HelpCommandHandler.optionsHelpEmbedTitle[language],
-			HelpCommandHandler.optionsHelpEmbedMessage[language]
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			HelpCommandHandler.optionsHelpEmbedMessage[language],
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			DiscordMessageEmbedBuilder.noImageUrl,
+			DiscordMessageEmbedBuilder.noFooterTextContent
 		);
 		this.selectOptions = [
 			{label: HelpCommandHandler.generalHelpSelectOptionLabel[language], emoji: "💡", value: "general"},
