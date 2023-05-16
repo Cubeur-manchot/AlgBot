@@ -143,11 +143,11 @@ class FeedbackCommandHandler {
 			.map(rowComponent => rowComponent.components[0].value);
 		let embed = DiscordMessageEmbedBuilder.createEmbed(this.embedColor,
 			`__Error report__\n"${shortDescription}"`,
-			null,
-			longDescription.length ? `> ${longDescription}` : null,
-			command.length ? [{name: "Command", value: command}] : null,
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			longDescription.length ? `> ${longDescription}` : DiscordMessageEmbedBuilder.noDescription,
+			command.length ? [{name: "Command", value: command}] : DiscordMessageEmbedBuilder.noFields,
 			interaction.user.avatarURL(),
-			null,
+			DiscordMessageEmbedBuilder.noImageUrl,
 			`From ${this.getPseudoFromInteraction(interaction)}, at ${new AlgBotDate().getDateString()}.`
 		);
 		let answerMessage = {
