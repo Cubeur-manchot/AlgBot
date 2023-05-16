@@ -39,10 +39,15 @@ class ServersCommandHandler {
 			.sort((firstGuild, secondGuild) => secondGuild.memberCount - firstGuild.memberCount)
 			.map(guild => `${guild.name} (${guild.memberCount} ${this.membersWord})`)
 			.join("\n");
-		return DiscordMessageEmbedBuilder.createSimpleEmbed(
+		return DiscordMessageEmbedBuilder.createEmbed(
 			this.embedColor,
 			this.serversCommandEmbedTitle,
-			`${this.serversCommandEmbedDescription} :\n\n${guildsList}`
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			`${this.serversCommandEmbedDescription} :\n\n${guildsList}`,
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			DiscordMessageEmbedBuilder.noImageUrl,
+			DiscordMessageEmbedBuilder.noFooterTextContent
 		);
 	};
 };
