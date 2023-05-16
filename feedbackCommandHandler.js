@@ -61,10 +61,15 @@ class FeedbackCommandHandler {
 		this.commandHandler = commandHandler;
 		this.embedColor = embedColor;
 		let language = this.commandHandler.messageHandler.algBot.language;
-		this.feedbackCommandEmbed = DiscordMessageEmbedBuilder.createSimpleEmbed(
+		this.feedbackCommandEmbed = DiscordMessageEmbedBuilder.createEmbed(
 			this.embedColor,
 			"Feedback",
-			FeedbackCommandHandler.selectFeedbackTypeQuestionLabel[language]
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			FeedbackCommandHandler.selectFeedbackTypeQuestionLabel[language],
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			DiscordMessageEmbedBuilder.noImageUrl,
+			DiscordMessageEmbedBuilder.noFooterTextContent
 		);
 		this.feedbackButtonsComponents = DiscordMessageComponentBuilder.createRowWithButtonsComponents([
 			{
