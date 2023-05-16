@@ -50,11 +50,6 @@ class DiscordMessageEmbedBuilder {
 		}
 		return embed;
 	};
-	static createEmbedWithImageLinkAndDescription = (color, title, url, imageUrl, description) => {
-		return DiscordMessageEmbedBuilder.createSimpleEmbed(color, title, description)
-			.setURL(url)
-			.setImage(imageUrl);
-	};
 	static applyTitleSizeLimit = title => {
 		return DiscordMessageEmbedBuilder.applyEmbedSizeLimit(
 			title, DiscordMessageEmbedBuilder.embedSizeLimits.title);
