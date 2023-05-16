@@ -101,11 +101,16 @@ class AlgCommandHandler {
 		let description = [moveCounts, commentWithLimit]
 			.filter(descriptionChunk => descriptionChunk !== null)
 			.join("\n");
-		return description.length
-			? DiscordMessageEmbedBuilder.createEmbedWithImageLinkAndDescription(this.embedColor,
-				moveSequenceWithLimit, algCubingNetUrl, visualCubeImageUrl, description)
-			: DiscordMessageEmbedBuilder.createEmbedWithImageAndLink(this.embedColor,
-				moveSequenceWithLimit, algCubingNetUrl, visualCubeImageUrl);
+		return DiscordMessageEmbedBuilder.createEmbed(
+				this.embedColor,
+				moveSequenceWithLimit,
+				algCubingNetUrl,
+				description.length ? description : DiscordMessageEmbedBuilder.noDescription,
+				DiscordMessageEmbedBuilder.noFields,
+				DiscordMessageEmbedBuilder.noThumbnailUrl,
+				visualCubeImageUrl,
+				DiscordMessageEmbedBuilder.noFooterTextContent
+			);
 	};
 	buildVisualCubeUrl = (moveSequence, optionsObject) => {
 		let moveSequenceForVisualCube =
