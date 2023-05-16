@@ -78,14 +78,6 @@ class AlgCommandHandler {
 	createAlgEmbed = (moveSequenceObject, optionsObject) => {
 		let moveSequenceWithLimit = this.applyDiscordEmbedLimits(moveSequenceObject.moveSequence, AlgCommandHandler.embedSizeLimits.title);
 		let cube = optionsObject.puzzle.replace("cube", "");
-		let commentWithLimit = moveSequenceObject.comment
-			? this.applyDiscordEmbedLimits(moveSequenceObject.comment, AlgCommandHandler.embedSizeLimits.description)
-			: null;
-		let moveCounts = moveSequenceObject.moveCounts
-			? Object.keys(moveSequenceObject.moveCounts)
-				.filter(metric => optionsObject.countMoves[metric] === true)
-				.map(metric => `${moveSequenceObject.moveCounts[metric]} ${metric.toUpperCase()}`)
-			: null;
 		let cubeSize = parseInt(cube.match(/\d+/)[0]);
 		let moveSequenceForAlgCubingNet =
 			this.algManipulator.replaceMiddleSliceMoves(moveSequenceObject.moveSequence, cubeSize);
@@ -96,14 +88,24 @@ class AlgCommandHandler {
 		let algCubingNetUrl = `https://alg.cubing.net/?alg=${moveSequenceForAlgCubingNetUrl}`
 			+ (optionsObject.isDo ? "" : `&setup=(${moveSequenceForAlgCubingNetUrl})%27`)
 			+ `&puzzle=${cube}`;
-		let description = `${moveCounts ? `(${moveCounts.join(", ")})` : ""}${moveCounts || commentWithLimit ? "\n" : ""}${commentWithLimit ?? ""}`;
-		return DiscordMessageEmbedBuilder.createEmbedWithImageAndLink(
-			this.embedColor,
-			moveSequenceWithLimit,
-			algCubingNetUrl,
-			description,
-			visualCubeImageUrl
-		);
+		let commentWithLimit = moveSequenceObject.comment
+			? this.applyDiscordEmbedLimits(moveSequenceObject.comment, AlgCommandHandler.embedSizeLimits.description)
+			: null;
+		let moveCounts = moveSequenceObject.moveCounts
+			? `(${Object.keys(moveSequenceObject.moveCounts)
+				.filter(metric => optionsObject.countMoves[metric] === true)
+				.map(metric => `${moveSequenceObject.moveCounts[metric]} ${metric.toUpperCase()}`)
+				.join(", ")
+				})`
+			: null;
+		let description = [moveCounts, commentWithLimit]
+			.filter(descriptionChunk => descriptionChunk !== null)
+			.join("\n");
+		return description.length
+			? DiscordMessageEmbedBuilder.createEmbedWithImageLinkAndDescription(this.embedColor,
+				moveSequenceWithLimit, algCubingNetUrl, visualCubeImageUrl, description)
+			: DiscordMessageEmbedBuilder.createEmbedWithImageAndLink(this.embedColor,
+				moveSequenceWithLimit, algCubingNetUrl, visualCubeImageUrl);
 	};
 	buildVisualCubeUrl = (moveSequence, optionsObject) => {
 		let moveSequenceForVisualCube =

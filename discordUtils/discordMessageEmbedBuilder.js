@@ -7,17 +7,33 @@ class DiscordMessageEmbedBuilder {
 		title: 256,
 		description: 4096
 	};
-	static createSimpleEmbed = (color, title, description) => {
+	static createBaseEmbed = (color, title) => {
 		return new Discord.EmbedBuilder()
-			.setColor(color)
-			.setTitle(DiscordMessageEmbedBuilder.applyTitleSizeLimit(title))
+		.setColor(color)
+		.setTitle(DiscordMessageEmbedBuilder.applyTitleSizeLimit(title))
+	};
+	static createSimpleEmbed = (color, title, description) => {
+		return DiscordMessageEmbedBuilder.createBaseEmbed(color, title)
 			.setDescription(DiscordMessageEmbedBuilder.applyDescriptionSizeLimit(description));
 	};
-	static createEmbedWithImageAndLink = (color, title, url, description, imageUrl) => {
+	static createEmbed = (color, title, description, fields, thumbnail, footer) => {
+
+	};
+	static createEmbedWithThumbnail = (color, title, description, thumbnailImageUrl, footerTextContent) => {
 		return DiscordMessageEmbedBuilder.createSimpleEmbed(color, title, description)
+			.setThumbnail(thumbnailImageUrl)
+			.setFooter({text: footerTextContent});
+	};
+	static createEmbedWithImageAndLink = (color, title, url, imageUrl) => {
+		return DiscordMessageEmbedBuilder.createBaseEmbed(color, title)
 			.setURL(url)
 			.setImage(imageUrl);
 	};
+	static createEmbedWithImageLinkAndDescription = (color, title, url, imageUrl, description) => {
+		return DiscordMessageEmbedBuilder.createSimpleEmbed(color, title, description)
+			.setURL(url)
+			.setImage(imageUrl);
+	}
 	static applyTitleSizeLimit = title => {
 		return DiscordMessageEmbedBuilder.applyEmbedSizeLimit(
 			title, DiscordMessageEmbedBuilder.embedSizeLimits.title);
