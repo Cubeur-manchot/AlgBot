@@ -841,7 +841,7 @@ class AlgCollection {
 		pll_gc: "R2' u' R U' R U R' u R2 f R' f'",
 		pll_gd: "f R f' R2' u' R U' R' U R' u R2",
 		pll_h: "M2' U M2' U2 M2' U M2'",
-		pll_ja: "R' U L' U2 R U' R' U2 R L",
+		pll_ja: "x R2' F R F' R U2' r' U r U2' x'",
 		pll_jb: "R U R' F' R U R' U' R' F R2 U' R'",
 		pll_j: "R U R' F' R U R' U' R' F R2 U' R'",
 		pll_na: "F' R U R' U' R' F R2 F U' R' U' R U F' R'",
