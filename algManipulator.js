@@ -917,9 +917,10 @@ class AlgCollection {
 			for (let variation of ["double", "triple", "fat", "back", "left", "anti"]) {
 				suneVariation += (word.match(new RegExp(variation)) ?? [""])[0];
 			}
+			suneVariation += "sune";
 			if (suneVariation.length === word.length
 				&& !(word.includes("double") && word.includes("triple"))) {
-					return AlgManipulator.knownAlgs[suneVariation];
+					return AlgCollection.knownAlgs[suneVariation];
 			} else {
 				return;
 			}
