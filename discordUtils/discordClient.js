@@ -26,11 +26,11 @@ class DiscordClient extends Discord.Client {
 		});
 		this.algBot = algBot;
 		this.routineActivity = DiscordClient.routineActivity[this.algBot.language];
-		this.on("ready", this.onReady);
-		this.on("messageCreate", this.algBot.messageHandler.onMessageCreate);
-		this.on("messageDelete", this.algBot.messageHandler.onMessageDelete);
-		this.on("messageUpdate", this.algBot.messageHandler.onMessageUpdate);
-		this.on("interactionCreate", this.algBot.messageHandler.commandHandler.onInteractionCreate);
+		this.on(Discord.Events.ClientReady, this.onReady);
+		this.on(Discord.Events.MessageCreate, this.algBot.messageHandler.onMessageCreate);
+		this.on(Discord.Events.MessageDelete, this.algBot.messageHandler.onMessageDelete);
+		this.on(Discord.Events.MessageUpdate, this.algBot.messageHandler.onMessageUpdate);
+		this.on(Discord.Events.InteractionCreate, this.algBot.messageHandler.commandHandler.onInteractionCreate);
 		this.loginWithToken();
 	};
 	sendMessageToChannel = (message, channel) => {
