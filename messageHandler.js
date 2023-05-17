@@ -104,27 +104,32 @@ class CommandHandler {
 			error: true
 		};
 	};
+	buildCustomId = baseCustomId => {
+		return `${baseCustomId}${this.messageHandler.algBot.prefix}${this.messageHandler.algBot.language}`;
+	}
 	onInteractionCreate = interaction => {
-		if (!this.messageHandler.messageIsAlgBotMessage(interaction.message)) {
-			return;
+		if (interaction.isMessageComponent() || interaction.isModalSubmit()) { // string select, button, modal submit
+			if (!this.messageHandler.messageIsAlgBotMessage(interaction.message)) {
+				return;
+			}
+			switch (interaction.customId) {
+				case this.helpCommandHandler.helpSelectOptionCustomId:
+					this.helpCommandHandler.handleHelpStringSelectInteraction(interaction);
+					break;
+				case this.feedbackCommandHandler.commandErrorFeedbackButtonCustomId:
+					this.feedbackCommandHandler.handleCommandErrorFeedbackButtonInteraction(interaction);
+					break;
+				case this.feedbackCommandHandler.otherFeedbackButtonCustomId:
+					this.feedbackCommandHandler.handleOtherFeedbackButtonInteraction(interaction);
+					break;
+				case this.feedbackCommandHandler.commandErrorFeedbackModalCustomId:
+					this.feedbackCommandHandler.handleCommandErrorFeedbackModalSubmit(interaction);
+					break;
+				case this.feedbackCommandHandler.otherFeedbackModalCustomId:
+					this.feedbackCommandHandler.handleOtherFeedbackModalSubmit(interaction);
+					break;
+			};
 		}
-		switch (interaction.customId) {
-			case HelpCommandHandler.helpSelectOptionCustomId:
-				this.helpCommandHandler.handleHelpStringSelectInteraction(interaction);
-				break;
-			case FeedbackCommandHandler.commandErrorFeedbackButtonCustomId:
-				this.feedbackCommandHandler.handleCommandErrorFeedbackButtonInteraction(interaction);
-				break;
-			case FeedbackCommandHandler.otherFeedbackButtonCustomId:
-				this.feedbackCommandHandler.handleOtherFeedbackButtonInteraction(interaction);
-				break;
-			case FeedbackCommandHandler.commandErrorFeedbackModalCustomId:
-				this.feedbackCommandHandler.handleCommandErrorFeedbackModalSubmit(interaction);
-				break;
-			case FeedbackCommandHandler.otherFeedbackModalCustomId:
-				this.feedbackCommandHandler.handleOtherFeedbackModalSubmit(interaction);
-				break;
-		};
 	};
 };
 

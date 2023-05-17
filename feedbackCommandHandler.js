@@ -71,16 +71,20 @@ class FeedbackCommandHandler {
 			DiscordMessageEmbedBuilder.noImageUrl,
 			DiscordMessageEmbedBuilder.noFooterTextContent
 		);
+		this.commandErrorFeedbackButtonCustomId = this.commandHandler.buildCustomId(FeedbackCommandHandler.commandErrorFeedbackButtonCustomId);
+		this.otherFeedbackButtonCustomId = this.commandHandler.buildCustomId(FeedbackCommandHandler.otherFeedbackButtonCustomId);
+		this.commandErrorFeedbackModalCustomId = this.commandHandler.buildCustomId(FeedbackCommandHandler.commandErrorFeedbackModalCustomId);
+		this.otherFeedbackModalCustomId = this.commandHandler.buildCustomId(FeedbackCommandHandler.otherFeedbackModalCustomId);
 		this.feedbackButtonsComponents = DiscordMessageComponentBuilder.createRowWithButtonsComponents([
 			{
 				label: FeedbackCommandHandler.commandErrorFeedbackButtonLabel[language],
 				emoji: "🤒",
-				customId: FeedbackCommandHandler.commandErrorFeedbackButtonCustomId
+				customId: this.commandErrorFeedbackButtonCustomId
 			},
 			{
 				label: FeedbackCommandHandler.otherFeedbackButtonLabel[language],
 				emoji: "🗨️",
-				customId: FeedbackCommandHandler.otherFeedbackButtonCustomId
+				customId: this.otherFeedbackButtonCustomId
 			}
 		]);
 		this.commandErrorFeedbackModal = DiscordMessageComponentBuilder.createFormModal(
@@ -110,7 +114,7 @@ class FeedbackCommandHandler {
 				customId: FeedbackCommandHandler.commandErrorFeedbackModalLongDescriptionCustomId
 			}],
 			FeedbackCommandHandler.commandErrorFeedbackModalTitle[language],
-			FeedbackCommandHandler.commandErrorFeedbackModalCustomId
+			this.commandErrorFeedbackModalCustomId
 		);
 		this.otherFeedbackModal = DiscordMessageComponentBuilder.createFormModal(
 			[{
@@ -123,7 +127,7 @@ class FeedbackCommandHandler {
 				customId: FeedbackCommandHandler.otherFeedbackModalDescriptionCustomId
 			}],
 			FeedbackCommandHandler.otherFeedbackModalTitle[language],
-			FeedbackCommandHandler.otherFeedbackModalCustomId
+			this.otherFeedbackModalCustomId
 		);
 		this.feedbackThankYouLabel = FeedbackCommandHandler.feedbackThankYouLabel[language];
 	};

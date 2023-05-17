@@ -136,6 +136,7 @@ class HelpCommandHandler {
 	constructor(commandHandler, embedColor) {
 		this.commandHandler = commandHandler;
 		let language = this.commandHandler.messageHandler.algBot.language;
+		this.helpSelectOptionCustomId = this.commandHandler.buildCustomId(HelpCommandHandler.helpSelectOptionCustomId);
 		this.generalHelpEmbed = DiscordMessageEmbedBuilder.createEmbed(
 			embedColor,
 			HelpCommandHandler.generalHelpEmbedTitle[language],
@@ -178,7 +179,7 @@ class HelpCommandHandler {
 				textContent: null,
 				embed: this.generalHelpEmbed,
 				components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
-					this.selectOptions, this.selectOptions[0].value, HelpCommandHandler.helpSelectOptionCustomId)
+					this.selectOptions, this.selectOptions[0].value, this.helpSelectOptionCustomId)
 			},
 			error: false
 		};
@@ -188,7 +189,7 @@ class HelpCommandHandler {
 		interaction.update({
 			embeds: [this[`${interactionValue}HelpEmbed`]],
 			components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
-				this.selectOptions, interactionValue, HelpCommandHandler.helpSelectOptionCustomId)
+				this.selectOptions, interactionValue, this.helpSelectOptionCustomId)
 		})
 		.catch(interactionCreateError => this.algBot.logger.errorLog(
 			`Fail to create interaction on StringSelect component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
