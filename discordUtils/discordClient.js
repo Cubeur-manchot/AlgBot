@@ -208,6 +208,11 @@ class DiscordClient extends Discord.Client {
 			}
 		}, 10000);
 	};
+	deleteMessageAfterSomeSeconds = message => {
+		setTimeout(() => {
+			this.deleteMessage(message);
+		}, 10000);
+	};
 	loginWithToken = () => {
 		this.login(process.env[`TOKEN_${this.algBot.language.toUpperCase()}`])
 			.then(() => {
