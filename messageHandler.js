@@ -13,7 +13,7 @@ class MessageHandler {
 	};
 	onMessageCreate = message => {
 		if (this.messageIsAlgBotCommand(message) && !this.messageIsInThreadWithoutAlgBot(message)) {
-			let commandResult = this.commandHandler.getCommandResult(message);
+			let commandResult = this.commandHandler.getMessageCommandResult(message);
 			this.algBot.discordClient.replyMessage(commandResult.message, message, commandResult.error);
 		}
 	};
@@ -26,7 +26,7 @@ class MessageHandler {
 		if (this.messageIsAlgBotCommand(oldMessage)) {
 			let previousAnswer = this.findAlgBotAnswer(oldMessage);
 			if (this.messageIsAlgBotCommand(newMessage)) {
-				let commandResult = this.commandHandler.getCommandResult(newMessage);
+				let commandResult = this.commandHandler.getMessageCommandResult(newMessage);
 				this.algBot.discordClient.editMessage(previousAnswer, commandResult.message, commandResult.error, newMessage);
 			} else {
 				this.algBot.discordClient.deleteMessage(previousAnswer);
@@ -74,7 +74,7 @@ class CommandHandler {
 		this.serversCommandHandler = new ServersCommandHandler(this, CommandHandler.embedColors.servers);
 		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[this.messageHandler.algBot.language];
 	};
-	getCommandResult = message => {
+	getMessageCommandResult = message => {
 		let commandHeader = message.content.split(" ")[0];
 		switch (commandHeader.substring(1)) {
 			case "help":
