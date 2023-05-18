@@ -198,7 +198,7 @@ class FeedbackCommandHandler {
 			embed: null,
 			components: null,
 			ephemeral: true
-		}, interaction);
+		}, interaction, false);
 	};
 };
 

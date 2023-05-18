@@ -99,7 +99,7 @@ class DiscordClient extends Discord.Client {
 			));
 		}
 	};
-	replyInteraction = (answer, interaction) => {
+	replyInteraction = (answer, interaction, deleteAfterSomeSeconds) => {
 		interaction.reply({
 			content: answer.textContent,
 			embeds: answer.embed ? [answer.embed] : null,
@@ -108,6 +108,11 @@ class DiscordClient extends Discord.Client {
 				repliedUser: false
 			},
 			ephemeral: answer.ephemeral
+		})
+		.then(interactionAnswerMessage => {
+			if (deleteAfterSomeSeconds) {
+				this.deleteMessageAfterSomeSeconds(interactionAnswerMessage);
+			}
 		})
 		.catch(interactionReplyError => this.algBot.logger.errorLog("Error when replying "
 			+ `"${answer.textContent ?? ""}" `
