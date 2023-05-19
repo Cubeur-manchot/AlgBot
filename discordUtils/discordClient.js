@@ -220,9 +220,9 @@ class DiscordClient extends Discord.Client {
 	};
 	loginWithToken = () => {
 		this.login(process.env[`TOKEN_${this.algBot.language.toUpperCase()}`])
-			.then(() => {
-				this.algBot.logger.infoLog(`AlgBot (${this.algBot.language}) is logged in !`);
-			})
+			.then(() => this.algBot.logger.infoLog(
+				`AlgBot (${this.algBot.language}) is logged in !`
+			))
 			.catch(loginError => this.algBot.logger.errorLog(
 				`Fail to login for AlgBot (${this.algBot.language}) : "${loginError}".`
 			));
