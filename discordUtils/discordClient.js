@@ -2,6 +2,7 @@
 
 import Discord from "discord.js";
 import {AlgBotDate} from "../date.js";
+import {HelpCommandHandler} from "../helpCommandHandler.js";
 
 class DiscordClient extends Discord.Client {
 	static discordApiUnknownMessageError = "DiscordAPIError[10008]: Unknown Message";
@@ -230,6 +231,7 @@ class DiscordClient extends Discord.Client {
 	onReady = () => {
 		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language}) is ready !`);
 		this.fetchFeedbackChannel();
+		this.deploySlashCommands();
 		this.setRoutinePresence();
 	};
 	fetchFeedbackChannel = () => {
@@ -243,6 +245,58 @@ class DiscordClient extends Discord.Client {
 			.catch(channelFetchError => this.algBot.logger.errorLog(
 				`Fail to fetch feedback channel for AlgBot (${this.algBot.language}) : "${channelFetchError}".`
 			));
+	};
+	deploySlashCommands = () => {
+		let commands = HelpCommandHandler.generalHelpCommands
+			.map(command => new Discord.SlashCommandBuilder()
+				.setName(command.name)
+				.setDescription(command.description[this.algBot.language])
+			);
+		this.rest.get(Discord.Routes.applicationCommands(this.application.id))
+		.then(currentCommands => {
+			if (this.areCommandsSetsEqual(currentCommands, commands)) {
+				this.algBot.logger.infoLog(
+					`AlgBot (${this.algBot.language})'s commands are up to date, no need to redeploy them.`
+				);
+			} else {
+				this.algBot.logger.infoLog(
+					`AlgBot (${this.algBot.language})'s commands are not up to date, and should be redeployed.`
+				);
+				this.deployCommands(commands);
+			}
+		})
+		.catch(applicationCommandsGetError => {
+			this.algBot.logger.warningLog(
+				`Fail to get application commands for AlgBot (${this.algBot.language}) : "${applicationCommandsGetError}".`
+			);
+			this.deployCommands(commands);
+		});
+	};
+	areCommandsSetsEqual = (currentCommands, newCommands) => {
+		if (currentCommands.length !== newCommands.length) {
+			return false;
+		}
+		currentCommands.sort((firstCommand, secondCommand) => firstCommand.name.localeCompare(secondCommand.name));
+		newCommands.sort((firstCommand, secondCommand) => firstCommand.name.localeCompare(secondCommand.name));
+		for (let commandIndex = 0; commandIndex < currentCommands.length; commandIndex++) {
+			if (currentCommands[commandIndex].name !== newCommands[commandIndex].name
+				|| currentCommands[commandIndex.description] !== newCommands[commandIndex.description]) {
+				return false;
+			}
+		}
+		return true;
+	};
+	deployCommands = (commands) => {
+		this.rest.put(
+			Discord.Routes.applicationCommands(this.application.id),
+			{body: commands.map(command => command.toJSON())}
+		)
+		.then(() => this.algBot.logger.infoLog(
+			`AlgBot (${this.algBot.language})'s commands have been deployed !`
+		))
+		.catch(applicationCommandsPutError => this.algBot.logger.errorLog(
+			`Fail to deploy application commands for AlgBot (${this.algBot.language}) : "${applicationCommandsPutError}".`
+		));
 	};
 	setRoutinePresence = () => {
 		this.user.setPresence({
