@@ -9,6 +9,9 @@ class Logger {
 	infoLog = infoMessage => {
 		console.log(`${this.getTimeStamp()}[Info] ${infoMessage}`);
 	};
+	warningLog = warningMessage => {
+		console.warn(`${this.getTimeStamp()}[Warning] ${warningMessage}`);
+	};
 	errorLog = errorMessage => {
 		console.error(`${this.getTimeStamp()}[Error] ${errorMessage}`);
 	};
