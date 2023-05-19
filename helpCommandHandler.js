@@ -45,7 +45,7 @@ class HelpCommandHandler {
 			french: "Permet de donner un feedback, par exemple pour rapporter un bug"
 		}
 	}, {
-		name: "server",
+		name: "servers",
 		description: {
 			english: "Lists all servers I am on",
 			french: "Liste tous les serveurs sur lesquels je suis"
