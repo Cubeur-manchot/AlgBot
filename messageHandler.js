@@ -74,6 +74,54 @@ class CommandHandler {
 		this.serversCommandHandler = new ServersCommandHandler(this, CommandHandler.embedColors.servers);
 		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[this.messageHandler.algBot.language];
 	};
+	onInteractionCreate = interaction => {
+		if (interaction.isMessageComponent() || interaction.isModalSubmit()) { // string select, button, modal submit
+			if (!this.messageHandler.messageIsAlgBotMessage(interaction.message)) {
+				return;
+			}
+			switch (interaction.customId) {
+				case this.helpCommandHandler.helpSelectOptionCustomId:
+					this.helpCommandHandler.handleHelpStringSelectInteraction(interaction);
+					break;
+				case this.feedbackCommandHandler.commandErrorFeedbackButtonCustomId:
+					this.feedbackCommandHandler.handleCommandErrorFeedbackButtonInteraction(interaction);
+					break;
+				case this.feedbackCommandHandler.otherFeedbackButtonCustomId:
+					this.feedbackCommandHandler.handleOtherFeedbackButtonInteraction(interaction);
+					break;
+				case this.feedbackCommandHandler.commandErrorFeedbackModalCustomId:
+					this.feedbackCommandHandler.handleCommandErrorFeedbackModalSubmit(interaction);
+					break;
+				case this.feedbackCommandHandler.otherFeedbackModalCustomId:
+					this.feedbackCommandHandler.handleOtherFeedbackModalSubmit(interaction);
+					break;
+			};
+		} else if (interaction.isChatInputCommand()) { // slash command
+			if (!this.interactionIsForAlgBotApplication(interaction)) {
+				return;
+			}
+			let commandResult = this.getSlashCommandResult(interaction);
+			this.messageHandler.algBot.discordClient.replyInteraction(commandResult.message, interaction, commandResult.error);
+		}
+	};
+	interactionIsForAlgBotApplication = interaction => {
+		return interaction.applicationId === this.messageHandler.algBot.discordClient.application.id;
+	};
+	getSlashCommandResult = interaction => {
+		let commandName = interaction.commandName;
+		switch (commandName) {
+			case "help":
+				return this.helpCommandHandler.getHelpCommandResult();
+			case "invite":
+				return this.inviteCommandHandler.getInviteCommandResult();
+			case "feedback":
+				return this.feedbackCommandHandler.getFeedbackCommandResult();
+			case "servers":
+				return this.serversCommandHandler.getServersCommandResult();
+			default:
+				return this.getUnrecognizedCommandResult(commandName);
+		};
+	};
 	getMessageCommandResult = message => {
 		let commandHeader = message.content.split(" ")[0];
 		switch (commandHeader.substring(1)) {
@@ -106,30 +154,6 @@ class CommandHandler {
 	};
 	buildCustomId = baseCustomId => {
 		return `${baseCustomId}${this.messageHandler.algBot.prefix}${this.messageHandler.algBot.language}`;
-	}
-	onInteractionCreate = interaction => {
-		if (interaction.isMessageComponent() || interaction.isModalSubmit()) { // string select, button, modal submit
-			if (!this.messageHandler.messageIsAlgBotMessage(interaction.message)) {
-				return;
-			}
-			switch (interaction.customId) {
-				case this.helpCommandHandler.helpSelectOptionCustomId:
-					this.helpCommandHandler.handleHelpStringSelectInteraction(interaction);
-					break;
-				case this.feedbackCommandHandler.commandErrorFeedbackButtonCustomId:
-					this.feedbackCommandHandler.handleCommandErrorFeedbackButtonInteraction(interaction);
-					break;
-				case this.feedbackCommandHandler.otherFeedbackButtonCustomId:
-					this.feedbackCommandHandler.handleOtherFeedbackButtonInteraction(interaction);
-					break;
-				case this.feedbackCommandHandler.commandErrorFeedbackModalCustomId:
-					this.feedbackCommandHandler.handleCommandErrorFeedbackModalSubmit(interaction);
-					break;
-				case this.feedbackCommandHandler.otherFeedbackModalCustomId:
-					this.feedbackCommandHandler.handleOtherFeedbackModalSubmit(interaction);
-					break;
-			};
-		}
 	};
 };
 
