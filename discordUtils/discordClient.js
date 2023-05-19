@@ -249,7 +249,9 @@ class DiscordClient extends Discord.Client {
 			activities: [{name: this.routineActivity, type: Discord.ActivityType.Playing}],
 			status: "online",
 		});
-		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language})'s routine presence has been set.`);
+		this.algBot.logger.infoLog(
+			`AlgBot (${this.algBot.language})'s routine presence has been set.`
+		);
 	};
 	channelIsDm = channel => {
 		return channel.type === Discord.ChannelType.DM;
