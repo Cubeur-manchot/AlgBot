@@ -485,7 +485,7 @@ class AlgMerger {
 			let aloneMoveIndexes = affectingMovesIndexes
 				.filter(moveIndexes => moveIndexes.length === 1)
 				.map(aloneSlice => aloneSlice[0]);
-			unCancelledMoves.push(...moves.filter((move, moveIndex) => aloneMoveIndexes.includes(moveIndex)));
+			unCancelledMoves.push(...moves.filter(move => aloneMoveIndexes.includes(move.index)));
 			for (let sliceIndex in affectingMovesIndexes) {
 				affectingMovesIndexes[sliceIndex] = affectingMovesIndexes[sliceIndex]
 					.filter(moveIndex => !aloneMoveIndexes.includes(moveIndex));
