@@ -336,7 +336,10 @@ class AlgMerger {
 		}
 		do {
 			for (let commutingGroup of commutingGroups) {
-				if (commutingGroup.length === 1 || commutingGroup.merged) {
+				if (commutingGroup.moves.length === 1) {
+					commutingGroup.merged;
+				}
+				if (commutingGroup.merged) {
 					continue;
 				}
 				commutingGroup.moves.forEach((move, index) => {
