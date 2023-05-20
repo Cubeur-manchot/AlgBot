@@ -335,8 +335,6 @@ class AlgMerger {
 			}
 		}
 		do {
-			commutingGroups = commutingGroups.filter(
-				commutingGroup => commutingGroup.length !== 0);
 			for (let commutingGroup of commutingGroups) {
 				if (commutingGroup.length === 1 || commutingGroup.merged) {
 					continue;
@@ -351,18 +349,18 @@ class AlgMerger {
 				commutingGroup.merged = true;
 			}
 			let previousCommutingGroup = null;
+			commutingGroups = commutingGroups.filter( // remove fully cancelled moves
+				commutingGroup => commutingGroup.moves.length !== 0);
 			let commutingGroupIndex = 0;
 			while (commutingGroupIndex < commutingGroups.length) {
 				let commutingGroup = commutingGroups[commutingGroupIndex];
-				if (commutingGroup.moves.length !== 0) { // commuting group has not completely cancelled
-					if (commutingGroup.commutingGroup === previousCommutingGroup) { // groups must be merged
-						commutingGroups[commutingGroupIndex - 1].moves.push(...commutingGroup.moves);
-						commutingGroups[commutingGroupIndex - 1].merged = false;
-						commutingGroups.splice(commutingGroupIndex, 1);
-					} else { // independant groups
-						commutingGroupIndex++;
-						previousCommutingGroup = commutingGroup.commutingGroup;
-					}
+				if (commutingGroup.commutingGroup === previousCommutingGroup) { // groups must be merged
+					commutingGroups[commutingGroupIndex - 1].moves.push(...commutingGroup.moves);
+					commutingGroups[commutingGroupIndex - 1].merged = false;
+					commutingGroups.splice(commutingGroupIndex, 1);
+				} else { // independant groups
+					commutingGroupIndex++;
+					previousCommutingGroup = commutingGroup.commutingGroup;
 				}
 			}
 		} while (commutingGroups.some(commutingGroup => !commutingGroup.merged));
