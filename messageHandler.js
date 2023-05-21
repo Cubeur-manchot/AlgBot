@@ -96,7 +96,7 @@ class CommandHandler {
 					this.feedbackCommandHandler.handleOtherFeedbackModalSubmit(interaction);
 					break;
 			};
-		} else if (interaction.isChatInputCommand()) { // slash command
+		} else if (interaction.isCommand()) { // slash command, user context menu command, message context menu command
 			if (!this.interactionIsForAlgBotApplication(interaction)) {
 				return;
 			}
