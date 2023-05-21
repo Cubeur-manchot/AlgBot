@@ -231,7 +231,7 @@ class DiscordClient extends Discord.Client {
 	onReady = () => {
 		this.algBot.logger.infoLog(`AlgBot (${this.algBot.language}) is ready !`);
 		this.fetchFeedbackChannel();
-		this.deploySlashCommands();
+		this.deployApplicationCommands();
 		this.setRoutinePresence();
 	};
 	fetchFeedbackChannel = () => {
@@ -246,15 +246,20 @@ class DiscordClient extends Discord.Client {
 				`Fail to fetch feedback channel for AlgBot (${this.algBot.language}) : "${channelFetchError}".`
 			));
 	};
-	deploySlashCommands = () => {
-		let commands = HelpCommandHandler.generalHelpCommands
-			.map(command => new Discord.SlashCommandBuilder()
-				.setName(command.name)
-				.setDescription(command.description[this.algBot.language])
-			);
+	deployApplicationCommands = () => {
+		let commandsWithoutArgument = HelpCommandHandler.generalHelpCommands
+			.filter(command => !command.argumentsExample);
+		let commands = [
+			...HelpCommandHandler.generalHelpCommands // slash commands
+				.map(command => this.createCommand(command, Discord.ApplicationCommandType.ChatInput)),
+			...commandsWithoutArgument // user context menu commands
+				.map(command => this.createCommand(command, Discord.ApplicationCommandType.User)),
+			...commandsWithoutArgument // message context menu commands
+				.map(command => this.createCommand(command, Discord.ApplicationCommandType.Message))
+		];
 		this.rest.get(Discord.Routes.applicationCommands(this.application.id))
 		.then(currentCommands => {
-			if (this.areCommandsSetsEqual(currentCommands, commands)) {
+			if (this.areFullCommandsSetsEqual(currentCommands, commands)) {
 				this.algBot.logger.infoLog(
 					`AlgBot (${this.algBot.language})'s commands are up to date, no need to redeploy them.`
 				);
@@ -271,6 +276,34 @@ class DiscordClient extends Discord.Client {
 			);
 			this.deployCommands(commands);
 		});
+	};
+	createCommand = (commandObject, type) => {
+		return (
+			type === Discord.ApplicationCommandType.ChatInput
+				? new Discord.SlashCommandBuilder()
+					.setDescription(commandObject.description[this.algBot.language])
+				: new Discord.ContextMenuCommandBuilder()
+					.setType(type)
+			)
+			.setName(commandObject.name);
+	};
+	areFullCommandsSetsEqual = (currentCommands, newCommands) => {
+		let currentSlashCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.ChatInput);
+		let newSlashCommands = newCommands.filter(command => command instanceof Discord.SlashCommandBuilder);
+		if (!this.areCommandsSetsEqual(currentSlashCommands, newSlashCommands)) {
+			return false;
+		}
+		let currentUserCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.User);
+		let newUserCommands = newCommands.filter(command => command.type === Discord.ApplicationCommandType.User);
+		if (!this.areCommandsSetsEqual(currentUserCommands, newUserCommands)) {
+			return false;
+		}
+		let currentMessageCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.Message);
+		let newMessageCommands = newCommands.filter(command => command.type === Discord.ApplicationCommandType.Message);
+		if (!this.areCommandsSetsEqual(currentMessageCommands, newMessageCommands)) {
+			return false;
+		}
+		return true;
 	};
 	areCommandsSetsEqual = (currentCommands, newCommands) => {
 		if (currentCommands.length !== newCommands.length) {
