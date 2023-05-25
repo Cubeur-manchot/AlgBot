@@ -2,7 +2,6 @@
 
 import Discord from "discord.js";
 import {AlgBotDate} from "../date.js";
-import {HelpCommandHandler} from "../helpCommandHandler.js";
 
 class DiscordClient extends Discord.Client {
 	static discordApiUnknownMessageError = "DiscordAPIError[10008]: Unknown Message";
@@ -247,16 +246,7 @@ class DiscordClient extends Discord.Client {
 			));
 	};
 	deployApplicationCommands = () => {
-		let commandsWithoutArgument = HelpCommandHandler.generalHelpCommands
-			.filter(command => !command.argumentsExample);
-		let commands = [
-			...HelpCommandHandler.generalHelpCommands // slash commands
-				.map(command => this.createCommand(command, Discord.ApplicationCommandType.ChatInput)),
-			...commandsWithoutArgument // user context menu commands
-				.map(command => this.createCommand(command, Discord.ApplicationCommandType.User)),
-			...commandsWithoutArgument // message context menu commands
-				.map(command => this.createCommand(command, Discord.ApplicationCommandType.Message))
-		];
+		let commands = this.algBot.messageHandler.commandHandler.buildApplicationCommands();
 		this.rest.get(Discord.Routes.applicationCommands(this.application.id))
 		.then(currentCommands => {
 			if (this.areFullCommandsSetsEqual(currentCommands, commands)) {
@@ -276,16 +266,6 @@ class DiscordClient extends Discord.Client {
 			);
 			this.deployCommands(commands);
 		});
-	};
-	createCommand = (commandObject, type) => {
-		return (
-			type === Discord.ApplicationCommandType.ChatInput
-				? new Discord.SlashCommandBuilder()
-					.setDescription(commandObject.description[this.algBot.language])
-				: new Discord.ContextMenuCommandBuilder()
-					.setType(type)
-			)
-			.setName(commandObject.name);
 	};
 	areFullCommandsSetsEqual = (currentCommands, newCommands) => {
 		let currentSlashCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.ChatInput);

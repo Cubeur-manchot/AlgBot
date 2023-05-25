@@ -1,5 +1,6 @@
 "use strict";
 
+import Discord from "discord.js";
 import {HelpCommandHandler} from "./helpCommandHandler.js";
 import {AlgCommandHandler} from "./algCommandHandler.js";
 import {FeedbackCommandHandler} from "./feedbackCommandHandler.js";
@@ -154,6 +155,34 @@ class CommandHandler {
 	};
 	buildCustomId = baseCustomId => {
 		return `${baseCustomId}${this.messageHandler.algBot.prefix}${this.messageHandler.algBot.language}`;
+	};
+	buildApplicationCommands = () => {
+		let commandsWithoutArgument = HelpCommandHandler.generalHelpCommands
+			.filter(command => !command.argumentsExample);
+		return [
+			...HelpCommandHandler.generalHelpCommands
+				.map(command => this.createSlashCommand(command)),
+			...commandsWithoutArgument
+				.map(command => this.createUserContextMenuCommand(command)),
+			...commandsWithoutArgument
+				.map(command => this.createMessageContextMenuCommand(command))
+		];
+	};
+	createSlashCommand = commandObject => {
+		let slashCommand = new Discord.SlashCommandBuilder()
+			.setDescription(commandObject.description[this.messageHandler.algBot.language])
+			.setName(commandObject.name);
+		return slashCommand;
+	};
+	createUserContextMenuCommand = commandObject => {
+		return new Discord.ContextMenuCommandBuilder()
+			.setType(Discord.ApplicationCommandType.User)
+			.setName(commandObject.name);
+	};
+	createMessageContextMenuCommand = commandObject => {
+		return new Discord.ContextMenuCommandBuilder()
+			.setType(Discord.ApplicationCommandType.Message)
+			.setName(commandObject.name);
 	};
 };
 
