@@ -172,6 +172,9 @@ class CommandHandler {
 		let slashCommand = new Discord.SlashCommandBuilder()
 			.setDescription(commandObject.description[this.messageHandler.algBot.language])
 			.setName(commandObject.name);
+		if (["alg", "do"].includes(commandObject.name)) {
+			this.algCommandHandler.addAlgOrDoSlashCommandOptions(slashCommand);
+		}
 		return slashCommand;
 	};
 	createUserContextMenuCommand = commandObject => {

@@ -2,7 +2,7 @@
 
 import {OptionsHandler} from "./optionsHandler.js";
 import {AlgManipulator} from "./algManipulator.js";
-import { DiscordMessageEmbedBuilder } from "./discordUtils/discordMessageEmbedBuilder.js";
+import {DiscordMessageEmbedBuilder} from "./discordUtils/discordMessageEmbedBuilder.js";
 
 class AlgCommandHandler {
 	static embedSizeLimits = {
@@ -17,6 +17,62 @@ class AlgCommandHandler {
 		english: "Invalid move sequence",
 		french: "Algorithme incorrect"
 	};
+	static movesOptionName = {
+		english: "alg",
+		french: "algo"
+	};
+	static movesOptionDescription = {
+		english: "Moves of the alg",
+		french: "Mouvements de l'algo"
+	};
+	static viewOptionName = {
+		english: "view",
+		french: "vue"
+	};
+	static viewOptionDescription = {
+		english: "View angle of the cube",
+		french: "Angle de vue du cube"
+	};
+	static lastLayerStageOptionName = {
+		english: "last_layer_set",
+		french: "set_du_last_layer"
+	};
+	static lastLayerStageOptionDescription = {
+		english: "Shows a state of the last layer",
+		french: "Montre un état du last layer"
+	};
+	static otherStageOptionName = {
+		english: "set_out_of_last_layer",
+		french: "set_hors_du_last_layer"
+	};
+	static otherStageOptionDescription = {
+		english: "Shows a non last layer stage",
+		french: "Montre une étape hors du last layer"
+	};
+	static countMovesOptionName = {
+		english: "moves_counters",
+		french: "compteur_de_moves"
+	};
+	static countMovesOptionDescription = {
+		english: "Counts the moves in several metrics",
+		french: "Compte les moves dans plusieurs métriques"
+	};
+	static orientationOptionName = {
+		english: "orientation",
+		french: "orientation"
+	};
+	static orientationOptionDescription = {
+		english: "Orientation of the cube",
+		french: "Orientation du cube"
+	};
+	static commentOptionName = {
+		english: "comment",
+		french: "commentaire"
+	};
+	static commentOptionDescription = {
+		english: "Comment on the alg, must start with a double slash : //",
+		french: "Commentaire sur l'algo, doit commencer avec un double slash : //"
+	};
 	constructor(commandHandler, embedColor) {
 		this.commandHandler = commandHandler;
 		this.optionsHandler = new OptionsHandler(this);
@@ -25,6 +81,20 @@ class AlgCommandHandler {
 		let language = this.commandHandler.messageHandler.algBot.language;
 		this.invalidOptionsLabel = AlgCommandHandler.invalidOptionsLabel[language];
 		this.invalidMoveSequenceLabel = AlgCommandHandler.invalidMoveSequenceLabel[language];
+		this.movesOptionName = AlgCommandHandler.movesOptionName[language];
+		this.movesOptionDescription = AlgCommandHandler.movesOptionDescription[language];
+		this.viewOptionName = AlgCommandHandler.viewOptionName[language];
+		this.viewOptionDescription = AlgCommandHandler.viewOptionDescription[language];
+		this.lastLayerStageOptionName = AlgCommandHandler.lastLayerStageOptionName[language];
+		this.lastLayerStageOptionDescription = AlgCommandHandler.lastLayerStageOptionDescription[language];
+		this.otherStageOptionName = AlgCommandHandler.otherStageOptionName[language];
+		this.otherStageOptionDescription = AlgCommandHandler.otherStageOptionDescription[language];
+		this.countMovesOptionName = AlgCommandHandler.countMovesOptionName[language];
+		this.countMovesOptionDescription = AlgCommandHandler.countMovesOptionDescription[language];
+		this.orientationOptionName = AlgCommandHandler.orientationOptionName[language];
+		this.orientationOptionDescription = AlgCommandHandler.orientationOptionDescription[language];
+		this.commentOptionName = AlgCommandHandler.commentOptionName[language];
+		this.commentOptionDescription = AlgCommandHandler.commentOptionDescription[language];
 	};
 	getAlgOrDoCommandResult = (command, isDo) => {
 		let [, moves, options, comment] = command
@@ -132,6 +202,69 @@ class AlgCommandHandler {
 			.join("");
 		let urlBegin = "http://cube.rider.biz/visualcube.php?fmt=png&bg=t&size=150";
 		return `${urlBegin}${view}&pzl=${puzzle}&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube}`;
+	};
+	addAlgOrDoSlashCommandOptions = slashCommand => {
+		slashCommand.addStringOption(option => option // moves
+			.setName(this.movesOptionName)
+			.setDescription(this.movesOptionDescription)
+			.setRequired(true)
+		);
+		slashCommand.addStringOption(option => option // view angle
+			.setName(this.viewOptionName)
+			.setDescription(this.viewOptionDescription)
+			.addChoices(...OptionsHandler.views.map(view => {return {name: `-${view}`, value: `-${view}`}}))
+			.setRequired(false)
+		);
+		slashCommand.addStringOption(option => option // stage (last layer)
+			.setName(this.lastLayerStageOptionName)
+			.setDescription(this.lastLayerStageOptionDescription)
+			.addChoices(...OptionsHandler.planViewStages.map(stage => {return {name: `-${stage}`, value: `-${stage}`}}))
+			.setRequired(false)
+		);
+		slashCommand.addStringOption(option => option // stage (not last layer)
+			.setName(this.otherStageOptionName)
+			.setDescription(this.otherStageOptionDescription)
+			.addChoices(...OptionsHandler.isometricViewStages.map(stage => {return {name: `-${stage}`, value: `-${stage}`}}))
+			.setRequired(false)
+		);
+		slashCommand.addStringOption(option => option // move counters
+			.setName(this.countMovesOptionName)
+			.setDescription(this.countMovesOptionDescription)
+			.addChoices(...[
+					["count"],
+					[OptionsHandler.metrics[0]],
+					[OptionsHandler.metrics[1]],
+					[OptionsHandler.metrics[2]],
+					[OptionsHandler.metrics[3]],
+					[OptionsHandler.metrics[0], OptionsHandler.metrics[1]],
+					[OptionsHandler.metrics[0], OptionsHandler.metrics[2]],
+					[OptionsHandler.metrics[0], OptionsHandler.metrics[3]],
+					[OptionsHandler.metrics[1], OptionsHandler.metrics[2]],
+					[OptionsHandler.metrics[1], OptionsHandler.metrics[3]],
+					[OptionsHandler.metrics[2], OptionsHandler.metrics[3]],
+					[OptionsHandler.metrics[0], OptionsHandler.metrics[1], OptionsHandler.metrics[2]],
+					[OptionsHandler.metrics[0], OptionsHandler.metrics[1], OptionsHandler.metrics[3]],
+					[OptionsHandler.metrics[0], OptionsHandler.metrics[2], OptionsHandler.metrics[3]],
+					[OptionsHandler.metrics[1], OptionsHandler.metrics[2], OptionsHandler.metrics[3]]
+				]
+				.map(metricsList => metricsList.map(metric => `-${metric}`).join(" "))
+				.map(metricsListString => {return {name: metricsListString, value: metricsListString}})
+			)
+			.setRequired(false)
+		);
+		slashCommand.addStringOption(option => option // orientation
+			.setName(this.orientationOptionName)
+			.setDescription(this.orientationOptionDescription)
+			.addChoices(...Object.keys(OptionsHandler.colorSchemes)
+				.filter(orientation => orientation.includes("-") || orientation === "yellow")
+				.map(orientation => {return {name: `-${orientation}`, value: `-${orientation}`}}))
+			.setRequired(false)
+		);
+		slashCommand.addStringOption(option => option // comment
+			.setName(this.commentOptionName)
+			.setDescription(this.commentOptionDescription)
+			.setRequired(false)
+		);
 	};
 };
 
