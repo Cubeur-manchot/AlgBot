@@ -219,6 +219,21 @@ class CommandHandler {
 				|| (checkDescription && currentCommand.description !== newCommand.description)) {
 				return false;
 			}
+			if (currentCommand.options?.length || newCommand.options?.length) {
+				// check command options
+				if (!currentCommand.options?.length || !newCommand.options?.length
+					|| currentCommand.options.length !== newCommand.options.length) {
+					return false;
+				}
+				for (let commandOptionIndex = 0; commandOptionIndex < currentCommand.options.length; commandOptionIndex++) {
+					let currentCommandOption = currentCommand.options[commandOptionIndex];
+					let newCommandOption = newCommand.options[commandOptionIndex];
+					if (currentCommandOption.name !== newCommandOption.name
+						|| currentCommandOption.description !== newCommandOption.description) {
+						return false;
+					}
+				}
+			}
 		}
 		return true;
 	};
