@@ -205,7 +205,7 @@ class CommandHandler {
 		}
 		return true;
 	};
-	areCommandsSetsEqual = (currentCommands, newCommands, checkDescription) => {
+	areCommandsSetsEqual = (currentCommands, newCommands, isSlash) => {
 		if (currentCommands.length !== newCommands.length) {
 			return false;
 		}
@@ -215,8 +215,13 @@ class CommandHandler {
 			let currentCommand = currentCommands[commandIndex];
 			let newCommand = newCommands[commandIndex];
 			// check command
-			if (currentCommand.name !== newCommand.name
-				|| (checkDescription && currentCommand.description !== newCommand.description)) {
+			if (currentCommand.name !== newCommand.name) {
+				return false;
+			}
+			if (!isSlash) {
+				continue;
+			}
+			if (currentCommand.description !== newCommand.description) {
 				return false;
 			}
 			if (currentCommand.options?.length || newCommand.options?.length) {
