@@ -232,6 +232,21 @@ class CommandHandler {
 						|| currentCommandOption.description !== newCommandOption.description) {
 						return false;
 					}
+					if (currentCommandOption.choices?.length || newCommandOption.choices?.length) {
+						// check command option choices
+						if (!currentCommandOption.choices?.length || !newCommandOption.choices?.length
+							|| currentCommandOption.choices.length !== newCommandOption.choices.length) {
+							return false;
+						}
+						for (let optionChoiceIndex = 0; optionChoiceIndex < currentCommandOption.choices.length; optionChoiceIndex++) {
+							let currentCommandOptionChoice = currentCommandOption.choices[optionChoiceIndex];
+							let newCommandOptionChoice = newCommandOption.choices[optionChoiceIndex];
+							if (currentCommandOptionChoice.name !== newCommandOptionChoice.name
+								|| currentCommandOptionChoice.value !== newCommandOptionChoice.value) {
+								return false;
+							}
+						}
+					}
 				}
 			}
 		}
