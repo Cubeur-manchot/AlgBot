@@ -187,6 +187,41 @@ class CommandHandler {
 			.setType(Discord.ApplicationCommandType.Message)
 			.setName(commandObject.name);
 	};
+	areFullCommandsSetsEqual = (currentCommands, newCommands) => {
+		let currentSlashCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.ChatInput);
+		let newSlashCommands = newCommands.filter(command => command instanceof Discord.SlashCommandBuilder);
+		if (!this.areCommandsSetsEqual(currentSlashCommands, newSlashCommands, true)) {
+			return false;
+		}
+		let currentUserCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.User);
+		let newUserCommands = newCommands.filter(command => command.type === Discord.ApplicationCommandType.User);
+		if (!this.areCommandsSetsEqual(currentUserCommands, newUserCommands, false)) {
+			return false;
+		}
+		let currentMessageCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.Message);
+		let newMessageCommands = newCommands.filter(command => command.type === Discord.ApplicationCommandType.Message);
+		if (!this.areCommandsSetsEqual(currentMessageCommands, newMessageCommands, false)) {
+			return false;
+		}
+		return true;
+	};
+	areCommandsSetsEqual = (currentCommands, newCommands, checkDescription) => {
+		if (currentCommands.length !== newCommands.length) {
+			return false;
+		}
+		currentCommands.sort((firstCommand, secondCommand) => firstCommand.name.localeCompare(secondCommand.name));
+		newCommands.sort((firstCommand, secondCommand) => firstCommand.name.localeCompare(secondCommand.name));
+		for (let commandIndex = 0; commandIndex < currentCommands.length; commandIndex++) {
+			let currentCommand = currentCommands[commandIndex];
+			let newCommand = newCommands[commandIndex];
+			// check command
+			if (currentCommand.name !== newCommand.name
+				|| (checkDescription && currentCommand.description !== newCommand.description)) {
+				return false;
+			}
+		}
+		return true;
+	};
 };
 
 export {MessageHandler};

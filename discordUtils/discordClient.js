@@ -249,7 +249,7 @@ class DiscordClient extends Discord.Client {
 		let commands = this.algBot.messageHandler.commandHandler.buildApplicationCommands();
 		this.rest.get(Discord.Routes.applicationCommands(this.application.id))
 		.then(currentCommands => {
-			if (this.areFullCommandsSetsEqual(currentCommands, commands)) {
+			if (this.algBot.messageHandler.commandHandler.areFullCommandsSetsEqual(currentCommands, commands)) {
 				this.algBot.logger.infoLog(
 					`AlgBot (${this.algBot.language})'s commands are up to date, no need to redeploy them.`
 				);
@@ -266,38 +266,6 @@ class DiscordClient extends Discord.Client {
 			);
 			this.deployCommands(commands);
 		});
-	};
-	areFullCommandsSetsEqual = (currentCommands, newCommands) => {
-		let currentSlashCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.ChatInput);
-		let newSlashCommands = newCommands.filter(command => command instanceof Discord.SlashCommandBuilder);
-		if (!this.areCommandsSetsEqual(currentSlashCommands, newSlashCommands)) {
-			return false;
-		}
-		let currentUserCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.User);
-		let newUserCommands = newCommands.filter(command => command.type === Discord.ApplicationCommandType.User);
-		if (!this.areCommandsSetsEqual(currentUserCommands, newUserCommands)) {
-			return false;
-		}
-		let currentMessageCommands = currentCommands.filter(command => command.type === Discord.ApplicationCommandType.Message);
-		let newMessageCommands = newCommands.filter(command => command.type === Discord.ApplicationCommandType.Message);
-		if (!this.areCommandsSetsEqual(currentMessageCommands, newMessageCommands)) {
-			return false;
-		}
-		return true;
-	};
-	areCommandsSetsEqual = (currentCommands, newCommands) => {
-		if (currentCommands.length !== newCommands.length) {
-			return false;
-		}
-		currentCommands.sort((firstCommand, secondCommand) => firstCommand.name.localeCompare(secondCommand.name));
-		newCommands.sort((firstCommand, secondCommand) => firstCommand.name.localeCompare(secondCommand.name));
-		for (let commandIndex = 0; commandIndex < currentCommands.length; commandIndex++) {
-			if (currentCommands[commandIndex].name !== newCommands[commandIndex].name
-				|| currentCommands[commandIndex.description] !== newCommands[commandIndex.description]) {
-				return false;
-			}
-		}
-		return true;
 	};
 	deployCommands = (commands) => {
 		this.rest.put(
