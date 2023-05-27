@@ -96,10 +96,7 @@ class AlgCommandHandler {
 		this.commentOptionName = AlgCommandHandler.commentOptionName[language];
 		this.commentOptionDescription = AlgCommandHandler.commentOptionDescription[language];
 	};
-	getAlgOrDoCommandResult = (command, isDo) => {
-		let [, moves, options, comment] = command
-			.replace(/(?<!\s.*)\s/, "  ")
-			.split(/(?<!\s.*)\s|(?<!\s-.*|\/\/.*)\s+(?=-|\/\/)|(?<!\/\/.*)\s*\/\/\s*/);
+	getAlgOrDoCommandResult = (moves, options, comment, isDo) => {
 		let parsedOptions = this.optionsHandler.parseOptions(options ?? "");
 		if (parsedOptions.errors.length) {
 			return {

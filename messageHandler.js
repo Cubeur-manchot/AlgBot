@@ -124,8 +124,13 @@ class CommandHandler {
 		};
 	};
 	getMessageCommandResult = message => {
-		let commandHeader = message.content.split(" ")[0];
-		switch (commandHeader.substring(1)) {
+		let [name, text, options, comment] = message.content
+			.replace(this.messageHandler.algBot.prefix, "")
+			.split(/(?<!\s.*)\s+|(?<!\s-.*|\/\/.*)\s+(?=-|\/\/)|(?<!\/\/.*)\s*\/\/\s*/);
+		return this.getCommandResult({name, text, options, comment});
+	};
+	getCommandResult = command => {
+		switch (command.name) {
 			case "help":
 				return this.helpCommandHandler.getHelpCommandResult();
 			case "invite":
@@ -135,12 +140,12 @@ class CommandHandler {
 			case "servers":
 				return this.serversCommandHandler.getServersCommandResult();
 			case "alg":
-				return this.algCommandHandler.getAlgOrDoCommandResult(message.content, false);
+				return this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, false);
 			case "do":
-				return this.algCommandHandler.getAlgOrDoCommandResult(message.content, true);
+				return this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, true);
 			default:
-				return this.getUnrecognizedCommandResult(commandHeader);
-		};
+				return this.getUnrecognizedCommandResult(command.name);
+		}
 	};
 	getErrorMessage = errorMessage => {
 		return `:x: ${errorMessage}.`;
