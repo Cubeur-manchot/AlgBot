@@ -110,18 +110,29 @@ class CommandHandler {
 	};
 	getSlashCommandResult = interaction => {
 		let commandName = interaction.commandName;
-		switch (commandName) {
-			case "help":
-				return this.helpCommandHandler.getHelpCommandResult();
-			case "invite":
-				return this.inviteCommandHandler.getInviteCommandResult();
-			case "feedback":
-				return this.feedbackCommandHandler.getFeedbackCommandResult();
-			case "servers":
-				return this.serversCommandHandler.getServersCommandResult();
-			default:
-				return this.getUnrecognizedCommandResult(commandName);
+		let receivedOptionValuesByType = {};
+		for (let optionType of AlgCommandHandler.optionTypes) {
+			receivedOptionValuesByType[optionType] = [];
+		}
+		for (let definedOption of this.algCommandHandler.slashCommandOptions) {
+			let receivedOption = interaction.options.get(definedOption.name);
+			if (receivedOption) {
+				receivedOptionValuesByType[definedOption.type].push(receivedOption.value);
+			}
+		}
+		let command = {
+			name: commandName,
+			text: receivedOptionValuesByType.text.length
+				? receivedOptionValuesByType.text.join(" ")
+				: null,
+			options: receivedOptionValuesByType.options.length
+				? receivedOptionValuesByType.options.join(" ")
+				: null,
+			comment: receivedOptionValuesByType.comment.length
+				? receivedOptionValuesByType.comment.join(" ")
+				: null
 		};
+		return this.getCommandResult(command);
 	};
 	getMessageCommandResult = message => {
 		let [name, text, options, comment] = message.content
