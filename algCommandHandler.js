@@ -17,8 +17,17 @@ class AlgCommandHandler {
 		english: "Invalid move sequence",
 		french: "Algorithme incorrect"
 	};
+	static textOptionType = "text";
+	static optionOptionType = "options";
+	static commentOptionType = "comment";
+	static optionTypes = [
+		AlgCommandHandler.textOptionType,
+		AlgCommandHandler.optionOptionType,
+		AlgCommandHandler.commentOptionType
+	];
 	static slashCommandOptions = [
 		{
+			type: AlgCommandHandler.textOptionType,
 			name: {
 				english: "alg",
 				french: "algo"
@@ -30,6 +39,7 @@ class AlgCommandHandler {
 			required: true
 		},
 		{
+			type: AlgCommandHandler.optionOptionType,
 			name: {
 				english: "view",
 				french: "vue"
@@ -42,6 +52,7 @@ class AlgCommandHandler {
 			required: false
 		},
 		{
+			type: AlgCommandHandler.optionOptionType,
 			name: {
 				english: "last_layer_set",
 				french: "set_du_last_layer"
@@ -54,6 +65,7 @@ class AlgCommandHandler {
 			required: false
 		},
 		{
+			type: AlgCommandHandler.optionOptionType,
 			name: {
 				english: "set_out_of_last_layer",
 				french: "set_hors_du_last_layer"
@@ -66,6 +78,7 @@ class AlgCommandHandler {
 			required: false
 		},
 		{
+			type: AlgCommandHandler.optionOptionType,
 			name: {
 				english: "moves_counters",
 				french: "compteur_de_moves"
@@ -96,6 +109,7 @@ class AlgCommandHandler {
 			required: false
 		},
 		{
+			type: AlgCommandHandler.optionOptionType,
 			name: {
 				english: "orientation",
 				french: "orientation"
@@ -110,6 +124,7 @@ class AlgCommandHandler {
 			required: false
 		},
 		{
+			type: AlgCommandHandler.commentOptionType,
 			name: {
 				english: "comment",
 				french: "commentaire"
@@ -131,6 +146,7 @@ class AlgCommandHandler {
 		this.invalidMoveSequenceLabel = AlgCommandHandler.invalidMoveSequenceLabel[language];
 		this.slashCommandOptions = AlgCommandHandler.slashCommandOptions
 			.map(option => {return {
+				type: option.type,
 				name: option.name[language],
 				description: option.description[language],
 				choices: option.choices,
