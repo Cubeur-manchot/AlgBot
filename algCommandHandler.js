@@ -111,6 +111,19 @@ class AlgCommandHandler {
 		{
 			type: AlgCommandHandler.optionOptionType,
 			name: {
+				english: "merge",
+				french: "fusion"
+			},
+			description: {
+				english: "Simplifies the moves that merge or cancel",
+				french: "Simplifie les mouvements qui fusionnent ou s'annulent "
+			},
+			choices: [{name: "-merge", value: "-merge"}],
+			required: false
+		},
+		{
+			type: AlgCommandHandler.optionOptionType,
+			name: {
 				english: "orientation",
 				french: "orientation"
 			},
