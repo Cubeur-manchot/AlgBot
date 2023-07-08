@@ -314,7 +314,7 @@ class AlgMerger {
 		let moveRegex = /([RUFLDBrufldbxyzMES])/;
 		let previousCommutingGroup = null;
 		let commutingGroups = [];
-		for (let move of moveSequence.split(" ")) {
+		for (let move of moveSequence.split(" ").filter(move => move !== "")) {
 			let [prefix, moveLetter, suffix] = move.split(moveRegex);
 			let moveObject = {
 				moveString: move,
