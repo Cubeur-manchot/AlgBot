@@ -219,7 +219,7 @@ class DiscordClient extends Discord.Client {
 		}, 10000);
 	};
 	loginWithToken = () => {
-		this.login(process.env[`TOKEN_${this.algBot.language.toUpperCase()}`])
+		this.login(process.env[`TOKEN_${this.algBot.language}`])
 			.then(() => this.algBot.logger.infoLog(
 				`AlgBot (${this.algBot.language}) is logged in !`
 			))
@@ -234,7 +234,7 @@ class DiscordClient extends Discord.Client {
 		this.setRoutinePresence();
 	};
 	fetchFeedbackChannel = () => {
-		this.channels.fetch(process.env[`FEEDBACKCHANNEL_${this.algBot.language.toUpperCase()}`])
+		this.channels.fetch(process.env[`FEEDBACKCHANNEL_${this.algBot.language}`])
 			.then(channel => {
 				this.algBot.messageHandler.commandHandler.feedbackCommandHandler.feedbackChannel = channel;
 				this.algBot.logger.infoLog(
