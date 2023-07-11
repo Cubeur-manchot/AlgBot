@@ -2,5 +2,6 @@
 
 import {AlgBot} from "./algBot.js"
 
-new AlgBot("french");
-new AlgBot("english");
+for (let language of process.env.LANGUAGES.split(",")) {
+	new AlgBot(language);
+}
