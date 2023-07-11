@@ -26,9 +26,7 @@ class DiscordMessageEmbedBuilder {
 			embed.setDescription(DiscordMessageEmbedBuilder.applyDescriptionSizeLimit(description));
 		}
 		if (fields !== DiscordMessageEmbedBuilder.noFields) {
-			for (let field of fields) {
-				embed.addFields(field);
-			}
+			embed.addFields(...fields);
 		}
 		if (thumbnailImageUrl !== DiscordMessageEmbedBuilder.noThumbnailUrl) {
 			embed.setThumbnail(thumbnailImageUrl);
