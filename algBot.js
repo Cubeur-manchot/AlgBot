@@ -5,7 +5,7 @@ import {ImageBuilder} from "./imageBuilder.js";
 import {Logger} from "./logger.js";
 import {MessageHandler} from "./messageHandler.js";
 
-const prefix = "$";
+const prefix = process.env["PREFIX"];
 
 class AlgBot {
 	constructor(language) {
