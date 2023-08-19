@@ -37,6 +37,7 @@ class DiscordClient extends Discord.Client {
 		channel.send({
 			content: message.textContent,
 			embeds: message.embed ? [message.embed] : null,
+			files: message.attachment ? [message.attachment] : null,
 			components: message.components,
 			allowedMentions: {
 				repliedUser: false
@@ -45,6 +46,7 @@ class DiscordClient extends Discord.Client {
 		.catch(messageSendError => this.algBot.logger.errorLog("Error when sending "
 			+ `"${message.textContent ?? ""}" `
 			+ `(embeds : ${message.embed ? 1 : 0}`
+			+ `, files : ${message.attachment ? 1 : 0}`
 			+ `, components : ${message.components?.length ?? 0})`
 			+ ` in channel "${channel.name}" `
 			+ `(channelId = ${channel.id}`
@@ -57,6 +59,7 @@ class DiscordClient extends Discord.Client {
 			initialMessage.reply({
 				content: answer.textContent,
 				embeds: answer.embed ? [answer.embed] : null,
+				files: answer.attachment ? [answer.attachment] : null,
 				components: answer.components,
 				allowedMentions: {
 					repliedUser: false
@@ -70,6 +73,7 @@ class DiscordClient extends Discord.Client {
 								`Error when reacting "${reaction}" to message `
 								+ `(content = "${answerMessage.content}"`
 								+ `, embeds : ${answerMessage.embeds?.length ?? 0}`
+								+ `, files : ${answerMessage.files?.length ?? 0}`
 								+ `, components : ${answerMessage.components?.length ?? 0}`
 								+ `, created at "${new AlgBotDate(answerMessage.createdTimestamp).getDateString()}"`
 								+ `, userId = ${answerMessage.author.id}`
@@ -86,10 +90,12 @@ class DiscordClient extends Discord.Client {
 			.catch(messageReplyError => this.algBot.logger.errorLog("Error when replying "
 				+ `"${answer.textContent ?? ""}" `
 				+ `(embeds : ${answer.embed ? 1 : 0}`
+				+ `, files : ${answer.file ? 1 : 0}`
 				+ `, components : ${answer.components?.length ?? 0})`
 				+ " to initial message "
 				+ `(content = "${initialMessage.content}"`
 				+ `, embeds : ${initialMessage.embeds?.length ?? 0}`
+				+ `, files : ${initialMessage.files?.length ?? 0}`
 				+ `, components : ${initialMessage.components?.length ?? 0}`
 				+ `, created at "${new AlgBotDate(initialMessage.createdTimestamp).getDateString()}"`
 				+ `, userId = ${initialMessage.author.id}`
@@ -103,6 +109,7 @@ class DiscordClient extends Discord.Client {
 		interaction.reply({
 			content: answer.textContent,
 			embeds: answer.embed ? [answer.embed] : null,
+			files: answer.attachment ? [answer.attachment] : null,
 			components: answer.components,
 			allowedMentions: {
 				repliedUser: false
@@ -117,6 +124,7 @@ class DiscordClient extends Discord.Client {
 		.catch(interactionReplyError => this.algBot.logger.errorLog("Error when replying "
 			+ `"${answer.textContent ?? ""}" `
 			+ `(embeds : ${answer.embed ? 1 : 0}`
+			+ `, files : ${answer.attachment ? 1 : 0}`
 			+ `, components : ${answer.components?.length ?? 0})`
 			+ " to interaction "
 			+ `(type = "${Discord.InteractionType[interaction.type]}"`
@@ -131,8 +139,9 @@ class DiscordClient extends Discord.Client {
 		if (oldMessage && !oldMessage.deleted) {
 			oldMessage.edit({
 				content: newMessage.textContent,
-				embeds: newMessage.embed ? [newMessage.embed] : [],
-				components: newMessage.components ?? [],
+				embeds: newMessage.embed ? [newMessage.embed] : null,
+				files: newMessage.attachment ? [newMessage.attachment] : null,
+				components: newMessage.components,
 				allowedMentions: {
 					repliedUser: false
 				}
@@ -145,6 +154,7 @@ class DiscordClient extends Discord.Client {
 								`Error when reacting "${reaction}" to message `
 								+ `(content = "${editedMessage.content}"`
 								+ `, embeds : ${editedMessage.embeds?.length ?? 0}`
+								+ `, files : ${editedMessage.files?.length ?? 0}`
 								+ `, components : ${editedMessage.components?.length ?? 0}`
 								+ `, created at "${new AlgBotDate(editedMessage.createdTimestamp).getDateString()}"`
 								+ `, userId = ${editedMessage.author.id}`
@@ -159,6 +169,7 @@ class DiscordClient extends Discord.Client {
 							"Error when removing all reactions of message "
 							+ `(content = "${editedMessage.content}"`
 							+ `, embeds : ${editedMessage.embeds?.length ?? 0}`
+							+ `, files : ${editedMessage.files?.length ?? 0}`
 							+ `, components : ${editedMessage.components?.length ?? 0}`
 							+ `, created at "${new AlgBotDate(editedMessage.createdTimestamp).getDateString()}"`
 							+ `, userId = ${editedMessage.author.id}`
@@ -173,7 +184,8 @@ class DiscordClient extends Discord.Client {
 			})
 			.catch(messageEditError => this.algBot.logger.errorLog("Error when editing message from "
 				+ `"${oldMessage.textContent ?? ""}" `
-				+ `(embeds : ${oldMessage.embeds??length ?? 0}`
+				+ `(embeds : ${oldMessage.embeds?.length ?? 0}`
+				+ `, files : ${oldMessage.files?.length ?? 0}`
 				+ `, components : ${oldMessage.components?.length ?? 0}`
 				+ `, created at "${new AlgBotDate(oldMessage.createdTimestamp).getDateString()}"`
 				+ `, userId = ${oldMessage.author.id}`
@@ -181,7 +193,8 @@ class DiscordClient extends Discord.Client {
 				+ `, serverName = ${oldMessage.channel.guild ? `"${oldMessage.channel.guild.name}"` : undefined})`
 				+ " to "
 				+ `"${newMessage.textContent ?? ""}" `
-				+ `(embeds : ${newMessage.embed ? "1" : "0"}`
+				+ `(embeds : ${newMessage.embed ? 1 : 0}`
+				+ `, files : ${newMessage.attachment ? 1 : 0}`
 				+ `, components : ${newMessage.components ? newMessage.components.length : "0"})`
 				+ ` : "${messageEditError}".`
 			));
@@ -195,6 +208,7 @@ class DiscordClient extends Discord.Client {
 						this.algBot.logger.errorLog("Error when deleting message "
 							+ `(content = "${message.content}"`
 							+ `, embeds : ${message.embeds?.length ?? 0}`
+							+ `, files : ${message.files?.length ?? 0}`
 							+ `, components : ${message.components?.length ?? 0}`
 							+ `, created at "${new AlgBotDate(message.createdTimestamp).getDateString()}"`
 							+ `, userId = ${message.author.id}`
