@@ -1,7 +1,6 @@
 "use strict";
 
 import {DiscordClient} from "./discordUtils/discordClient.js";
-import {ImageBuilder} from "./imageBuilder.js";
 import {Logger} from "./logger.js";
 import {MessageHandler} from "./messageHandler.js";
 
@@ -14,7 +13,6 @@ class AlgBot {
 		this.logger = new Logger(this);
 		this.messageHandler = new MessageHandler(this);
 		this.discordClient = new DiscordClient(this);
-		this.imageBuilder = new ImageBuilder(this);
 	};
 };
 

@@ -2,6 +2,7 @@
 
 import {OptionsHandler} from "./optionsHandler.js";
 import {AlgManipulator} from "./algManipulator.js";
+import {ImageBuilder} from "./imageBuilder.js";
 import {DiscordMessageEmbedBuilder} from "./discordUtils/discordMessageEmbedBuilder.js";
 
 class AlgCommandHandler {
@@ -153,6 +154,7 @@ class AlgCommandHandler {
 		this.commandHandler = commandHandler;
 		this.optionsHandler = new OptionsHandler(this);
 		this.algManipulator = new AlgManipulator(this);
+		this.imageBuilder = new ImageBuilder(this);
 		this.embedColor = embedColor;
 		let language = this.commandHandler.messageHandler.algBot.language;
 		this.invalidOptionsLabel = AlgCommandHandler.invalidOptionsLabel[language];
