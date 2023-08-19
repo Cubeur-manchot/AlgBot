@@ -134,7 +134,6 @@ class FeedbackCommandHandler {
 	getFeedbackCommandResult = () => {
 		return {
 			message: {
-				textContent: null,
 				embed: this.feedbackCommandEmbed,
 				components: this.feedbackButtonsComponents
 			},
@@ -160,9 +159,7 @@ class FeedbackCommandHandler {
 			`From ${this.getPseudoFromInteraction(interaction)}, at ${new AlgBotDate().getDateString()}.`
 		);
 		let answerMessage = {
-			textContent: null,
-			embed: embed,
-			components: null
+			embed: embed
 		};
 		this.commandHandler.messageHandler.algBot.discordClient.sendMessageToChannel(answerMessage, this.feedbackChannel);
 		this.replyFeedbackModalSubmitInteraction(interaction);
@@ -179,9 +176,7 @@ class FeedbackCommandHandler {
 			`From ${this.getPseudoFromInteraction(interaction)}, at ${new AlgBotDate().getDateString()}.`
 		);
 		let answerMessage = {
-			textContent: null,
-			embed: embed,
-			components: null
+			embed: embed
 		};
 		this.commandHandler.messageHandler.algBot.discordClient.sendMessageToChannel(answerMessage, this.feedbackChannel);
 		this.replyFeedbackModalSubmitInteraction(interaction);
@@ -195,8 +190,6 @@ class FeedbackCommandHandler {
 	replyFeedbackModalSubmitInteraction = interaction => {
 		this.commandHandler.messageHandler.algBot.discordClient.replyInteraction({
 			textContent: this.feedbackThankYouLabel,
-			embed: null,
-			components: null,
 			ephemeral: true
 		}, interaction, false);
 	};

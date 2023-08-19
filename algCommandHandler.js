@@ -199,9 +199,8 @@ class AlgCommandHandler {
 		parsedMoveSequence.comment = comment;
 		return {
 			message: {
-				textContent: null,
 				embed: this.createAlgEmbed(parsedMoveSequence, parsedOptions),
-				components: null, // todo reactivate -rotatable with buttons
+				//components: null, // todo reactivate -rotatable with buttons
 				reactions: ["❤", "💩", "🥇", "👽"]
 			},
 			error: false
