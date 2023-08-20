@@ -204,7 +204,7 @@ class AlgCommandHandler {
 			parsedMoveSequence.moveCounts = moveCounts;
 		}
 		// build image
-		let {imageResult, imageError} = this.imageBuilder.buildVisualCubeImage(parsedMoveSequence.moveSequence, parsedOptions, cubeSize);
+		let image = this.imageBuilder.buildVisualCubeImage(parsedMoveSequence.moveSequence, parsedOptions, cubeSize);
 		// build animation link
 		let moveSequenceForAlgCubingNetUrl = this.algManipulator.replaceMiddleSliceMoves(parsedMoveSequence.moveSequence, cubeSize)
 			.replace(/\s/g, "_") // replace spaces
@@ -235,13 +235,13 @@ class AlgCommandHandler {
 			description.length ? description : DiscordMessageEmbedBuilder.noDescription,
 			DiscordMessageEmbedBuilder.noFields,
 			DiscordMessageEmbedBuilder.noThumbnailUrl,
-			imageResult.url,
+			image.url,
 			DiscordMessageEmbedBuilder.noFooterTextContent
 		);
 		return {
 			message: {
 				embed: embed,
-				attachment: imageResult.attachment,
+				attachment: image.attachment,
 				//components: null, // todo reactivate -rotatable with buttons
 				reactions: ["❤", "💩", "🥇", "👽"]
 			},

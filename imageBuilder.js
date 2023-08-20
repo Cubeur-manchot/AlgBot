@@ -27,10 +27,8 @@ class ImageBuilder {
 			.replace(/\s/g, "%20") // replace spaces
 			.replace(/'/g, "%27"); // replace apostrophes
 		return {
-			imageResult: {
-				url: `${urlBegin}${view}&pzl=${cubeSize}&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube}`
-			},
-			imageError: false
+			url: `${urlBegin}${view}&pzl=${cubeSize}&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube}`,
+			error: false
 		};
 	};
 };
