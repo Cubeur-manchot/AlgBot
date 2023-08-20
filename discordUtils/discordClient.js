@@ -139,9 +139,9 @@ class DiscordClient extends Discord.Client {
 		if (oldMessage && !oldMessage.deleted) {
 			oldMessage.edit({
 				content: newMessage.textContent,
-				embeds: newMessage.embed ? [newMessage.embed] : null,
-				files: newMessage.attachment ? [newMessage.attachment] : null,
-				components: newMessage.components,
+				embeds: newMessage.embed ? [newMessage.embed] : [],
+				files: newMessage.attachment ? [newMessage.attachment] : [],
+				components: newMessage.components ?? [],
 				allowedMentions: {
 					repliedUser: false
 				}
