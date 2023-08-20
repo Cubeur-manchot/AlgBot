@@ -205,6 +205,15 @@ class AlgCommandHandler {
 		}
 		// build image
 		let image = this.imageBuilder.buildVisualCubeImage(parsedMoveSequence.moveSequence, parsedOptions, cubeSize);
+		if (image.errors.length) {
+			return {
+				message: {
+					textContent: this.commandHandler.getErrorMessage(`${this.invalidMoveSequenceLabel}`)
+					// todo add Holo-Cube reasons
+				},
+				error: true
+			};
+		}
 		// build animation link
 		let moveSequenceForAlgCubingNetUrl = this.algManipulator.replaceMiddleSliceMoves(parsedMoveSequence.moveSequence, cubeSize)
 			.replace(/\s/g, "_") // replace spaces

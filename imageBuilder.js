@@ -28,7 +28,7 @@ class ImageBuilder {
 			.replace(/'/g, "%27"); // replace apostrophes
 		return {
 			url: `${urlBegin}${view}&pzl=${cubeSize}&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube}`,
-			error: false
+			errors: []
 		};
 	};
 };
