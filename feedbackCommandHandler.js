@@ -134,6 +134,7 @@ class FeedbackCommandHandler {
 	getFeedbackCommandResult = () => {
 		return {
 			message: {
+				textContent: "",
 				embed: this.feedbackCommandEmbed,
 				components: this.feedbackButtonsComponents
 			},

@@ -25,6 +25,7 @@ class InviteCommandHandler {
 	getInviteCommandResult = () => {
 		return {
 			message: {
+				textContent: "",
 				embed: this.buildInviteCommandEmbed()
 			},
 			error: false

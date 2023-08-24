@@ -217,6 +217,7 @@ class HelpCommandHandler {
 	getHelpCommandResult = () => {
 		return {
 			message: {
+				textContent: "",
 				embed: this.generalHelpEmbed,
 				components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
 					this.selectOptions, this.selectOptions[0].value, this.helpSelectOptionCustomId)

@@ -26,6 +26,7 @@ class ServersCommandHandler {
 	getServersCommandResult = () => {
 		return {
 			message: {
+				textContent: "",
 				embed: this.buildServersCommandEmbed()
 			},
 			error: false

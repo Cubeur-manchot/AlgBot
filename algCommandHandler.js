@@ -265,6 +265,7 @@ class AlgCommandHandler {
 		);
 		return {
 			message: {
+				textContent: "",
 				embed: embed,
 				attachment: image.attachment,
 				//components: null, // todo reactivate -rotatable with buttons
