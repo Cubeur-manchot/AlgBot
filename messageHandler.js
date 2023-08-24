@@ -12,9 +12,9 @@ class MessageHandler {
 		this.algBot = algBot;
 		this.commandHandler = new CommandHandler(this);
 	};
-	onMessageCreate = message => {
+	onMessageCreate = async message => {
 		if (this.messageIsAlgBotCommand(message) && !this.messageIsInThreadWithoutAlgBot(message)) {
-			let commandResult = this.commandHandler.getMessageCommandResult(message);
+			let commandResult = await this.commandHandler.getMessageCommandResult(message);
 			this.algBot.discordClient.replyMessage(commandResult.message, message, commandResult.error);
 		}
 	};
@@ -23,17 +23,17 @@ class MessageHandler {
 			this.algBot.discordClient.deleteMessage(this.findAlgBotAnswer(message));
 		}
 	};
-	onMessageUpdate = (oldMessage, newMessage) => {
+	onMessageUpdate = async (oldMessage, newMessage) => {
 		if (this.messageIsAlgBotCommand(oldMessage)) {
 			let previousAnswer = this.findAlgBotAnswer(oldMessage);
 			if (this.messageIsAlgBotCommand(newMessage)) {
-				let commandResult = this.commandHandler.getMessageCommandResult(newMessage);
+				let commandResult = await this.commandHandler.getMessageCommandResult(newMessage);
 				this.algBot.discordClient.editMessage(previousAnswer, commandResult.message, commandResult.error, newMessage);
 			} else {
 				this.algBot.discordClient.deleteMessage(previousAnswer);
 			}
 		} else {
-			this.onMessageCreate(newMessage);
+			await this.onMessageCreate(newMessage);
 		}
 	};
 	messageIsAlgBotCommand = message => {
@@ -75,7 +75,7 @@ class CommandHandler {
 		this.serversCommandHandler = new ServersCommandHandler(this, CommandHandler.embedColors.servers);
 		this.unrecognizedCommandLabel = CommandHandler.unrecognizedCommandLabel[this.messageHandler.algBot.language];
 	};
-	onInteractionCreate = interaction => {
+	onInteractionCreate = async interaction => {
 		if (interaction.isMessageComponent() || interaction.isModalSubmit()) { // string select, button, modal submit
 			if (!this.messageHandler.messageIsAlgBotMessage(interaction.message)) {
 				return;
@@ -101,14 +101,14 @@ class CommandHandler {
 			if (!this.interactionIsForAlgBotApplication(interaction)) {
 				return;
 			}
-			let commandResult = this.getSlashCommandResult(interaction);
+			let commandResult = await this.getSlashCommandResult(interaction);
 			this.messageHandler.algBot.discordClient.replyInteraction(commandResult.message, interaction, commandResult.error);
 		}
 	};
 	interactionIsForAlgBotApplication = interaction => {
 		return interaction.applicationId === this.messageHandler.algBot.discordClient.application.id;
 	};
-	getSlashCommandResult = interaction => {
+	getSlashCommandResult = async interaction => {
 		let commandName = interaction.commandName;
 		let receivedOptionValuesByType = {};
 		for (let optionType of AlgCommandHandler.optionTypes) {
@@ -132,15 +132,15 @@ class CommandHandler {
 				? receivedOptionValuesByType.comment.join(" ")
 				: null
 		};
-		return this.getCommandResult(command);
+		return await this.getCommandResult(command);
 	};
-	getMessageCommandResult = message => {
+	getMessageCommandResult = async message => {
 		let [name, text, options, comment] = message.content
 			.replace(this.messageHandler.algBot.prefix, "")
 			.split(/(?<!\s.*)\s+|(?<!\s-.*|\/\/.*)\s+(?=-|\/\/)|(?<!\/\/.*)\s*\/\/\s*/);
-		return this.getCommandResult({name, text, options, comment});
+		return await this.getCommandResult({name, text, options, comment});
 	};
-	getCommandResult = command => {
+	getCommandResult = async command => {
 		switch (command.name) {
 			case "help":
 				return this.helpCommandHandler.getHelpCommandResult();
@@ -151,9 +151,9 @@ class CommandHandler {
 			case "servers":
 				return this.serversCommandHandler.getServersCommandResult();
 			case "alg":
-				return this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, false);
+				return await this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, false);
 			case "do":
-				return this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, true);
+				return await this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, true);
 			default:
 				return this.getUnrecognizedCommandResult(command.name);
 		}

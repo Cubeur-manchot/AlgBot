@@ -14,5 +14,7 @@ COPY discordUtils /discordUtils
 COPY algCommandHandler.js algManipulator.js optionsHandler.js imageBuilder.js /
 # other commands
 COPY helpCommandHandler.js feedbackCommandHandler.js serversCommandHandler.js inviteCommandHandler.js /
+# Holo-Cube from distant repository
+ADD https://cubeur-manchot.github.io/Holo-Cube/bundles/holo-cube-algorithm.node-bundle.js holocube.js
 
 CMD ["node", "index.js"]

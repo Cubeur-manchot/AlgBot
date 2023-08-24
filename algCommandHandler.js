@@ -182,7 +182,7 @@ class AlgCommandHandler {
 				required: option.required
 			}});
 	};
-	getAlgOrDoCommandResult = (moves, options, comment, isDo) => {
+	getAlgOrDoCommandResult = async (moves, options, comment, isDo) => {
 		// parse options
 		let parsedOptions = this.optionsHandler.parseOptions(options ?? "");
 		if (parsedOptions.errors.length) {
@@ -218,7 +218,9 @@ class AlgCommandHandler {
 			parsedMoveSequence.moveCounts = moveCounts;
 		}
 		// build image
-		let image = this.imageBuilder.buildVisualCubeImage(parsedMoveSequence.moveSequence, parsedOptions, cubeSize);
+		let image = parsedOptions.imageGenerator === OptionsHandler.holoCubeImageGenerator
+			? await this.imageBuilder.buildHoloCubeImage(parsedMoveSequence.moveSequence, parsedOptions, cubeSize)
+			: this.imageBuilder.buildVisualCubeImage(parsedMoveSequence.moveSequence, parsedOptions, cubeSize);
 		if (image.errors.length) {
 			return {
 				message: {

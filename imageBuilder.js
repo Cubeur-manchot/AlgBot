@@ -1,8 +1,14 @@
 "use strict";
 
+import Discord from "discord.js";
+import {JSDOM} from "jsdom";
+import {Runner} from "../holocube.js";
+import xmlserializer from "xmlserializer";
+import sharp from "sharp";
 import {OptionsHandler} from "./optionsHandler.js";
 
 class ImageBuilder {
+	static jsDomDocument = new JSDOM().window.document;
 	static cubeImageSize = 150;
 	constructor(algCommandHandler) {
 		this.algCommandHandler = algCommandHandler;
@@ -32,6 +38,50 @@ class ImageBuilder {
 			errors: []
 		};
 	};
+	buildHoloCubeImage = async (moveSequence, optionsObject, cubeSize) => {
+		let runner = new Runner({
+			puzzle: {
+				fullName: `cube${Array(3).fill(cubeSize).join("x")}`
+			},
+			drawingOptions: {
+				document: ImageBuilder.jsDomDocument,
+				imageHeight: ImageBuilder.cubeImageSize,
+				imageWidth: ImageBuilder.cubeImageSize,
+				puzzleHeight: ImageBuilder.cubeImageSize * 0.8,
+				puzzleWidth: ImageBuilder.cubeImageSize * 0.8
+			},
+			logger: {
+				verbosity: 0
+			}
+		});
+		let result = runner.run(optionsObject.isDo
+			? moveSequence
+			: this.algCommandHandler.algManipulator.invertSequence(moveSequence)
+		);
+		switch (result.status) {
+			case "success":
+				let svg = result.svg;
+				let pngBuffer = await this.convertSvgSvgElementToPngBuffer(svg);
+				let attachment = new Discord.AttachmentBuilder(pngBuffer, {name: "holoCubeImage.png"});
+				return {
+					url: "attachment://holoCubeImage.png",
+					attachment: attachment,
+					errors: []
+				};
+			case "fail":
+				return {
+					errors: result.errors
+				};
+		}
+	};
+	convertSvgSvgElementToPngBuffer = svgSvgElement => // sharp returns a promise (async)
+		sharp(
+			Buffer.from(
+				xmlserializer.serializeToString(svgSvgElement)
+			)
+		)
+		.toFormat("png")
+		.toBuffer();
 };
 
 export {ImageBuilder};
