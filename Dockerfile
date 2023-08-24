@@ -17,4 +17,4 @@ COPY helpCommandHandler.js feedbackCommandHandler.js serversCommandHandler.js in
 # Holo-Cube from distant repository
 ADD https://cubeur-manchot.github.io/Holo-Cube/bundles/holo-cube-algorithm.node-bundle.js holocube.js
 
-CMD ["node", "index.js"]
+CMD ["node", "--no-warnings", "index.js"]
