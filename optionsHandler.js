@@ -64,6 +64,12 @@ class OptionsHandler {
 		"blue-yellow": {U: "blue", F: "yellow", R: "orange", D: "green", B: "white", L: "red"},
 		"blue-orange": {U: "blue", F: "orange", R: "white", D: "green", B: "red", L: "yellow"}
 	};
+	static visualCubeImageGeneretor = "visualcube";
+	static holoCubeImageGenerator = "holocube";
+	static imageGenerators = [
+		OptionsHandler.visualCubeImageGeneretor,
+		OptionsHandler.holoCubeImageGenerator
+	];
 	static defaultOptions = {
 		holoCube: false,
 		puzzle: "cube3x3x3",
@@ -85,6 +91,7 @@ class OptionsHandler {
 			L: "orange"
 		},
 		rotatable: false,
+		imageGenerator: OptionsHandler.visualCubeImageGeneretor,
 		errors: []
 	};
 	static unrecognizedOptionErrorMessage = {
@@ -143,6 +150,8 @@ class OptionsHandler {
 				optionsResult.colorScheme = OptionsHandler.colorSchemes[option];
 			/*} else if (option === "rotatable") {
 				optionsResult.rotatable = true;*/
+			} else if (OptionsHandler.imageGenerators.includes(option)) {
+				optionsResult.imageGenerator = option;
 			} else {
 				optionsResult.errors.push({
 					option: option,
