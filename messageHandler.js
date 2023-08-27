@@ -62,6 +62,45 @@ class CommandHandler {
 		servers: 0x771bc2, // purple
 		invite: 0x13bf41 // green
 	};
+	static commands = [{
+		name: "alg",
+		description: {
+			english: "Displays the case that the alg solves",
+			french: "Affiche le cas que l'algo résout"
+		},
+		argumentsExample: "r U R' F' R U R' U' R' F R2 U' r'"
+	}, {
+		name: "do",
+		description: {
+			english: "Applies the alg on a solved cube and displays the result",
+			french: "Applique l'algo sur un cube résolu et affiche le résultat"
+		},
+		argumentsExample: "r U R' F' R U R' U' R' F R2 U' r'"
+	}, {
+		name: "help",
+		description: {
+			english: "Displays this help, the recognized algs and the supported options",
+			french: "Affiche cette aide, les algos reconnus et les options supportées"
+		}
+	}, {
+		name: "invite",
+		description: {
+			english: "Displays the links to invite me to a server",
+			french: "Affiche les liens pour m'inviter sur un serveur"
+		}
+	}, {
+		name: "feedback",
+		description: {
+			english: "Allows to give feedback, for example to report a bug",
+			french: "Permet de donner un feedback, par exemple pour rapporter un bug"
+		}
+	}, {
+		name: "servers",
+		description: {
+			english: "Lists all servers I am on",
+			french: "Liste tous les serveurs sur lesquels je suis"
+		}
+	}];
 	static unrecognizedCommandLabel = {
 		english: "Unrecognized command",
 		french: "Commande non reconnue"
@@ -173,10 +212,10 @@ class CommandHandler {
 		return `${baseCustomId}${this.messageHandler.algBot.prefix}${this.messageHandler.algBot.language}`;
 	};
 	buildApplicationCommands = () => {
-		let commandsWithoutArgument = HelpCommandHandler.generalHelpCommands
+		let commandsWithoutArgument = CommandHandler.commands
 			.filter(command => !command.argumentsExample);
 		return [
-			...HelpCommandHandler.generalHelpCommands
+			...CommandHandler.commands
 				.map(command => this.createSlashCommand(command)),
 			...commandsWithoutArgument
 				.map(command => this.createUserContextMenuCommand(command)),
@@ -275,4 +314,4 @@ class CommandHandler {
 	};
 };
 
-export {MessageHandler};
+export {MessageHandler, CommandHandler};

@@ -1,66 +1,10 @@
 "use strict";
 
+import {CommandHandler} from "./messageHandler.js";
 import {DiscordMessageComponentBuilder} from "./discordUtils/discordMessageComponentBuilder.js";
 import {DiscordMessageEmbedBuilder} from "./discordUtils/discordMessageEmbedBuilder.js";
 
 class HelpCommandHandler {
-	static generalHelpEmbedTitle = {
-		english: "Help",
-		french: "Aide"
-	};
-	static generalHelpHeaderLabel = {
-		english: "I'm a :robot: that displays images of",
-		french: "Je suis un :robot: qui affiche des images de"
-	};
-	static generalHelpCommands = [{
-		name: "alg",
-		description: {
-			english: "Displays the case that the alg solves",
-			french: "Affiche le cas que l'algo résout"
-		},
-		argumentsExample: "r U R' F' R U R' U' R' F R2 U' r'"
-	}, {
-		name: "do",
-		description: {
-			english: "Applies the alg on a solved cube and displays the result",
-			french: "Applique l'algo sur un cube résolu et affiche le résultat"
-		},
-		argumentsExample: "r U R' F' R U R' U' R' F R2 U' r'"
-	}, {
-		name: "help",
-		description: {
-			english: "Displays this help, the recognized algs and the supported options",
-			french: "Affiche cette aide, les algos reconnus et les options supportées"
-		}
-	}, {
-		name: "invite",
-		description: {
-			english: "Displays the links to invite me to a server",
-			french: "Affiche les liens pour m'inviter sur un serveur"
-		}
-	}, {
-		name: "feedback",
-		description: {
-			english: "Allows to give feedback, for example to report a bug",
-			french: "Permet de donner un feedback, par exemple pour rapporter un bug"
-		}
-	}, {
-		name: "servers",
-		description: {
-			english: "Lists all servers I am on",
-			french: "Liste tous les serveurs sur lesquels je suis"
-		}
-	}];
-	static generalHelpFooterLabel = {
-		english:
-			"\nIf the command is edited/deleted, I'll automatically adapt my answer.\n"
-			+ "\nIf a command is incorrect, I'll send an error message,"
-			+ " and I'll delete the command after 10 seconds to clean the channel.",
-		french:
-			"\nSi la commande est modifiée ou supprimée, j'adapte automatiquement ma réponse.\n"
-			+ "\nSi une commande est incorrecte, j'envoie un message d'erreur,"
-			+ " et je supprime la commande au bout de 10 secondes pour faire le ménage."
-	};
 	static algListHelpEmbedTitle = {
 		english: "Alg list",
 		french: "Liste des algos"
@@ -164,30 +108,11 @@ class HelpCommandHandler {
 	static helpSelectOptionCustomId = "helpSelectOption";
 	constructor(commandHandler, embedColor) {
 		this.commandHandler = commandHandler;
+		this.embedColor = embedColor;
+		this.generalHelpEmbed = GeneralHelpEmbedBuilder.buildEmbed(this);
+
 		let language = this.commandHandler.messageHandler.algBot.language;
-		let prefix = this.commandHandler.messageHandler.algBot.prefix;
 		this.helpSelectOptionCustomId = this.commandHandler.buildCustomId(HelpCommandHandler.helpSelectOptionCustomId);
-		let generalHelpEmbedMessage =
-			`${HelpCommandHandler.generalHelpHeaderLabel[language]} <:3x3solved:708049634349547531>\n`
-			+ HelpCommandHandler.generalHelpCommands
-				.map(command =>
-					`\n\`${prefix}${command.name}\` : ${command.description[language]}`
-					+ "```parser3\n"
-					+ `${prefix}${command.name}`
-					+ (command.argumentsExample ? ` ${command.argumentsExample}` : "")
-					+ "```")
-				.join("")
-			+ HelpCommandHandler.generalHelpFooterLabel[language];
-		this.generalHelpEmbed = DiscordMessageEmbedBuilder.createEmbed(
-			embedColor,
-			HelpCommandHandler.generalHelpEmbedTitle[language],
-			DiscordMessageEmbedBuilder.noTitleUrl,
-			generalHelpEmbedMessage,
-			DiscordMessageEmbedBuilder.noFields,
-			DiscordMessageEmbedBuilder.noThumbnailUrl,
-			DiscordMessageEmbedBuilder.noImageUrl,
-			DiscordMessageEmbedBuilder.noFooterTextContent
-		);
 		this.algListHelpEmbed = DiscordMessageEmbedBuilder.createEmbed(
 			embedColor,
 			HelpCommandHandler.algListHelpEmbedTitle[language],
@@ -235,6 +160,50 @@ class HelpCommandHandler {
 		.catch(interactionCreateError => this.algBot.logger.errorLog(
 			`Fail to create interaction on StringSelect component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
 		))
+	};
+};
+
+class GeneralHelpEmbedBuilder {
+	static generalHelpEmbedTitle = {
+		english: "Help",
+		french: "Aide"
+	};
+	static generalHelpHeaderLabel = {
+		english: "I'm a :robot: that displays images of",
+		french: "Je suis un :robot: qui affiche des images de"
+	};
+	static generalHelpFooterLabel = {
+		english:
+			"\nIf the command is edited/deleted, I'll automatically adapt my answer.\n"
+			+ "\nIf a command is incorrect, I'll send an error message,"
+			+ " and I'll delete the command after 10 seconds to clean the channel.",
+		french:
+			"\nSi la commande est modifiée ou supprimée, j'adapte automatiquement ma réponse.\n"
+			+ "\nSi une commande est incorrecte, j'envoie un message d'erreur,"
+			+ " et je supprime la commande au bout de 10 secondes pour faire le ménage."
+	};
+	static buildEmbed = helpCommandHandler => {
+		let language = helpCommandHandler.commandHandler.messageHandler.algBot.language;
+		let prefix = helpCommandHandler.commandHandler.messageHandler.algBot.prefix;
+		return DiscordMessageEmbedBuilder.createEmbed(
+			helpCommandHandler.embedColor,
+			GeneralHelpEmbedBuilder.generalHelpEmbedTitle[language],
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			`${GeneralHelpEmbedBuilder.generalHelpHeaderLabel[language]} <:3x3solved:708049634349547531>\n`
+				+ CommandHandler.commands
+					.map(command =>
+						`\n\`${prefix}${command.name}\` : ${command.description[language]}`
+						+ "```parser3\n"
+						+ `${prefix}${command.name}`
+						+ (command.argumentsExample ? ` ${command.argumentsExample}` : "")
+						+ "```")
+					.join("")
+				+ GeneralHelpEmbedBuilder.generalHelpFooterLabel[language],
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			DiscordMessageEmbedBuilder.noImageUrl,
+			DiscordMessageEmbedBuilder.noFooterTextContent
+		);
 	};
 };
 
