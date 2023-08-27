@@ -5,7 +5,93 @@ import {DiscordMessageComponentBuilder} from "./discordUtils/discordMessageCompo
 import {DiscordMessageEmbedBuilder} from "./discordUtils/discordMessageEmbedBuilder.js";
 
 class HelpCommandHandler {
-	static algListHelpEmbedTitle = {
+	static helpSelectOptionCustomId = "helpSelectOption";
+	constructor(commandHandler, embedColor) {
+		this.commandHandler = commandHandler;
+		let language = this.commandHandler.messageHandler.algBot.language;
+		let prefix = this.commandHandler.messageHandler.algBot.prefix;
+		this.generalHelpEmbed = GeneralHelpEmbedBuilder.buildEmbed(embedColor, language, prefix);
+		this.algListHelpEmbed = AlgListHelpEmbedBuilder.buildEmbed(embedColor, language);
+		this.optionsHelpEmbed = OptionsHelpEmbedBuilder.buildEmbed(embedColor, language);
+		this.selectOptions = [
+			{label: GeneralHelpEmbedBuilder.selectOptionLabel[language], emoji: "💡", value: "general"},
+			{label: AlgListHelpEmbedBuilder.selectOptionLabel[language], emoji: "📖", value: "algList"},
+			{label: OptionsHelpEmbedBuilder.selectOptionLabel[language], emoji: "🔧", value: "options"}
+		];
+		this.helpSelectOptionCustomId = this.commandHandler.buildCustomId(HelpCommandHandler.helpSelectOptionCustomId);
+	};
+	getHelpCommandResult = () => {
+		return {
+			message: {
+				textContent: "",
+				embed: this.generalHelpEmbed,
+				components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
+					this.selectOptions, this.selectOptions[0].value, this.helpSelectOptionCustomId)
+			},
+			error: false
+		};
+	};
+	handleHelpStringSelectInteraction = interaction => {
+		let interactionValue = interaction.values[0];
+		interaction.update({
+			embeds: [this[`${interactionValue}HelpEmbed`]],
+			components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
+				this.selectOptions, interactionValue, this.helpSelectOptionCustomId)
+		})
+		.catch(interactionCreateError => this.algBot.logger.errorLog(
+			`Fail to create interaction on StringSelect component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
+		))
+	};
+};
+
+class GeneralHelpEmbedBuilder {
+	static embedTitle = {
+		english: "Help",
+		french: "Aide"
+	};
+	static headerLabel = {
+		english: "I'm a :robot: that displays images of",
+		french: "Je suis un :robot: qui affiche des images de"
+	};
+	static footerLabel = {
+		english:
+			"\nIf the command is edited/deleted, I'll automatically adapt my answer.\n"
+			+ "\nIf a command is incorrect, I'll send an error message,"
+			+ " and I'll delete the command after 10 seconds to clean the channel.",
+		french:
+			"\nSi la commande est modifiée ou supprimée, j'adapte automatiquement ma réponse.\n"
+			+ "\nSi une commande est incorrecte, j'envoie un message d'erreur,"
+			+ " et je supprime la commande au bout de 10 secondes pour faire le ménage."
+	};
+	static selectOptionLabel = {
+		english: "General help",
+		french: "Aide générale"
+	};
+	static buildEmbed = (embedColor, language, prefix) => {
+		return DiscordMessageEmbedBuilder.createEmbed(
+			embedColor,
+			GeneralHelpEmbedBuilder.embedTitle[language],
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			`${GeneralHelpEmbedBuilder.headerLabel[language]} <:3x3solved:708049634349547531>\n`
+				+ CommandHandler.commands
+					.map(command =>
+						`\n\`${prefix}${command.name}\` : ${command.description[language]}`
+						+ "```parser3\n"
+						+ `${prefix}${command.name}`
+						+ (command.argumentsExample ? ` ${command.argumentsExample}` : "")
+						+ "```")
+					.join("")
+				+ GeneralHelpEmbedBuilder.footerLabel[language],
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			DiscordMessageEmbedBuilder.noImageUrl,
+			DiscordMessageEmbedBuilder.noFooterTextContent
+		);
+	};
+};
+
+class AlgListHelpEmbedBuilder {
+	static embedTitle = {
 		english: "Alg list",
 		french: "Liste des algos"
 	};
@@ -45,7 +131,26 @@ class HelpCommandHandler {
 			+ "\nLes commutateurs, conjugués et multiples sont également supportés :"
 			+ "```parser3\n$alg F (sexy)3' F' [R' U' : [R', F]]```"
 	};
-	static optionsHelpEmbedTitle = {
+	static selectOptionLabel = {
+		english: "Alg list",
+		french: "Liste des algos"
+	};
+	static buildEmbed = (embedColor, language) => {
+		return DiscordMessageEmbedBuilder.createEmbed(
+			embedColor,
+			AlgListHelpEmbedBuilder.embedTitle[language],
+			DiscordMessageEmbedBuilder.noTitleUrl,
+			AlgListHelpEmbedBuilder.algListHelpEmbedMessage[language],
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			DiscordMessageEmbedBuilder.noImageUrl,
+			DiscordMessageEmbedBuilder.noFooterTextContent
+		);
+	};
+};
+
+class OptionsHelpEmbedBuilder {
+	static embedTitle = {
 		english: "Options",
 		french: "Options"
 	};
@@ -93,112 +198,16 @@ class HelpCommandHandler {
 			+ "\n`-rotatable` : permet de faire tourner le cube en cliquant sur les réactions (temporairement désactivé)"
 			+ "```yaml\n$alg sune -rotatable```"
 	};
-	static generalHelpSelectOptionLabel = {
-		english: "General help",
-		french: "Aide générale"
-	};
-	static algListHelpSelectOptionLabel = {
-		english: "Alg list",
-		french: "Liste des algos"
-	};
-	static optionsHelpSelectOptionLabel = {
+	static selectOptionLabel = {
 		english: "Options",
 		french: "Options"
 	};
-	static helpSelectOptionCustomId = "helpSelectOption";
-	constructor(commandHandler, embedColor) {
-		this.commandHandler = commandHandler;
-		this.embedColor = embedColor;
-		this.generalHelpEmbed = GeneralHelpEmbedBuilder.buildEmbed(this);
-
-		let language = this.commandHandler.messageHandler.algBot.language;
-		this.helpSelectOptionCustomId = this.commandHandler.buildCustomId(HelpCommandHandler.helpSelectOptionCustomId);
-		this.algListHelpEmbed = DiscordMessageEmbedBuilder.createEmbed(
-			embedColor,
-			HelpCommandHandler.algListHelpEmbedTitle[language],
-			DiscordMessageEmbedBuilder.noTitleUrl,
-			HelpCommandHandler.algListHelpEmbedMessage[language],
-			DiscordMessageEmbedBuilder.noFields,
-			DiscordMessageEmbedBuilder.noThumbnailUrl,
-			DiscordMessageEmbedBuilder.noImageUrl,
-			DiscordMessageEmbedBuilder.noFooterTextContent
-		);
-		this.optionsHelpEmbed = DiscordMessageEmbedBuilder.createEmbed(
-			embedColor,
-			HelpCommandHandler.optionsHelpEmbedTitle[language],
-			DiscordMessageEmbedBuilder.noTitleUrl,
-			HelpCommandHandler.optionsHelpEmbedMessage[language],
-			DiscordMessageEmbedBuilder.noFields,
-			DiscordMessageEmbedBuilder.noThumbnailUrl,
-			DiscordMessageEmbedBuilder.noImageUrl,
-			DiscordMessageEmbedBuilder.noFooterTextContent
-		);
-		this.selectOptions = [
-			{label: HelpCommandHandler.generalHelpSelectOptionLabel[language], emoji: "💡", value: "general"},
-			{label: HelpCommandHandler.algListHelpSelectOptionLabel[language], emoji: "📖", value: "algList"},
-			{label: HelpCommandHandler.optionsHelpSelectOptionLabel[language], emoji: "🔧", value: "options"}
-		];
-	};
-	getHelpCommandResult = () => {
-		return {
-			message: {
-				textContent: "",
-				embed: this.generalHelpEmbed,
-				components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
-					this.selectOptions, this.selectOptions[0].value, this.helpSelectOptionCustomId)
-			},
-			error: false
-		};
-	};
-	handleHelpStringSelectInteraction = interaction => {
-		let interactionValue = interaction.values[0];
-		interaction.update({
-			embeds: [this[`${interactionValue}HelpEmbed`]],
-			components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
-				this.selectOptions, interactionValue, this.helpSelectOptionCustomId)
-		})
-		.catch(interactionCreateError => this.algBot.logger.errorLog(
-			`Fail to create interaction on StringSelect component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
-		))
-	};
-};
-
-class GeneralHelpEmbedBuilder {
-	static generalHelpEmbedTitle = {
-		english: "Help",
-		french: "Aide"
-	};
-	static generalHelpHeaderLabel = {
-		english: "I'm a :robot: that displays images of",
-		french: "Je suis un :robot: qui affiche des images de"
-	};
-	static generalHelpFooterLabel = {
-		english:
-			"\nIf the command is edited/deleted, I'll automatically adapt my answer.\n"
-			+ "\nIf a command is incorrect, I'll send an error message,"
-			+ " and I'll delete the command after 10 seconds to clean the channel.",
-		french:
-			"\nSi la commande est modifiée ou supprimée, j'adapte automatiquement ma réponse.\n"
-			+ "\nSi une commande est incorrecte, j'envoie un message d'erreur,"
-			+ " et je supprime la commande au bout de 10 secondes pour faire le ménage."
-	};
-	static buildEmbed = helpCommandHandler => {
-		let language = helpCommandHandler.commandHandler.messageHandler.algBot.language;
-		let prefix = helpCommandHandler.commandHandler.messageHandler.algBot.prefix;
+	static buildEmbed = (embedColor, language) => {
 		return DiscordMessageEmbedBuilder.createEmbed(
-			helpCommandHandler.embedColor,
-			GeneralHelpEmbedBuilder.generalHelpEmbedTitle[language],
+			embedColor,
+			OptionsHelpEmbedBuilder.embedTitle[language],
 			DiscordMessageEmbedBuilder.noTitleUrl,
-			`${GeneralHelpEmbedBuilder.generalHelpHeaderLabel[language]} <:3x3solved:708049634349547531>\n`
-				+ CommandHandler.commands
-					.map(command =>
-						`\n\`${prefix}${command.name}\` : ${command.description[language]}`
-						+ "```parser3\n"
-						+ `${prefix}${command.name}`
-						+ (command.argumentsExample ? ` ${command.argumentsExample}` : "")
-						+ "```")
-					.join("")
-				+ GeneralHelpEmbedBuilder.generalHelpFooterLabel[language],
+			OptionsHelpEmbedBuilder.optionsHelpEmbedMessage[language],
 			DiscordMessageEmbedBuilder.noFields,
 			DiscordMessageEmbedBuilder.noThumbnailUrl,
 			DiscordMessageEmbedBuilder.noImageUrl,
