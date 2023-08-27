@@ -41,7 +41,8 @@ class ImageBuilder {
 	buildHoloCubeImage = async (moveSequence, optionsObject, cubeSize) => {
 		let runner = new Runner({
 			puzzle: {
-				fullName: `cube${Array(3).fill(cubeSize).join("x")}`
+				fullName: `cube${Array(3).fill(cubeSize).join("x")}`,
+				colorScheme: Object.values(optionsObject.colorScheme) // defined in fixed order : U, F, R, D, B, L
 			},
 			drawingOptions: {
 				document: ImageBuilder.jsDomDocument,
