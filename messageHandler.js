@@ -65,40 +65,40 @@ class CommandHandler {
 	static commands = [{
 		name: "alg",
 		description: {
-			english: "Displays the case that the alg solves",
-			french: "Affiche le cas que l'algo résout"
+			english: "Displays the case that the alg solves.",
+			french: "Affiche le cas que l'algo résout."
 		},
 		argumentsExample: "r U R' F' R U R' U' R' F R2 U' r'"
 	}, {
 		name: "do",
 		description: {
-			english: "Applies the alg on a solved cube and displays the result",
-			french: "Applique l'algo sur un cube résolu et affiche le résultat"
+			english: "Applies the alg on a solved cube and displays the result.",
+			french: "Applique l'algo sur un cube résolu et affiche le résultat."
 		},
 		argumentsExample: "r U R' F' R U R' U' R' F R2 U' r'"
 	}, {
 		name: "help",
 		description: {
-			english: "Displays this help, the recognized algs and the supported options",
-			french: "Affiche cette aide, les algos reconnus et les options supportées"
+			english: "Displays this help, the recognized algs and the supported options.",
+			french: "Affiche cette aide, les algos reconnus et les options supportées."
 		}
 	}, {
 		name: "invite",
 		description: {
-			english: "Displays the links to invite me to a server",
-			french: "Affiche les liens pour m'inviter sur un serveur"
+			english: "Displays the links to invite me to a server.",
+			french: "Affiche les liens pour m'inviter sur un serveur."
 		}
 	}, {
 		name: "feedback",
 		description: {
-			english: "Allows to give feedback, for example to report a bug",
-			french: "Permet de donner un feedback, par exemple pour rapporter un bug"
+			english: "Allows to give feedback, for example to report a bug.",
+			french: "Permet de donner un feedback, par exemple pour rapporter un bug."
 		}
 	}, {
 		name: "servers",
 		description: {
-			english: "Lists all servers I am on",
-			french: "Liste tous les serveurs sur lesquels je suis"
+			english: "Lists all servers I am on.",
+			french: "Liste tous les serveurs sur lesquels je suis."
 		}
 	}];
 	static unrecognizedCommandLabel = {
