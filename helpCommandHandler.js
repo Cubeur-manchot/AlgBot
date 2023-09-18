@@ -12,12 +12,12 @@ class HelpCommandHandler {
 		let language = this.commandHandler.messageHandler.algBot.language;
 		let prefix = this.commandHandler.messageHandler.algBot.prefix;
 		let highlightLanguage = "tcl";
-		this.generalHelpEmbed = GeneralHelpEmbedBuilder.buildEmbed(embedColor, language, prefix, highlightLanguage);
+		this.commandsHelpEmbed = CommandsHelpEmbedBuilder.buildEmbed(embedColor, language, prefix, highlightLanguage);
 		this.algListHelpEmbed = AlgListHelpEmbedBuilder.buildEmbed(embedColor, language, prefix, highlightLanguage);
 		this.optionsHelpEmbed = OptionsHelpEmbedBuilder.buildEmbed(embedColor, language, prefix, highlightLanguage);
 		this.interactionHelpEmbed = InteractionHelpEmbedBuilder.buildEmbed(embedColor, language, prefix);
 		this.selectOptions = [
-			{label: GeneralHelpEmbedBuilder.embedTitle[language], emoji: "💡", value: "general"},
+			{label: CommandsHelpEmbedBuilder.embedTitle[language], emoji: "💡", value: "commands"},
 			{label: AlgListHelpEmbedBuilder.embedTitle[language], emoji: "📖", value: "algList"},
 			{label: OptionsHelpEmbedBuilder.embedTitle[language], emoji: "🔧", value: "options"},
 			{label: InteractionHelpEmbedBuilder.embedTitle[language], emoji: "↔", value: "interaction"},
@@ -28,7 +28,7 @@ class HelpCommandHandler {
 		return {
 			message: {
 				textContent: "",
-				embed: this.generalHelpEmbed,
+				embed: this.commandsHelpEmbed,
 				components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
 					this.selectOptions, this.selectOptions[0].value, this.helpSelectOptionCustomId)
 			},
@@ -48,10 +48,10 @@ class HelpCommandHandler {
 	};
 };
 
-class GeneralHelpEmbedBuilder {
+class CommandsHelpEmbedBuilder {
 	static embedTitle = {
-		english: "General help",
-		french: "Aide générale"
+		english: "Commands",
+		french: "Commandes"
 	};
 	static headerLabel = {
 		english: "I'm a :robot: that displays images of",
@@ -60,9 +60,9 @@ class GeneralHelpEmbedBuilder {
 	static buildEmbed = (embedColor, language, prefix, highlightLanguage) => {
 		return DiscordMessageEmbedBuilder.createEmbed(
 			embedColor,
-			GeneralHelpEmbedBuilder.embedTitle[language],
+			CommandsHelpEmbedBuilder.embedTitle[language],
 			DiscordMessageEmbedBuilder.noTitleUrl,
-			`${GeneralHelpEmbedBuilder.headerLabel[language]} <:3x3solved:708049634349547531>`,
+			`${CommandsHelpEmbedBuilder.headerLabel[language]} <:3x3solved:708049634349547531>`,
 			CommandHandler.commands
 				.map(command => {return {
 					name: `\`${prefix}${command.name}\``,
