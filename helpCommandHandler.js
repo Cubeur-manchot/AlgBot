@@ -11,7 +11,7 @@ class HelpCommandHandler {
 		this.commandHandler = commandHandler;
 		let language = this.commandHandler.messageHandler.algBot.language;
 		let prefix = this.commandHandler.messageHandler.algBot.prefix;
-		let highlightLanguage = "parser3";
+		let highlightLanguage = "tcl";
 		this.generalHelpEmbed = GeneralHelpEmbedBuilder.buildEmbed(embedColor, language, prefix, highlightLanguage);
 		this.algListHelpEmbed = AlgListHelpEmbedBuilder.buildEmbed(embedColor, language, prefix, highlightLanguage);
 		this.optionsHelpEmbed = OptionsHelpEmbedBuilder.buildEmbed(embedColor, language, prefix, highlightLanguage);
