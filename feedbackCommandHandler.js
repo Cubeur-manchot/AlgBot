@@ -75,7 +75,7 @@ class FeedbackCommandHandler {
 		this.otherFeedbackButtonCustomId = this.commandHandler.buildCustomId(FeedbackCommandHandler.otherFeedbackButtonCustomId);
 		this.commandErrorFeedbackModalCustomId = this.commandHandler.buildCustomId(FeedbackCommandHandler.commandErrorFeedbackModalCustomId);
 		this.otherFeedbackModalCustomId = this.commandHandler.buildCustomId(FeedbackCommandHandler.otherFeedbackModalCustomId);
-		this.feedbackButtonsComponents = DiscordMessageComponentBuilder.createRowWithButtonsComponents([
+		this.feedbackButtonsComponents = DiscordMessageComponentBuilder.createRowsWithButtonsComponents([[
 			{
 				label: FeedbackCommandHandler.commandErrorFeedbackButtonLabel[language],
 				emoji: "🤒",
@@ -86,7 +86,7 @@ class FeedbackCommandHandler {
 				emoji: "🗨️",
 				customId: this.otherFeedbackButtonCustomId
 			}
-		]);
+		]]);
 		this.commandErrorFeedbackModal = DiscordMessageComponentBuilder.createFormModal(
 			[{
 				label: FeedbackCommandHandler.commandErrorFeedbackModalCommandInputLabel[language],

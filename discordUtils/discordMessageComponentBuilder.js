@@ -13,15 +13,15 @@ class DiscordMessageComponentBuilder {
 			])
 		];
 	};
-	static createRowWithButtonsComponents = buttons => {
-		return [new Discord.ActionRowBuilder()
-			.setComponents(buttons.map(button => new Discord.ButtonBuilder()
+	static createRowsWithButtonsComponents = buttonsLists => {
+		return buttonsLists.map(buttonsList => new Discord.ActionRowBuilder()
+			.setComponents(buttonsList.map(button => new Discord.ButtonBuilder()
 				.setStyle(Discord.ButtonStyle.Secondary)
 				.setLabel(button.label)
 				.setEmoji(button.emoji)
 				.setCustomId(button.customId))
 			)
-		];
+		);
 	};
 	static createFormModal = (inputFields, title, customId) => {
 		return new Discord.ModalBuilder()
