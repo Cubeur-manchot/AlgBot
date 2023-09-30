@@ -21,10 +21,12 @@ class MessageHandler {
 	onMessageDelete = message => {
 		if (this.messageIsAlgBotCommand(message)) {
 			this.algBot.discordClient.deleteMessage(this.findAlgBotAnswer(message));
+			delete this.commandHandler.algCommandHandler.rotatableOptionsCache[message.id];
 		}
 	};
 	onMessageUpdate = async (oldMessage, newMessage) => {
 		if (this.messageIsAlgBotCommand(oldMessage)) {
+			delete this.commandHandler.algCommandHandler.rotatableOptionsCache[oldMessage.id];
 			let previousAnswer = this.findAlgBotAnswer(oldMessage);
 			if (this.messageIsAlgBotCommand(newMessage)) {
 				let commandResult = await this.commandHandler.getMessageCommandResult(newMessage);

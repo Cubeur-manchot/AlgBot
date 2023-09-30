@@ -250,6 +250,12 @@ class AlgCommandHandler {
 		let description = [moveCounts, commentWithLimit]
 			.filter(descriptionChunk => descriptionChunk !== null)
 			.join("\n");
+		if (parsedOptions.rotatable) {
+			this.rotatableOptionsCache[commandId] = parsedOptions;
+			setTimeout(() => { // reset cache entry after 30 days
+				this.rotatableOptionsCache[commandId] = null;
+			}, 2592000000);
+		}
 		// build embed
 		let embed = DiscordMessageEmbedBuilder.createEmbed(
 			this.embedColor,
