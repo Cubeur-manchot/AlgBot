@@ -218,9 +218,7 @@ class AlgCommandHandler {
 			parsedMoveSequence.moveCounts = moveCounts;
 		}
 		// build image
-		let image = parsedOptions.imageGenerator === OptionsHandler.holoCubeImageGenerator
-			? await this.imageBuilder.buildHoloCubeImage(parsedMoveSequence.moveSequence, parsedOptions, cubeSize)
-			: this.imageBuilder.buildVisualCubeImage(parsedMoveSequence.moveSequence, parsedOptions, cubeSize);
+		let image = await this.imageBuilder.buildPuzzleImage(parsedMoveSequence.moveSequence, parsedOptions, cubeSize);
 		if (image.errors.length) {
 			return {
 				message: {

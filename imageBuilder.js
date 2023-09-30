@@ -13,6 +13,11 @@ class ImageBuilder {
 	constructor(algCommandHandler) {
 		this.algCommandHandler = algCommandHandler;
 	};
+	buildPuzzleImage = async (moveSequence, optionsObject, cubeSize) => {
+		return optionsObject.imageGenerator === OptionsHandler.holoCubeImageGenerator
+		? await this.buildHoloCubeImage(moveSequence, optionsObject, cubeSize)
+		: this.buildVisualCubeImage(moveSequence, optionsObject, cubeSize);
+	}; 
 	buildVisualCubeImage = (moveSequence, optionsObject, cubeSize) => {
 		let urlBegin = "http://cube.rider.biz/visualcube.php";
 		let view = optionsObject.view === OptionsHandler.planView ? "&view=plan" : "";
