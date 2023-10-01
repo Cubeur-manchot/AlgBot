@@ -252,9 +252,9 @@ class AlgCommandHandler {
 			.join("\n");
 		if (parsedOptions.rotatable) {
 			this.rotatableOptionsCache[commandId] = parsedOptions;
-			setTimeout(() => { // reset cache entry after 30 days
+			setTimeout(() => { // reset cache entry after 10 days
 				this.rotatableOptionsCache[commandId] = null;
-			}, 2592000000);
+			}, 864000000);
 		}
 		// build embed
 		let embed = DiscordMessageEmbedBuilder.createEmbed(
