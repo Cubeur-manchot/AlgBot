@@ -298,8 +298,8 @@ class InteractionHelpEmbedBuilder {
 				french: ":broom: Commande incorrecte"
 			},
 			value: {
-				english: "If a command is incorrect, it will be deleted after 10 seconds for channel cleaning, except if it was edited in between.",
-				french: "Si une commande est incorrecte, elle sera supprimée au bout de 10 secondes, excepté si elle a été modifiée entre temps."
+				english: "If a command is incorrect, it will be deleted after 30 seconds for channel cleaning, except if it was edited in between.",
+				french: "Si une commande est incorrecte, elle sera supprimée au bout de 30 secondes, excepté si elle a été modifiée entre temps."
 			}
 		},
 		{

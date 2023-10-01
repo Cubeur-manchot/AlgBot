@@ -225,7 +225,7 @@ class DiscordClient extends Discord.Client {
 			if (message.editedTimestamp <= currentLastUpdateTimeStamp) {
 				this.deleteMessage(message);
 			}
-		}, 10000);
+		}, 30000);
 	};
 	deleteMessageAfterSomeSeconds = message => {
 		setTimeout(() => {
