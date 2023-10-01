@@ -118,7 +118,7 @@ class AlgCommandHandler {
 			},
 			description: {
 				english: "Simplifies the moves that merge or cancel",
-				french: "Simplifie les mouvements qui fusionnent ou s'annulent "
+				french: "Simplifie les mouvements qui fusionnent ou s'annulent"
 			},
 			choices: [{name: "-merge", value: "-merge"}],
 			required: false
