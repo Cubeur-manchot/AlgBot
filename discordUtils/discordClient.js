@@ -200,6 +200,17 @@ class DiscordClient extends Discord.Client {
 			));
 		}
 	};
+	updateInteractionMessage = (interaction, newMessage) => {
+		interaction.update({
+			content: newMessage.textContent,
+			embeds: newMessage.embed ? [newMessage.embed] : null,
+			files: newMessage.attachment ? [newMessage.attachment] : null,
+			components: newMessage.components
+		})
+		.catch(interactionCreateError => this.algBot.logger.errorLog(
+			`Fail to update interaction message for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
+		));
+	};
 	deleteMessage = message => {
 		if (message) {
 			message.delete()

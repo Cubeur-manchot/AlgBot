@@ -401,14 +401,11 @@ class AlgCommandHandler {
 			newImage.url,
 			`${this.appliedRotationsLabel} : ${newAppliedRotations}.`
 		);
-		interaction.update({
-			embeds: [newEmbed],
-			files: newImage.attachment ? [newImage.attachment] : null,
+		this.commandHandler.messageHandler.algBot.discordClient.updateInteractionMessage(interaction, {
+			embed: newEmbed,
+			attachment: newImage.attachment,
 			components: this.rotationButtonsComponents[optionsObject.view]
-		})
-		.catch(interactionCreateError => this.algBot.logger.errorLog(
-			`Fail to create interaction on rotation Button component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
-		));
+		});
 	};
 };
 

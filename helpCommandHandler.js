@@ -37,14 +37,10 @@ class HelpCommandHandler {
 	};
 	handleHelpStringSelectInteraction = interaction => {
 		let interactionValue = interaction.values[0];
-		interaction.update({
-			embeds: [this[`${interactionValue}HelpEmbed`]],
-			components: DiscordMessageComponentBuilder.createRowWithSelectComponents(
-				this.selectOptions, interactionValue, this.helpSelectOptionCustomId)
-		})
-		.catch(interactionCreateError => this.algBot.logger.errorLog(
-			`Fail to create interaction on StringSelect component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
-		));
+		this.commandHandler.messageHandler.algBot.discordClient.updateInteractionMessage(interaction, {
+			embed: this[`${interactionValue}HelpEmbed`],
+			components: DiscordMessageComponentBuilder.createRowWithSelectComponents(this.selectOptions, interactionValue, this.helpSelectOptionCustomId)
+		});
 	};
 };
 
