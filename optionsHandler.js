@@ -148,8 +148,8 @@ class OptionsHandler {
 				optionsResult.mergeMoves = true;
 			} else if (OptionsHandler.colorSchemes[option]) {
 				optionsResult.colorScheme = OptionsHandler.colorSchemes[option];
-			/*} else if (option === "rotatable") {
-				optionsResult.rotatable = true;*/
+			} else if (option === "rotatable") {
+				optionsResult.rotatable = true;
 			} else if (OptionsHandler.imageGenerators.includes(option)) {
 				optionsResult.imageGenerator = option;
 			} else {

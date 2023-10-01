@@ -121,6 +121,10 @@ class CommandHandler {
 			if (!this.messageHandler.messageIsAlgBotMessage(interaction.message)) {
 				return;
 			}
+			if (this.algCommandHandler.rotationsFromCustomId.hasOwnProperty(interaction.customId)) {
+				this.algCommandHandler.handleRotationButtonInteraction(interaction);
+				return;
+			}
 			switch (interaction.customId) {
 				case this.helpCommandHandler.helpSelectOptionCustomId:
 					this.helpCommandHandler.handleHelpStringSelectInteraction(interaction);
@@ -171,7 +175,8 @@ class CommandHandler {
 				: null,
 			comment: receivedOptionValuesByType.comment.length
 				? receivedOptionValuesByType.comment.join(" ")
-				: null
+				: null,
+			id: interaction.id
 		};
 		return await this.getCommandResult(command);
 	};
@@ -179,7 +184,7 @@ class CommandHandler {
 		let [name, text, options, comment] = message.content
 			.replace(this.messageHandler.algBot.prefix, "")
 			.split(/(?<!\s.*)\s+|(?<!\s-.*|\/\/.*)\s+(?=-|\/\/)|(?<!\/\/.*)\s*\/\/\s*/);
-		return await this.getCommandResult({name, text, options, comment});
+		return await this.getCommandResult({name, text, options, comment, id: message.id});
 	};
 	getCommandResult = async command => {
 		switch (command.name) {
@@ -192,9 +197,9 @@ class CommandHandler {
 			case "servers":
 				return this.serversCommandHandler.getServersCommandResult();
 			case "alg":
-				return await this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, false);
+				return await this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, false, command.id);
 			case "do":
-				return await this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, true);
+				return await this.algCommandHandler.getAlgOrDoCommandResult(command.text, command.options, command.comment, true, command.id);
 			default:
 				return this.getUnrecognizedCommandResult(command.name);
 		}

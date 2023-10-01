@@ -4,6 +4,7 @@ import {OptionsHandler} from "./optionsHandler.js";
 import {AlgManipulator} from "./algManipulator.js";
 import {ImageBuilder} from "./imageBuilder.js";
 import {DiscordMessageEmbedBuilder} from "./discordUtils/discordMessageEmbedBuilder.js";
+import {DiscordMessageComponentBuilder} from "./discordUtils/discordMessageComponentBuilder.js";
 
 class AlgCommandHandler {
 	static embedSizeLimits = {
@@ -164,6 +165,57 @@ class AlgCommandHandler {
 			required: false
 		}
 	];
+	static appliedRotationsLabel = {
+		english: "Applied rotations",
+		french: "Rotations appliquées"
+	};
+	static noAppliedRotationLabel = {
+		english: "none",
+		french: "aucune"
+	};
+	static rotationButtonBaseCustomId = "rotationButtonCustomId";
+	static rotationButtons = [
+		{
+			view: OptionsHandler.planView,
+			buttons: [
+				[
+					{label: "x'", emoji: "⬇"},
+					{label: "x" , emoji: "⬆"},
+					{label: "x2", emoji: "⏫"}
+				],
+				[
+					{label: "y'", emoji: "⤴"},
+					{label: "y" , emoji: "⤵"},
+					{label: "y2", emoji: "↩"}
+				],
+				[
+					{label: "z'", emoji: "⬅"},
+					{label: "z" , emoji: "➡"},
+					{label: "z2", emoji: "⏩"}
+				]
+			]
+		},
+		{
+			view: OptionsHandler.isometricView,
+			buttons: [
+				[
+					{label: "x'", emoji: "↙"},
+					{label: "x" , emoji: "↗"},
+					{label: "x2", emoji: "<:fast_forward_top_right:1154549730588762192>"}
+				],
+				[
+					{label: "y'", emoji: "⤴"},
+					{label: "y" , emoji: "⤵"},
+					{label: "y2", emoji: "↩"}
+				],
+				[
+					{label: "z'", emoji: "↘"},
+					{label: "z" , emoji: "↖"},
+					{label: "z2", emoji: "<:fast_forward_bottom_right:1154549216463564881>"}
+				]
+			]
+		}
+	];
 	constructor(commandHandler, embedColor) {
 		this.commandHandler = commandHandler;
 		this.optionsHandler = new OptionsHandler(this);
@@ -181,8 +233,30 @@ class AlgCommandHandler {
 				choices: option.choices,
 				required: option.required
 			}});
+		this.appliedRotationsLabel = AlgCommandHandler.appliedRotationsLabel[language];
+		this.noAppliedRotationLabel = AlgCommandHandler.noAppliedRotationLabel[language];
+		this.rotationButtonsComponents = Object.fromEntries(AlgCommandHandler.rotationButtons.map(rotationButtonsDefinition => [
+			rotationButtonsDefinition.view,
+			DiscordMessageComponentBuilder.createRowsWithButtonsComponents(
+				rotationButtonsDefinition.buttons.map(
+					buttonsRow => buttonsRow.map(
+						button => {return {
+							...button,
+							customId: this.commandHandler.buildCustomId(`${AlgCommandHandler.rotationButtonBaseCustomId}${rotationButtonsDefinition.view}${button.label}`)
+						}}
+					)
+				)
+			)
+		]));
+		this.rotationsFromCustomId = Object.fromEntries(
+			Object.values(this.rotationButtonsComponents)
+				.flat(2)
+				.flatMap(componentRow => componentRow.components)
+				.map(buttonComponent => {return [buttonComponent.data.custom_id, buttonComponent.data.label]})
+		);
+		this.rotatableOptionsCache = {};
 	};
-	getAlgOrDoCommandResult = async (moves, options, comment, isDo) => {
+	getAlgOrDoCommandResult = async (moves, options, comment, isDo, commandId) => {
 		// parse options
 		let parsedOptions = this.optionsHandler.parseOptions(options ?? "");
 		if (parsedOptions.errors.length) {
@@ -250,7 +324,13 @@ class AlgCommandHandler {
 		let description = [moveCounts, commentWithLimit]
 			.filter(descriptionChunk => descriptionChunk !== null)
 			.join("\n");
+		let components = [];
+		let footerTextContent = DiscordMessageEmbedBuilder.noFooterTextContent;
 		if (parsedOptions.rotatable) {
+			// build footer
+			footerTextContent = `${this.appliedRotationsLabel} : ${this.noAppliedRotationLabel}.`;
+			// build components
+			components = this.rotationButtonsComponents[parsedOptions.view];
 			this.rotatableOptionsCache[commandId] = parsedOptions;
 			setTimeout(() => { // reset cache entry after 10 days
 				this.rotatableOptionsCache[commandId] = null;
@@ -265,14 +345,14 @@ class AlgCommandHandler {
 			DiscordMessageEmbedBuilder.noFields,
 			DiscordMessageEmbedBuilder.noThumbnailUrl,
 			image.url,
-			DiscordMessageEmbedBuilder.noFooterTextContent
+			footerTextContent
 		);
 		return {
 			message: {
 				textContent: "",
 				embed: embed,
 				attachment: image.attachment,
-				//components: null, // todo reactivate -rotatable with buttons
+				components: components,
 				reactions: ["❤", "💩", "🥇", "👽"]
 			},
 			error: false
@@ -296,6 +376,39 @@ class AlgCommandHandler {
 				return option;
 			});
 		}
+	};
+	handleRotationButtonInteraction = async interaction => {
+		let optionsObject = this.rotatableOptionsCache[interaction.message.reference.messageId];
+		let oldEmbed = interaction.message.embeds[0];
+		let moveSequence = oldEmbed.title;
+		let oldAppliedRotations = oldEmbed.footer.text
+			.replace(new RegExp(`^${this.appliedRotationsLabel} : |\\.$`, "g"), "")
+			.replace(this.noAppliedRotationLabel, "");
+		let newRotationToApply = this.rotationsFromCustomId[interaction.customId];
+		let newAppliedRotations = `${oldAppliedRotations} ${newRotationToApply}`.trim();
+		let newImage = await this.imageBuilder.buildPuzzleImage(
+			optionsObject.isDo
+				? `${moveSequence} ${newAppliedRotations}`
+				: `${this.algManipulator.invertSequence(newAppliedRotations)} ${moveSequence}`,
+			optionsObject);
+		let newEmbed = DiscordMessageEmbedBuilder.createEmbed(
+			oldEmbed.color,
+			oldEmbed.title,
+			oldEmbed.url,
+			oldEmbed.description,
+			DiscordMessageEmbedBuilder.noFields,
+			DiscordMessageEmbedBuilder.noThumbnailUrl,
+			newImage.url,
+			`${this.appliedRotationsLabel} : ${newAppliedRotations}.`
+		);
+		interaction.update({
+			embeds: [newEmbed],
+			files: newImage.attachment ? [newImage.attachment] : null,
+			components: this.rotationButtonsComponents[optionsObject.view]
+		})
+		.catch(interactionCreateError => this.algBot.logger.errorLog(
+			`Fail to create interaction on rotation Button component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
+		));
 	};
 };
 

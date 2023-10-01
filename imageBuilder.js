@@ -32,22 +32,28 @@ class ImageBuilder {
 			.map(color => color[0]) // keep first letter only
 			.join("");
 		let stage = optionsObject.stage;
-		let caseOrAlg = optionsObject.isDo ? "alg" : "case";
 		let moveSequenceForVisualCube =
 			this.algCommandHandler.algManipulator.replaceInnerSliceMoves(
-				this.algCommandHandler.algManipulator.replaceMiddleSliceMoves(moveSequence, cubeSize)
+				this.algCommandHandler.algManipulator.replaceMiddleSliceMoves(
+					optionsObject.isDo
+						? moveSequence
+						: this.algCommandHandler.algManipulator.invertSequence(moveSequence),
+					cubeSize)
 			)
 			.replace(/\s/g, "%20") // replace spaces
 			.replace(/'/g, "%27"); // replace apostrophes
 		return {
-			url: `${urlBegin}?fmt=png&size=${ImageBuilder.cubeImageSize}&bg=t${view}&pzl=${cubeSize}&sch=${colorScheme}&stage=${stage}&${caseOrAlg}=${moveSequenceForVisualCube}`,
+			url: `${urlBegin}?fmt=png&size=${ImageBuilder.cubeImageSize}&bg=t${view}&pzl=${cubeSize}&sch=${colorScheme}&stage=${stage}&alg=${moveSequenceForVisualCube}`,
 			errors: []
 		};
 	};
 	buildHoloCubeImage = async (moveSequence, optionsObject, cubeSize) => {
+		let puzzleName = `cube${Array(3).fill(cubeSize).join("x")}`;
+		let stage = optionsObject.stage;
+		let view = optionsObject.view;
 		let runner = new Runner({
 			puzzle: {
-				fullName: `cube${Array(3).fill(cubeSize).join("x")}`,
+				fullName: puzzleName,
 				colorScheme: Object.values(optionsObject.colorScheme) // defined in fixed order : U, F, R, D, B, L
 			},
 			drawingOptions: {
@@ -69,9 +75,10 @@ class ImageBuilder {
 			case "success":
 				let svg = result.svg;
 				let pngBuffer = await this.convertSvgSvgElementToPngBuffer(svg);
-				let attachment = new Discord.AttachmentBuilder(pngBuffer, {name: "holoCubeImage.png"});
+				let fileName = "holoCubeImage.png";
+				let attachment = new Discord.AttachmentBuilder(pngBuffer, {name: fileName});
 				return {
-					url: "attachment://holoCubeImage.png",
+					url: `attachment://${fileName}`,
 					attachment: attachment,
 					errors: []
 				};

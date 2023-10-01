@@ -44,7 +44,7 @@ class HelpCommandHandler {
 		})
 		.catch(interactionCreateError => this.algBot.logger.errorLog(
 			`Fail to create interaction on StringSelect component for AlgBot (${this.algBot.language}) : "${interactionCreateError}".`
-		))
+		));
 	};
 };
 
@@ -245,8 +245,8 @@ class OptionsHelpEmbedBuilder {
 		{
 			name: "rotatable",
 			value: {
-				english: "Allows to rotate the cube to see different angles. This option is temporarily disabled.",
-				french: "Permet de faire tourner le cube pour voir différents angles. Cette option est temporairement désactivée."
+				english: "Allows to rotate the cube to see different angles.",
+				french: "Permet de faire tourner le cube pour voir différents angles."
 			},
 			example: "f R' f' -rotatable"
 		}
