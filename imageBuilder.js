@@ -13,7 +13,8 @@ class ImageBuilder {
 	constructor(algCommandHandler) {
 		this.algCommandHandler = algCommandHandler;
 	};
-	buildPuzzleImage = async (moveSequence, optionsObject, cubeSize) => {
+	buildPuzzleImage = async (moveSequence, optionsObject) => {
+		let cubeSize = parseInt(optionsObject.puzzle.match(/\d+/)[0]);
 		return optionsObject.imageGenerator === OptionsHandler.holoCubeImageGenerator
 		? await this.buildHoloCubeImage(moveSequence, optionsObject, cubeSize)
 		: this.buildVisualCubeImage(moveSequence, optionsObject, cubeSize);
