@@ -91,6 +91,7 @@ class AlgManipulator {
 		let splitMoveSequence = moveSequenceString
 			.replace(/’/g, "'") // replace wrong apostrophe typography
 			.split(separatorRegexp) // split with structuring characters
+			.map(chunk => chunk.trim())
 			.filter(chunk => chunk.length !== 0);
 		let stack = [{
 			partialMoveSequence: ""
