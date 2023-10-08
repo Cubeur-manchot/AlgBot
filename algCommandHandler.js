@@ -281,11 +281,11 @@ class AlgCommandHandler {
 				error: true
 			};
 		}
-		let moveSequenceWithLimit = this.applyDiscordEmbedLimits(parsedMoveSequence.moveSequence, AlgCommandHandler.embedSizeLimits.title);
 		// merge moves
 		if (parsedOptions.mergeMoves) {
 			parsedMoveSequence.moveSequence = this.algManipulator.algMerger.mergeMoves(parsedMoveSequence.moveSequence, cubeSize);
 		}
+		let moveSequenceWithLimit = this.applyDiscordEmbedLimits(parsedMoveSequence.moveSequence, AlgCommandHandler.embedSizeLimits.title);
 		// count moves
 		if (Object.values(parsedOptions.countMoves).includes(true)) {
 			let moveCounts = this.algManipulator.countMoves(parsedMoveSequence.moveSequence);
