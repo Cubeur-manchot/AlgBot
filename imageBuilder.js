@@ -49,12 +49,15 @@ class ImageBuilder {
 	};
 	buildHoloCubeImage = async (moveSequence, optionsObject, cubeSize) => {
 		let puzzleName = `cube${Array(3).fill(cubeSize).join("x")}`;
-		let stage = optionsObject.stage;
+		let stage = optionsObject.stage === "cross" ? "Cross" : optionsObject.stage.toUpperCase();
 		let view = optionsObject.view;
 		let runner = new Runner({
 			puzzle: {
 				fullName: puzzleName,
-				colorScheme: Object.values(optionsObject.colorScheme) // defined in fixed order : U, F, R, D, B, L
+				colorScheme: Object.values(optionsObject.colorScheme), // defined in fixed order : U, F, R, D, B, L
+				mask: {
+					stage: stage
+				}
 			},
 			drawingOptions: {
 				document: ImageBuilder.jsDomDocument,
