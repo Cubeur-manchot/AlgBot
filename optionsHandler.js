@@ -2,14 +2,34 @@
 
 class OptionsHandler {
 	static planViewStages = [
-		"ollcp", "oll", "ocll", "oell", "cll", "coll", "cmll",
-		"ell", "ocell", "pll", "zbll", "1lll"
+		"pll", "zbll", "ell", "1lll", "lse", "lsep", "l4c", "zzll",
+		"ollcp", "coll", "cpeoll",
+		"oll", "ocll",
+		"eoll",
+		"llef",
+		"cll",
+		"cmll"
 	];
 	static isometricViewStages = [
-		"cross", "f2l", "f2l_1", "f2l_2", "f2l_3", "f2l_sm",
-		"cls", "cols", "els", "vls", "zbls", "vh", "wv",
-		"fl", "line", "2x2x2", "2x2x3", "fb", "f2b"
+		"vls", "hls", "ols", "wv", "sv", "mw", "cls", "jtle",
+		"zbls", "eols", "vhls", "els",
+		"eolr",
+		"cross",
+		"fb",
+		"sb",
+		"fl",
+		"l2c",
+		"l2e"
 	];
+	//static planViewStages = [
+	//	"ollcp", "oll", "ocll", "oell", "cll", "coll", "cmll",
+	//	"ell", "ocell", "pll", "zbll", "1lll"
+	//];
+	//static isometricViewStages = [
+	// 	"cross", "f2l", "f2l_1", "f2l_2", "f2l_3", "f2l_sm",
+	// 	"cls", "cols", "els", "vls", "zbls", "vh", "wv",
+	// 	"fl", "line", "2x2x2", "2x2x3", "fb", "f2b"
+	//];
 	static planView = "plan";
 	static isometricView = "isometric";
 	static normalView = "normal";
