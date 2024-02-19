@@ -21,10 +21,6 @@ class OptionsHandler {
 		"l2c",
 		"l2e"
 	];
-	//static planViewStages = [
-	//	"ollcp", "oll", "ocll", "oell", "cll", "coll", "cmll",
-	//	"ell", "ocell", "pll", "zbll", "1lll"
-	//];
 	//static isometricViewStages = [
 	// 	"cross", "f2l", "f2l_1", "f2l_2", "f2l_3", "f2l_sm",
 	// 	"cls", "cols", "els", "vls", "zbls", "vh", "wv",
