@@ -216,9 +216,9 @@ class OptionsHelpEmbedBuilder {
 			name: "color",
 			value: {
 				english: `Specifies the color of the top face (${Object.keys(OptionsHandler.colorSchemes).filter(option => option.includes("-")).map(option => `\`-${option}\``).join(", ")})`
-					+ `and even the color of the front face (${Object.keys(OptionsHandler.colorSchemes).filter(option => !option.includes("-")).map(option => `\`-${option}\``).join(", ")}).`,
+					+ ` and even the color of the front face (${Object.keys(OptionsHandler.colorSchemes).filter(option => !option.includes("-")).map(option => `\`-${option}\``).join(", ")}).`,
 				french: `Spécifie la couleur de la face du haut (${Object.keys(OptionsHandler.colorSchemes).filter(option => option.includes("-")).map(option => `\`-${option}\``).join(", ")})`
-					+ `voire la couleur de la face avant (${Object.keys(OptionsHandler.colorSchemes).filter(option => !option.includes("-")).map(option => `\`-${option}\``).join(", ")}).`
+					+ ` voire la couleur de la face avant (${Object.keys(OptionsHandler.colorSchemes).filter(option => !option.includes("-")).map(option => `\`-${option}\``).join(", ")}).`
 			},
 			example: "M' U M U' -isometric -yellow-orange"
 		},
