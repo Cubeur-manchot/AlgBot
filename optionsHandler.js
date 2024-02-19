@@ -111,7 +111,7 @@ class OptionsHandler {
 			L: "orange"
 		},
 		rotatable: false,
-		imageGenerator: OptionsHandler.visualCubeImageGeneretor,
+		imageGenerator: OptionsHandler.holoCubeImageGenerator,
 		errors: []
 	};
 	static unrecognizedOptionErrorMessage = {
