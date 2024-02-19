@@ -22,9 +22,9 @@ class OptionsHandler {
 		"l2e"
 	];
 	//static isometricViewStages = [
-	// 	"cross", "f2l", "f2l_1", "f2l_2", "f2l_3", "f2l_sm",
-	// 	"cls", "cols", "els", "vls", "zbls", "vh", "wv",
-	// 	"fl", "line", "2x2x2", "2x2x3", "fb", "f2b"
+	// 	"f2l", "f2l_1", "f2l_2", "f2l_3", "f2l_sm",
+	// 	"cols",
+	// 	"line", "2x2x2", "2x2x3"
 	//];
 	static planView = "plan";
 	static isometricView = "isometric";
