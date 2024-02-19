@@ -195,10 +195,10 @@ class OptionsHelpEmbedBuilder {
 		{
 			name: "stage",
 			value: {
-				english: "Hides some stickers of the puzzle to show a precise step (not yet supported by Holo-Cube). Valid options : "
+				english: "Hides some stickers of the puzzle to show a precise step. Valid options : "
 				+ `${OptionsHandler.planViewStages.map(option => `\`-${option}\``).join(", ")} (apply a "plan" view"), `
 				+ `${OptionsHandler.isometricViewStages.map(option => `\`-${option}\``).join(", ")} (apply an "isometric" view").`,
-				french: "Masque des stickers sur le puzzle pour montrer une étape précise (pas encore supporté par Holo-Cube). Options valides : "
+				french: "Masque des stickers sur le puzzle pour montrer une étape précise. Options valides : "
 				+ `${OptionsHandler.planViewStages.map(option => `\`-${option}\``).join(", ")} (appliquent une vue "plan"), `
 				+ `${OptionsHandler.isometricViewStages.map(option => `\`-${option}\``).join(", ")} (appliquent une vue "isometric").`
 			},
