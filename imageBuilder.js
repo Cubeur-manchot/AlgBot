@@ -61,6 +61,7 @@ class ImageBuilder {
 			},
 			drawingOptions: {
 				document: ImageBuilder.jsDomDocument,
+				view: view,
 				imageHeight: ImageBuilder.cubeImageSize,
 				imageWidth: ImageBuilder.cubeImageSize,
 				puzzleHeight: ImageBuilder.cubeImageSize * 0.8,
