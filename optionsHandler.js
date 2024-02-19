@@ -14,16 +14,17 @@ class OptionsHandler {
 		"vls", "hls", "ols", "wv", "sv", "mw", "cls", "jtle",
 		"zbls", "eols", "vhls", "els",
 		"eolr",
+		"f2l",
 		"cross",
 		"fb",
 		"sb",
 		"fl",
+		"cols",
 		"l2c",
 		"l2e"
 	];
 	//static isometricViewStages = [
-	// 	"f2l", "f2l_1", "f2l_2", "f2l_3", "f2l_sm",
-	// 	"cols",
+	//  "f2l_1", "f2l_2", "f2l_3", "f2l_sm",
 	// 	"line", "2x2x2", "2x2x3"
 	//];
 	static planView = "plan";
