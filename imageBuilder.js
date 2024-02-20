@@ -10,6 +10,18 @@ import {OptionsHandler} from "./optionsHandler.js";
 class ImageBuilder {
 	static jsDomDocument = new JSDOM().window.document;
 	static cubeImageSize = 150;
+	static holoCubeVerbosityLevels = {
+		off: 0,
+		errors: 1,
+		general: 2,
+		detailed: 3,
+		debug: 4
+	};
+	static holoCubeLoggerModes = {
+		console: "console",
+		htmlTag: "htmlTag",
+		none: "none"
+	};
 	constructor(algCommandHandler) {
 		this.algCommandHandler = algCommandHandler;
 	};
@@ -68,7 +80,8 @@ class ImageBuilder {
 				puzzleWidth: ImageBuilder.cubeImageSize * 0.8
 			},
 			logger: {
-				verbosity: 0
+				verbosity: ImageBuilder.holoCubeVerbosityLevels.off,
+				mode: ImageBuilder.holoCubeLoggerModes.console
 			}
 		});
 		let result = runner.run(optionsObject.isDo
