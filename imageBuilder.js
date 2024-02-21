@@ -22,6 +22,10 @@ class ImageBuilder {
 		htmlTag: "htmlTag",
 		none: "none"
 	};
+	static holoCubeStatuses = {
+		success: "success",
+		fail: "fail"
+	};
 	constructor(algCommandHandler) {
 		this.algCommandHandler = algCommandHandler;
 	};
@@ -89,7 +93,7 @@ class ImageBuilder {
 			: this.algCommandHandler.algManipulator.invertSequence(moveSequence)
 		);
 		switch (result.status) {
-			case "success":
+			case ImageBuilder.holoCubeStatuses.success:
 				let svg = result.svg;
 				let pngBuffer = await this.convertSvgSvgElementToPngBuffer(svg);
 				let fileName = "holoCubeImage.png";
@@ -99,7 +103,7 @@ class ImageBuilder {
 					attachment: attachment,
 					errors: []
 				};
-			case "fail":
+			case ImageBuilder.holoCubeStatuses.fail:
 				return {
 					errors: result.errors
 				};
