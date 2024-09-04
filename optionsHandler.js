@@ -29,13 +29,11 @@ class OptionsHandler {
 	//];
 	static planView = "plan";
 	static isometricView = "isometric";
-	static normalView = "normal";
 	static topDownView = "topDown";
 	static netView = "net";
 	static views = [
 		OptionsHandler.planView,
-		OptionsHandler.isometricView,
-		OptionsHandler.normalView,
+		OptionsHandler.isometricView
 		//OptionsHandler.topDownView, // todo activate when available
 		//OptionsHandler.netView // todo activate when available
 	];
