@@ -100,7 +100,7 @@ class AlgManipulator {
 		for (let moveSequenceChunk of splitMoveSequence) {
 			if (!separatorRegexp.test(moveSequenceChunk)) { // not structuring character (standard moves)
 				let moveSequenceCleanedChunk = [];
-				for (let word of moveSequenceChunk.split(" ").filter(word => word.length !== 0)) {
+				for (let word of moveSequenceChunk.split(/\s+/)) {
 					let moveMatches = word.match(movePatternsRegex);
 					if (moveMatches && moveMatches.join("").length === word.length) { // word is fully composed of known moves
 						moveSequenceCleanedChunk.push(moveMatches.join(" "));
