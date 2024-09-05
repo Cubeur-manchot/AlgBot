@@ -123,12 +123,17 @@ class OptionsHandler {
 		english: "Empty option",
 		french: "Option vide"
 	};
+	static invalidPuzzleSizeErrorMessage = {
+		english: "Puzzle size is too big (max = 34)",
+		french: "La taille du puzzle est trop grande (max = 34)"
+	};
 	constructor(algCommandHandler) {
 		this.algCommandHandler = algCommandHandler;
 		let language = this.algCommandHandler.commandHandler.messageHandler.algBot.language;
 		this.unrecognizedOptionErrorMessage = OptionsHandler.unrecognizedOptionErrorMessage[language];
 		this.wrongOptionStartErrorMessage = OptionsHandler.wrongOptionStartErrorMessage[language];
 		this.emptyOptionErrorMessage = OptionsHandler.emptyOptionErrorMessage[language];
+		this.invalidPuzzleSizeErrorMessage = OptionsHandler.invalidPuzzleSizeErrorMessage[language];
 	};
 	parseOptions = options => {
 		let optionsResult = structuredClone(OptionsHandler.defaultOptions);
@@ -148,7 +153,14 @@ class OptionsHandler {
 					message: this.emptyOptionErrorMessage
 				});
 			} else if (/^\d+$/.test(option)) { // only regular cubes are supported
-				optionsResult.puzzle = `cube${option}x${option}x${option}`;
+				if (parseInt(option) <= 34) {
+					optionsResult.puzzle = `cube${option}x${option}x${option}`;
+				} else {
+					optionsResult.errors.push({
+						option: option,
+						message: this.invalidPuzzleSizeErrorMessage
+					});
+				}
 			} else if (OptionsHandler.planViewStages.includes(option)) {
 				optionsResult.stage = option;
 				optionsResult.view = OptionsHandler.planView;
