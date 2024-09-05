@@ -207,8 +207,8 @@ class OptionsHelpEmbedBuilder {
 		{
 			name: "view",
 			value: {
-				english: "Force the view : `plan` or `isometric` (`normal` view is obsolete).",
-				french: "Force la vue : `plan` ou `isometric` (la vue `normal` est obsolète)."
+				english: "Force the view : `plan` or `isometric`.",
+				french: "Force la vue : `plan` ou `isometric`."
 			},
 			example: "sexy sledge -cmll -isometric"
 		},
