@@ -5,7 +5,6 @@ import {JSDOM} from "jsdom";
 import {Runner} from "../holocube.js";
 import xmlserializer from "xmlserializer";
 import sharp from "sharp";
-import {OptionsHandler} from "./optionsHandler.js";
 
 class ImageBuilder {
 	static jsDomDocument = new JSDOM().window.document;
@@ -31,37 +30,7 @@ class ImageBuilder {
 	};
 	buildPuzzleImage = async (moveSequence, optionsObject) => {
 		let cubeSize = parseInt(optionsObject.puzzle.match(/\d+/)[0]);
-		return optionsObject.imageGenerator === OptionsHandler.holoCubeImageGenerator
-		? await this.buildHoloCubeImage(moveSequence, optionsObject, cubeSize)
-		: this.buildVisualCubeImage(moveSequence, optionsObject, cubeSize);
-	}; 
-	buildVisualCubeImage = (moveSequence, optionsObject, cubeSize) => {
-		let urlBegin = "http://cube.rider.biz/visualcube.php";
-		let view = optionsObject.view === OptionsHandler.planView ? "&view=plan" : "";
-		let colorScheme = [
-			optionsObject.colorScheme.U,
-			optionsObject.colorScheme.R,
-			optionsObject.colorScheme.F,
-			optionsObject.colorScheme.D,
-			optionsObject.colorScheme.L,
-			optionsObject.colorScheme.B]
-			.map(color => color[0]) // keep first letter only
-			.join("");
-		let stage = optionsObject.stage;
-		let moveSequenceForVisualCube =
-			this.algCommandHandler.algManipulator.replaceInnerSliceMoves(
-				this.algCommandHandler.algManipulator.replaceMiddleSliceMoves(
-					optionsObject.isDo
-						? moveSequence
-						: this.algCommandHandler.algManipulator.invertSequence(moveSequence),
-					cubeSize)
-			)
-			.replace(/\s/g, "%20") // replace spaces
-			.replace(/'/g, "%27"); // replace apostrophes
-		return {
-			url: `${urlBegin}?fmt=png&size=${ImageBuilder.cubeImageSize}&bg=t${view}&pzl=${cubeSize}&sch=${colorScheme}&stage=${stage}&alg=${moveSequenceForVisualCube}`,
-			errors: []
-		};
+		return await this.buildHoloCubeImage(moveSequence, optionsObject, cubeSize);
 	};
 	buildHoloCubeImage = async (moveSequence, optionsObject, cubeSize) => {
 		let puzzleName = `cube${Array(3).fill(cubeSize).join("x")}`;

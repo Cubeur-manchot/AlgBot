@@ -187,8 +187,8 @@ class OptionsHelpEmbedBuilder {
 		{
 			name: "puzzle",
 			value: {
-				english: "Specifies a puzzle on which to show the alg. Valid puzzles : all cubes from 1 to 34 (limited to 10 for VisualCube).",
-				french: "Spécifie le puzzle sur lequel montrer l'algo. Puzzles valides : tous les cubes de 1 à 34 (limité à 10 pour VisualCube)."
+				english: "Specifies a puzzle on which to show the alg. Valid puzzles : all cubes from 1 to 34.",
+				french: "Spécifie le puzzle sur lequel montrer l'algo. Puzzles valides : tous les cubes de 1 à 34."
 			},
 			example: "4x4ollparity -4"
 		},

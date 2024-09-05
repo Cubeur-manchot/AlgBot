@@ -139,20 +139,6 @@ class AlgCommandHandler {
 			required: false
 		},
 		{
-			type: AlgCommandHandler.optionOptionType,
-			name: {
-				english: "image",
-				french: "image"
-			},
-			description: {
-				english: "Specifies the tool to generate the image",
-				french: "Spécifie l'outil pour générer l'image"
-			},
-			choices: OptionsHandler.imageGenerators
-				.map(imageGenerator => {return {name: `-${imageGenerator}`, value: `-${imageGenerator}`}}),
-			required: false
-		},
-		{
 			type: AlgCommandHandler.commentOptionType,
 			name: {
 				english: "comment",
