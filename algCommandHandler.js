@@ -113,6 +113,19 @@ class AlgCommandHandler {
 		{
 			type: AlgCommandHandler.optionOptionType,
 			name: {
+				english: "puzzle",
+				french: "puzzle"
+			},
+			description: {
+				english: "Simplifies the size of the puzzle",
+				french: "Simplifie la taille du puzzle"
+			},
+			choices: [3, 4, 5, 7, 2, 1, 10, 21, 34].map(layersCount => {return {name: `-${layersCount}`, value: `-${layersCount}`}}),
+			required: false
+		},
+		{
+			type: AlgCommandHandler.optionOptionType,
+			name: {
 				english: "merge",
 				french: "fusion"
 			},

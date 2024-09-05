@@ -185,7 +185,7 @@ class OptionsHandler {
 				optionsResult.errors.push({
 					option: option,
 					message: this.unrecognizedOptionErrorMessage
-				})
+				});
 			}
 		}
 		if (forcedView) {
