@@ -96,7 +96,7 @@ class AlgManipulator {
 		let stack = [{
 			partialMoveSequence: ""
 		}];
-		let movePatternsRegex = /([xyz]|\d+-\d+([RUFLDB]w|[rufldb])|\d*([RUFLDB]w?|[rufldbMESmes]))\d*'?(?!-)/g;
+		let movePatternsRegex = /([xyz]|\d+-\d+([RUFLDB]w|[rufldb])|\d*([RUFLDB]w?|[rufldbMES])|[mes])\d*'?(?!-)/g;
 		for (let moveSequenceChunk of splitMoveSequence) {
 			if (!separatorRegexp.test(moveSequenceChunk)) { // not structuring character (standard moves)
 				let moveSequenceCleanedChunk = [];
