@@ -79,6 +79,13 @@ class OptionsHandler {
 		"blue-yellow": {U: "blue", F: "yellow", R: "orange", D: "green", B: "white", L: "red"},
 		"blue-orange": {U: "blue", F: "orange", R: "white", D: "green", B: "red", L: "yellow"}
 	};
+	static standardParsingMode = "standardParsing";
+	static bigBlindParsingMode = "bigbld";
+	static teamBlindParsingMode = "teambld";
+	static parsingModes = [
+		OptionsHandler.standardParsingMode,
+		OptionsHandler.bigBlindParsingMode,
+		OptionsHandler.teamBlindParsingMode
 	];
 	static defaultOptions = {
 		holoCube: false,
@@ -100,6 +107,7 @@ class OptionsHandler {
 			B: "blue",
 			L: "orange"
 		},
+		parsingMode: OptionsHandler.standardParsingMode,
 		rotatable: false,
 		errors: []
 	};
@@ -157,6 +165,8 @@ class OptionsHandler {
 				optionsResult.mergeMoves = true;
 			} else if (OptionsHandler.colorSchemes[option]) {
 				optionsResult.colorScheme = OptionsHandler.colorSchemes[option];
+			} else if (OptionsHandler.parsingModes.includes(option)) {
+				optionsResult.parsingMode = option;
 			} else if (option === "rotatable") {
 				optionsResult.rotatable = true;
 			} else {

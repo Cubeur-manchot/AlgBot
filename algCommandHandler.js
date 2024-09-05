@@ -139,6 +139,19 @@ class AlgCommandHandler {
 			required: false
 		},
 		{
+			type: AlgCommandHandler.optionOptionType,
+			name: {
+				english: "parsing_mode",
+				french: "mode_de_parsing"
+			},
+			description: {
+				english: "Specify how to parse the moves",
+				french: "Spécifie comment parser les mouvements"
+			},
+			choices: OptionsHandler.parsingModes.map(parsingMode => {return {name: `-${parsingMode}`, value: `-${parsingMode}`}}),
+			required: false
+		},
+		{
 			type: AlgCommandHandler.commentOptionType,
 			name: {
 				english: "comment",
@@ -256,7 +269,16 @@ class AlgCommandHandler {
 		}
 		parsedOptions.isDo = isDo;
 		let cubeSize = parseInt(parsedOptions.puzzle.match(/\d+/)[0]);
-		// parse move sequence
+		// special move parsing (bigBLD and teamBLD)
+		switch (parsedOptions.parsingMode) {
+			case OptionsHandler.bigBlindParsingMode:
+				moves = this.algManipulator.replaceBigBlindMoves(moves);
+				break;
+			case OptionsHandler.teamBlindParsingMode:
+				moves = this.algManipulator.replaceTeamBlindMoves(moves);
+				break;
+		}
+		// parse move sequence (structure and known algs)
 		let parsedMoveSequence = this.algManipulator.parseMoveSequence(moves ?? "");
 		if (parsedMoveSequence.errors.length) {
 			return {

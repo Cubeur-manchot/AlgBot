@@ -37,10 +37,6 @@ class AlgManipulator {
 		english: "Wrong closing character",
 		french: "Mauvais caractère de fermeture"
 	};
-	static unrecognizedMoveErrorMessage = {
-		english: "Unrecognized move",
-		french: "Mouvement non reconnu"
-	};
 	static xAxisCommutingGroup = "xRLrlM";
 	static yAxisCommutingGroup = "yUDudE";
 	static zAxisCommutingGroup = "zFBfbS";
@@ -78,7 +74,6 @@ class AlgManipulator {
 		this.middleSeparatorOutOfBracketsErrorMessage = AlgManipulator.middleSeparatorOutOfBracketsErrorMessage[language];
 		this.closingNonOpenStructureErrorMessage = AlgManipulator.closingNonOpenStructureErrorMessage[language];
 		this.wrongClosingCharacterErrorMessage = AlgManipulator.wrongClosingCharacterErrorMessage[language];
-		this.unrecognizedMoveErrorMessage = AlgManipulator.unrecognizedMoveErrorMessage[language];
 	};
 	parseMoveSequence = moveSequenceString => {
 		let errors = [];
@@ -100,20 +95,12 @@ class AlgManipulator {
 		for (let moveSequenceChunk of splitMoveSequence) {
 			if (!separatorRegexp.test(moveSequenceChunk)) { // not structuring character (standard moves)
 				let moveSequenceCleanedChunk = [];
-				for (let word of moveSequenceChunk.split(/\s+/)) {
+				for (let word of moveSequenceChunk.split(/\s+/g)) {
 					let moveMatches = word.match(movePatternsRegex);
 					if (moveMatches && moveMatches.join("").length === word.length) { // word is fully composed of known moves
 						moveSequenceCleanedChunk.push(moveMatches.join(" "));
 					} else {
-						let alg = this.algCollection.findAlg(word.toLowerCase());
-						if (alg) {
-							moveSequenceCleanedChunk.push(alg);
-						} else {
-							errors.push({
-								scope: word,
-								message: this.unrecognizedMoveErrorMessage
-							});
-						}
+						moveSequenceCleanedChunk.push(this.algCollection.findAlg(word.toLowerCase()) ?? word); // pushes the algorithm found, otherwise the raw word hoping it will be replaced later with either -teambld or -bigbld option
 					}
 				}
 				stack[stack.length - 1].partialMoveSequence += ` ${moveSequenceCleanedChunk.join(" ")}`;
@@ -254,6 +241,34 @@ class AlgManipulator {
 					return move;
 				}
 			})
+			.join(" ");
+	};
+	replaceBigBlindMoves = moveSequence => {
+		return moveSequence
+			.split(" ")
+			.map(move => /^[ufrdbl]/.test(move) ? `2${move.toUpperCase}` : move) // moves u, f, r, d, b, l are replaced with 2U, 2F, 2R, 2D, 2B, 2L
+			.join(" ");
+	};
+	replaceTeamBlindMoves = moveSequence => {
+		let replacements = {
+			"right": "y", "droite": "y", "left": "y'", "gauche": "y'", "top": "x'", "haut": "x'", "bottom": "x", "bas": "x", // rotations
+			"1p": "R' U R", "2p": "R U' R'", "3p": "L' U L", "4p": "L U' L'", // simple insertions
+			"1g": "R' U2 R", "2g": "R U2 R'", "3g": "L' U2 L", "4g": "L U2 L'", // "big" insertions
+			"1s": "R' U' R", "2s": "R U R'", "3s": "L' U' L", "4s": "L U L'", // splitted pair insertions
+			"1pp": "R' U R U' R' U R", "2pp": "R U' R' U R U' R'", "3pp": "L' U L U' L' U L", "4pp": "L U' L' U L U' L'", // double simple insertions
+			"1ss": "R' U' R U R' U' R", "2ss": "R U R' U' R U R'", "3ss": "L' U' L U L' U' L", "4ss": "L U L' U' L U L'", // double splitted pair insertions
+			"1ppp": "R' U R U' R' U R U' R' U R", "2ppp": "R U R' U' R U R' U' R U R'", "3ppp": "L' U L U' L' U L U' L' U L", "4ppp": "L U' L' U L U' L' U L U' L'", // triple simple insertions
+			"1sss": "R' U' R U R' U' R U R' U' R", "2sss": "R U R' U' R U R' U' R U R'", "3sss": "L' U' L U L' U' L U L' U' L", "4sss": "L U L' U' L U L' U' L U L'", // triple splitted pair insertions
+			"1sledge": "R B' R' B", "2sledge": "R' F R F'", "3sledge": "L F' L' F", "4sledge": "L' B L B'", // sledges
+			"1doublesledge": "R B' R' B R B' R' B", "2doublesledge": "R' F R F' R' F R F'", "3doublesledge": "L F' L' F L F' L' F", "4doublesledge": "L' B L B' L' B L B'", // double sledges
+			"1triplesledge": "R B' R' B R B' R' B R B' R' B", "2triplesledge": "R' F R F' R' F R F' R' F R F'", "3triplesledge": "L F' L' F L F' L' F L F' L' F", "4triplesledge": "L' B L B' L' B L B' L' B L B'", // triple sledges
+			"1hedge": "B' R B R'", "2hedge": "F R' F' R", "3hedge": "F' L F L'", "4hedge": "B L' B' L", // hedges
+			"1doublehedge": "B' R B R' B' R B R'", "2doublehedge": "F R' F' R F R' F' R", "3doublehedge": "F' L F L' F' L F L'", "4doublehedge": "B L' B' L B L' B' L", // double hedges
+			"1triplehedge": "B' R B R' B' R B R' B' R B R'", "2triplehedge": "F R' F' R F R' F' R F R' F' R", "3triplehedge": "F' L F L' F' L F L' F' L F L'", "4triplehedge": "B L' B' L B L' B' L B L' B' L" // triple hedges
+		};
+		return moveSequence
+			.split(" ")
+			.map(move => replacements[move.toLowerCase()] ?? move)
 			.join(" ");
 	};
 	replaceInnerSliceMoves = moveSequence => {

@@ -245,6 +245,16 @@ class OptionsHelpEmbedBuilder {
 				french: "Permet de faire tourner le cube pour voir différents angles."
 			},
 			example: "f R' f' -rotatable"
+		},
+		{
+			name: "parsingMode",
+			value: {
+				english: "Allows to write algs with alternative or extentended notations. Valid options : "
+					+ `${OptionsHandler.parsingModes.map(option => `\`-${option}\``).join(", ")}.`,
+				french: "Permet d'écrire des mouvements avec des notations alternatives ou étendues. Options valides : "
+					+ `${OptionsHandler.parsingModes.map(option => `\`-${option}\``).join(", ")}.`,
+			},
+			example: "r Uw' l' Uw r' Uw' l Uw' -bigBLD"
 		}
 	];
 	static buildEmbed = (embedColor, language, prefix, highlightLanguage) => {
