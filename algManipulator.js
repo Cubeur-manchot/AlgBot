@@ -37,6 +37,10 @@ class AlgManipulator {
 		english: "Wrong closing character",
 		french: "Mauvais caractère de fermeture"
 	};
+	static invalidMovesErrorMessage = {
+		english: "Invalid moves",
+		french: "Mouvements invalides"
+	};
 	static xAxisCommutingGroup = "xRLrlM";
 	static yAxisCommutingGroup = "yUDudE";
 	static zAxisCommutingGroup = "zFBfbS";
@@ -74,6 +78,7 @@ class AlgManipulator {
 		this.middleSeparatorOutOfBracketsErrorMessage = AlgManipulator.middleSeparatorOutOfBracketsErrorMessage[language];
 		this.closingNonOpenStructureErrorMessage = AlgManipulator.closingNonOpenStructureErrorMessage[language];
 		this.wrongClosingCharacterErrorMessage = AlgManipulator.wrongClosingCharacterErrorMessage[language];
+		this.invalidMovesErrorMessage = AlgManipulator.invalidMovesErrorMessage[language];
 	};
 	parseMoveSequence = moveSequenceString => {
 		let errors = [];
@@ -96,11 +101,20 @@ class AlgManipulator {
 			if (!separatorRegexp.test(moveSequenceChunk)) { // not structuring character (standard moves)
 				let moveSequenceCleanedChunk = [];
 				for (let word of moveSequenceChunk.split(/\s+/g)) {
-					let moveMatches = word.match(movePatternsRegex);
-					if (moveMatches && moveMatches.join("").length === word.length) { // word is fully composed of known moves
-						moveSequenceCleanedChunk.push(moveMatches.join(" "));
+					let knownAlg = this.algCollection.findAlg(word.toLowerCase());
+					if (knownAlg) {
+						moveSequenceCleanedChunk.push(knownAlg);
 					} else {
-						moveSequenceCleanedChunk.push(this.algCollection.findAlg(word.toLowerCase()) ?? word); // pushes the algorithm found, otherwise the raw word hoping it will be replaced later with either -teambld or -bigbld option
+						let moveMatches = word.match(movePatternsRegex);
+						if (moveMatches && moveMatches.join("").length === word.length) { // word is fully composed of known moves
+							moveSequenceCleanedChunk.push(moveMatches.join(" "));
+						} else {
+							errors.push({
+								scope: moveSequenceChunk,
+								message: this.invalidMovesErrorMessage
+							});
+							break;
+						}
 					}
 				}
 				stack[stack.length - 1].partialMoveSequence += ` ${moveSequenceCleanedChunk.join(" ")}`;
