@@ -40,10 +40,13 @@ class MessageHandler {
 	};
 	messageIsAlgBotCommand = message => {
 		return message.content.startsWith(this.algBot.prefix)
-			&& !message.author.bot;
+			&& (!message.author.bot || this.messageIsMee7Message);
 	};
 	messageIsAlgBotMessage = message => {
 		return message.author.id === this.algBot.discordClient.user.id;
+	};
+	messageIsMee7Message = message => {
+		return message.author.id === "836691886218805270";
 	};
 	findAlgBotAnswer = message => {
 		return [...message.channel.messages.cache.values()].find(channelMessage =>
